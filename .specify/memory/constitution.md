@@ -209,6 +209,19 @@ Enmienda 4.3.0 → 4.4.0 (2026-10-10), decidida por el propietario del proyecto 
 - §20: pruebas nuevas de quién cambia y quién ve la foto, y de su eliminación
 - Principios modificados: ninguno renombrado. Secciones añadidas: §14.2. Eliminadas: ninguna
 - Pendientes: siguen abiertas las siete decisiones de la §28. La spec 007 implementa esta versión
+
+Enmienda 4.4.0 → 4.5.0 (2026-10-10), decidida por el propietario del proyecto en la spec 008:
+- §12.6 (nueva): ficha básica de cada PRESIDENTE, DIRECTIVO y ENTRENADOR (nombre, rol, foto de
+  perfil y categorías y equipos que entrena, sin documento ni contacto), que abre cualquier
+  integrante de su club; y esas personas cambian por sí mismas su celular, nombres, apellidos y
+  fecha de nacimiento, pero no su documento
+- §14.2: la foto de perfil de una cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR la ven los
+  integrantes de los clubes donde tiene ese rol; la de una cuenta de jugador sigue siendo privada
+- §8 (Jugador): de los entrenadores, presidentes y directivos de su club ve la ficha básica, y no
+  solo el nombre y los apellidos del entrenador
+- §20: pruebas ajustadas y nuevas de la ficha básica, de la foto de perfil y de los datos propios
+- Principios modificados: ninguno renombrado. Secciones añadidas: §12.6. Eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 008 implementa esta versión
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -795,7 +808,9 @@ Puede, únicamente sobre su propio jugador:
 
 - Consultar la ficha, el calendario, las convocatorias, las estadísticas y las evaluaciones.
 - Consultar su categoría, los equipos en los que está y quiénes son los entrenadores de su
-  categoría. De un entrenador solamente ve el nombre y los apellidos.
+  categoría.
+- Abrir la ficha básica de cualquier PRESIDENTE, DIRECTIVO o ENTRENADOR de su club (ver §12.6).
+  De ellos no ve nada más: ni documento ni datos de contacto.
 - Consultar el estado de cuenta y los recibos.
 - Pagar mensualidades y arbitrajes.
 - Confirmar asistencia a entrenamientos y partidos.
@@ -1151,6 +1166,28 @@ puede reenviarla o corregir su correo; no invita presidentes adicionales.
 Un club puede tener más de un PRESIDENTE. A un presidente adicional lo elige otro PRESIDENTE de
 ese mismo club, dándole el rol a alguien que ya está registrado en el club.
 
+### 12.6. Ficha básica y datos propios de presidentes, directivos y entrenadores
+
+Cada integrante con rol PRESIDENTE, DIRECTIVO o ENTRENADOR tiene una ficha básica en su club. Muestra
+únicamente:
+
+- Su nombre completo.
+- Su rol en ese club.
+- Su foto de perfil, o sus iniciales si no tiene (ver §14.2).
+- Las categorías activas que entrena en ese club y los equipos activos que dirige en cada una.
+
+No muestra ni entrega el documento, la fecha de nacimiento, el correo, el celular ni ningún otro
+dato de la cuenta.
+
+La abre cualquier integrante del mismo club, con cualquier rol, también la cuenta de un jugador.
+Nadie de otro club la abre, tampoco el DESARROLLADOR. Desde cada club se ven solo el rol, las
+categorías y los equipos de ese club.
+
+Estas personas cambian por sí mismas, desde su perfil, su celular, sus nombres, sus apellidos y su
+fecha de nacimiento, con las reglas del registro (ver §12.1). El cambio vale en todos sus clubes.
+El tipo y el número de documento no los cambian, porque con ellos se inicia sesión (ver §10 y
+§12.4). Los datos de una cuenta de jugador se siguen cambiando desde la ficha de su jugador.
+
 ## 13. Histórico operativo y financiero
 
 La información histórica no debe depender exclusivamente del estado actual de una entidad.
@@ -1263,8 +1300,12 @@ El retiro no es un estado de ingreso (ver §12.1.1): se expresa con Activo.
 ### 14.2. Foto del jugador
 
 Cada jugador tiene una foto propia, guardada en su ficha. Es distinta de la foto de perfil de la
-cuenta, que sigue siendo privada y solo la ve su dueño: los hermanos de una misma cuenta tienen
-cada uno la suya.
+cuenta: los hermanos de una misma cuenta tienen cada uno la suya.
+
+La foto de perfil de la cuenta solo la carga, cambia y quita su dueño. La de una cuenta con rol
+PRESIDENTE, DIRECTIVO o ENTRENADOR en un club la ven los integrantes de ese club, únicamente en su
+ficha básica y junto a su nombre (ver §12.6). La de una cuenta de jugador es privada y solo la ve
+su dueño. Nadie de otro club ni el DESARROLLADOR obtiene la foto de perfil de otra cuenta.
 
 - La cargan, cambian y quitan la propia cuenta, sobre su jugador, y el PRESIDENTE, sobre cualquier
   jugador de su club. Nadie más.
@@ -1568,7 +1609,14 @@ Las pruebas deben validar principalmente:
 - Que un PRESIDENTE o un DIRECTIVO asignado como entrenador conserva su único rol y su alcance.
 - Que un entrenador no accede a una categoría que no tiene asignada y sí ve todos los equipos de
   las suyas.
-- Que una cuenta de jugador solo ve su categoría, sus equipos y el nombre de sus entrenadores.
+- Que una cuenta de jugador solo ve su categoría, sus equipos, sus entrenadores y la ficha básica
+  de los presidentes, directivos y entrenadores de su club.
+- Que la ficha básica no entrega documento, fecha de nacimiento ni contacto, que la abre cualquier
+  integrante del club y que nadie de otro club ni el DESARROLLADOR la obtiene.
+- Que la foto de perfil de un PRESIDENTE, DIRECTIVO o ENTRENADOR solo la ven los integrantes de su
+  club, y que la de una cuenta de jugador solo la ve su dueño.
+- Que un PRESIDENTE, DIRECTIVO o ENTRENADOR cambia su celular, nombres, apellidos y fecha de
+  nacimiento, y que nadie cambia su documento.
 - Que solo se borra una categoría o un equipo que nunca tuvo jugadores ni entrenadores.
 - Que un jugador retirado no accede a ninguna información del club y conserva todos sus datos,
   salvo su foto.
@@ -1758,4 +1806,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.4.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-10
+**Versión**: 4.5.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-10
