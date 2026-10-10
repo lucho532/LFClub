@@ -8,6 +8,7 @@ Escribe:
   arranque (288 dp) y su giro desde Android 12.
 - frontend/android/.../mipmap-*/ic_launcher.png e ic_launcher_round.png: el icono de Android 7, que
   no usa el icono adaptable. Para rasterizarlo usa Chrome sin interfaz y Pillow.
+- frontend/public/favicon.svg, favicon-32.png y apple-touch-icon.png: el icono de la web.
 
 Uso, desde la raíz del repositorio: python scripts/generar-balon.py
 El balón tiene el estilo de paneles en estrella de un balón clásico, sin ninguna marca.
@@ -150,18 +151,9 @@ export const BRILLO = '{g['brillo']}';
 '''
 
 
-def iconos_png(g):
-    """Rasteriza el icono cuadrado y el redondo a 512 px con Chrome y los escala a cada densidad."""
-    tamanos = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
-    formas = {
-        'ic_launcher.png': f'<rect x="12" y="12" width="84" height="84" rx="18" fill="{FONDO}"/>',
-        'ic_launcher_round.png': f'<circle cx="54" cy="54" r="42" fill="{FONDO}"/>',
-    }
-    with tempfile.TemporaryDirectory() as temporal:
-        for nombre, forma in formas.items():
-            svg = os.path.join(temporal, nombre + '.svg')
-            png = os.path.join(temporal, nombre)
-            escribir(svg, f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 12 84 84" width="512" height="512">
+def svg_icono(g, forma):
+    """El balón sobre una forma de fondo, recortado al balón y a esa forma (lienzo 12..96)."""
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 12 84 84" width="512" height="512">
   {forma}
   <defs><clipPath id="b"><path d="{g['contorno']}"/></clipPath></defs>
   <path d="{g['contorno']}" fill="{BLANCO}"/>
@@ -171,12 +163,43 @@ def iconos_png(g):
     <path d="{g['brillo']}" fill="{BLANCO}" fill-opacity="0.45"/>
   </g>
   <path d="{g['contorno']}" fill="none" stroke="{BORDE}" stroke-width="1.2"/>
-</svg>''')
-            subprocess.run([CHROME, '--headless=new', '--disable-gpu', '--hide-scrollbars',
-                            '--default-background-color=00000000', f'--screenshot={png}',
-                            '--window-size=512,512', 'file:///' + svg.replace('\\', '/')],
-                           check=True, capture_output=True)
-            imagen = Image.open(png).convert('RGBA')
+</svg>'''
+
+
+FORMA_CUADRADA = f'<rect x="12" y="12" width="84" height="84" rx="18" fill="{FONDO}"/>'
+FORMA_REDONDA = f'<circle cx="54" cy="54" r="42" fill="{FONDO}"/>'
+
+
+def rasterizar(svg_texto, carpeta, nombre):
+    """PNG de 512 px con fondo transparente, dibujado por Chrome sin interfaz."""
+    svg = os.path.join(carpeta, nombre + '.svg')
+    png = os.path.join(carpeta, nombre + '.png')
+    escribir(svg, svg_texto)
+    subprocess.run([CHROME, '--headless=new', '--disable-gpu', '--hide-scrollbars',
+                    '--default-background-color=00000000', f'--screenshot={png}',
+                    '--window-size=512,512', 'file:///' + svg.replace(os.sep, '/')],
+                   check=True, capture_output=True)
+    return Image.open(png).convert('RGBA')
+
+
+def favicon(g):
+    """El balón solo, sin fondo, en SVG para los navegadores y en PNG para los que no lo leen."""
+    publica = os.path.join(FRONTEND, 'public')
+    solo = svg_icono(g, '').replace('viewBox="12 12 84 84"', 'viewBox="23 23 62 62"')
+    escribir(os.path.join(publica, 'favicon.svg'), solo.replace(' width="512" height="512"', ''))
+    with tempfile.TemporaryDirectory() as temporal:
+        rasterizar(solo, temporal, 'favicon').resize((32, 32), Image.LANCZOS).save(
+            os.path.join(publica, 'favicon-32.png'))
+        rasterizar(svg_icono(g, FORMA_CUADRADA.replace('rx="18"', 'rx="0"')), temporal, 'apple').resize(
+            (180, 180), Image.LANCZOS).save(os.path.join(publica, 'apple-touch-icon.png'))
+
+
+def iconos_png(g):
+    """Rasteriza el icono cuadrado y el redondo de Android 7 y los escala a cada densidad."""
+    tamanos = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
+    with tempfile.TemporaryDirectory() as temporal:
+        for nombre, forma in (('ic_launcher.png', FORMA_CUADRADA), ('ic_launcher_round.png', FORMA_REDONDA)):
+            imagen = rasterizar(svg_icono(g, forma), temporal, nombre)
             for carpeta, lado in tamanos.items():
                 imagen.resize((lado, lado), Image.LANCZOS).save(os.path.join(RES, f'mipmap-{carpeta}', nombre))
 
@@ -190,6 +213,7 @@ def main():
              vector(g, 288, 'Balón de La Pecosa: pantalla de arranque, dentro del círculo de 192 dp.'))
     escribir(os.path.join(RES, 'drawable', 'balon_arranque_animado.xml'), ANIMADO)
     iconos_png(g)
+    favicon(g)
     print('Balón generado.')
 
 
