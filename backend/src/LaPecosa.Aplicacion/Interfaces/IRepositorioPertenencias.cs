@@ -3,11 +3,13 @@ using LaPecosa.Dominio.Entidades;
 namespace LaPecosa.Aplicacion.Interfaces;
 
 /// <summary>
-/// Representa las consultas de la propia cuenta que cruzan clubes por necesidad: iniciar sesión y
-/// elegir club (constitución §7.1, segunda excepción).
-/// Su responsabilidad es responder, siempre acotado a una cuenta o a un documento, a qué clubes
-/// pertenece una cuenta, cuáles son sus integrantes en uno de ellos (puede tener varios: los
-/// hermanos) y de qué cuenta es un documento.
+/// Representa las consultas que cruzan clubes por necesidad: las de la propia cuenta para iniciar
+/// sesión y elegir club, y las del número de documento de un jugador que pasa a otra cuenta
+/// (constitución §7.1, segunda y cuarta excepción).
+/// Su responsabilidad es responder, siempre acotado a una cuenta o a números de documento, a qué
+/// clubes pertenece una cuenta, cuáles son sus integrantes en uno de ellos (puede tener varios: los
+/// hermanos) y qué integrantes tienen un número, en cualquier club. Un mismo número puede estar en
+/// dos cuentas, en clubes distintos (§10).
 /// No lista integrantes de un club ni entrega datos de un club a quien no pertenece a él.
 /// </summary>
 public interface IRepositorioPertenencias
@@ -28,8 +30,21 @@ public interface IRepositorioPertenencias
     /// </summary>
     Task<UsuarioRol?> ObtenerAsync(Guid usuarioId, Guid clubId, CancellationToken cancelacion = default);
 
-    /// <summary>Cuenta dueña de un número de documento ya normalizado; nulo si nadie lo tiene.</summary>
+    /// <summary>
+    /// Una cuenta que tiene ese número de documento ya normalizado; nulo si nadie lo tiene. Con el
+    /// número en dos cuentas devuelve una cualquiera, así que solo sirve para saber si el número
+    /// tiene dueño. Para decidir entre cuentas, <see cref="ListarPorDocumentosAsync"/>.
+    /// </summary>
     Task<Usuario?> ObtenerCuentaPorDocumentoAsync(string numeroDocumento, CancellationToken cancelacion = default);
+
+    /// <summary>
+    /// Todos los integrantes que tienen alguno de esos números de documento ya normalizados, en
+    /// todos los clubes, en una sola consulta y sin seguirlos. Es la única lectura que cruza clubes
+    /// sin estar acotada a una cuenta, y lo está siempre a números de documento (§7.1, cuarta
+    /// excepción). Con la colección vacía no consulta.
+    /// </summary>
+    Task<IReadOnlyList<UsuarioRol>> ListarPorDocumentosAsync(
+        IReadOnlyCollection<string> numerosNormalizados, CancellationToken cancelacion = default);
 
     /// <summary>
     /// Identificadores de los integrantes de esa cuenta que tienen ese número de documento ya

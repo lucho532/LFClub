@@ -5,7 +5,11 @@ using LaPecosa.Pruebas.Integracion.Base;
 
 namespace LaPecosa.Pruebas.Integracion.Plataforma;
 
-/// <summary>Solo el DESARROLLADOR cambia los colores de un club (constitución §20, RF-008).</summary>
+/// <summary>
+/// Desde el panel, solo el DESARROLLADOR cambia los colores de un club (constitución §20, RF-008). El
+/// PRESIDENTE cambia los de su propio club por la ruta del club (spec 007, que deja sin efecto el
+/// escenario 2 de la historia 4 de la 001): ver <c>IdentidadPorElPresidentePruebas</c>.
+/// </summary>
 [Collection(ColeccionApi.Nombre)]
 public class ColoresPruebas
 {
@@ -58,7 +62,7 @@ public class ColoresPruebas
     }
 
     [Fact]
-    public async Task Ni_el_presidente_del_propio_club_puede_cambiar_los_colores()
+    public async Task El_presidente_no_usa_la_ruta_del_panel_para_los_colores()
     {
         var club = await _fabrica.Sembrador.CrearClubAsync();
         var (presidente, _) = await _fabrica.Sembrador.CrearIntegranteAsync(club, Rol.PRESIDENTE);

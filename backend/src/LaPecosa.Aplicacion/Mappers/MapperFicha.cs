@@ -22,14 +22,16 @@ public static class MapperFicha
     /// <summary>
     /// La ficha de ese jugador, que debe venir con su cuenta, su categoría y sus equipos cargados.
     /// <paramref name="ficha"/> es nulo si nadie la ha cambiado; <paramref name="entregados"/> solo
-    /// se usa si el alcance permite ver los documentos; <paramref name="hoy"/> decide si es menor.
+    /// se usa si el alcance permite ver los documentos; <paramref name="hoy"/> decide si es menor;
+    /// <paramref name="fotoActualizadaEn"/> es la fecha de su foto, o nula si no tiene.
     /// </summary>
     public static FichaJugadorDto AFicha(
         UsuarioRol jugador,
         FichaJugador? ficha,
         IReadOnlyList<DocumentoEntregado> entregados,
         AlcanceDeFicha alcance,
-        DateOnly hoy)
+        DateOnly hoy,
+        DateTime? fotoActualizadaEn)
     {
         var cuenta = jugador.Usuario
             ?? throw new InvalidOperationException("El jugador debe venir con su cuenta cargada.");
@@ -52,7 +54,8 @@ public static class MapperFicha
             alcance.VeDatosClinicos ? DatosClinicos(ficha) : null,
             alcance.VeDocumentos ? Documentos(entregados) : null,
             ficha is null ? null : UltimoCambio(ficha, jugador),
-            new PermisosDeFichaDto(alcance.Cambia, alcance.CorrigeIdentidad));
+            new PermisosDeFichaDto(alcance.Cambia, alcance.CorrigeIdentidad),
+            fotoActualizadaEn);
     }
 
     private static List<string> Equipos(UsuarioRol jugador) => jugador.Equipos

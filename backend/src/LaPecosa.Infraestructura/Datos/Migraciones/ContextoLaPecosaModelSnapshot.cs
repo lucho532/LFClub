@@ -331,6 +331,33 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.ToTable("FichasJugador", (string)null);
                 });
 
+            modelBuilder.Entity("LaPecosa.Dominio.Entidades.FotoJugador", b =>
+                {
+                    b.Property<Guid>("UsuarioRolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uuid");
+
+                    b.Property<byte[]>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTime>("GuardadaEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TipoContenido")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("UsuarioRolId");
+
+                    b.HasIndex("ClubId");
+
+                    b.ToTable("FotosJugador", (string)null);
+                });
+
             modelBuilder.Entity("LaPecosa.Dominio.Entidades.FotoPerfil", b =>
                 {
                     b.Property<Guid>("UsuarioId")
@@ -752,6 +779,25 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.HasOne("LaPecosa.Dominio.Entidades.UsuarioRol", "UsuarioRol")
                         .WithOne()
                         .HasForeignKey("LaPecosa.Dominio.Entidades.FichaJugador", "UsuarioRolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Club");
+
+                    b.Navigation("UsuarioRol");
+                });
+
+            modelBuilder.Entity("LaPecosa.Dominio.Entidades.FotoJugador", b =>
+                {
+                    b.HasOne("LaPecosa.Dominio.Entidades.Club", "Club")
+                        .WithMany()
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LaPecosa.Dominio.Entidades.UsuarioRol", "UsuarioRol")
+                        .WithOne()
+                        .HasForeignKey("LaPecosa.Dominio.Entidades.FotoJugador", "UsuarioRolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

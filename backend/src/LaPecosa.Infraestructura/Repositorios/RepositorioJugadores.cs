@@ -59,6 +59,13 @@ public class RepositorioJugadores : IRepositorioJugadores
                 cancelacion);
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<UsuarioRol>> ListarDelClubAsync(CancellationToken cancelacion = default) =>
+        await Jugadores.AsNoTracking()
+            .Include(jugador => jugador.Categoria)
+            .Include(jugador => jugador.Equipos).ThenInclude(fila => fila.Equipo)
+            .ToListAsync(cancelacion);
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<UsuarioRol>> ListarSinCategoriaAsync(CancellationToken cancelacion = default) =>
         await Jugadores.AsNoTracking().Where(jugador => jugador.CategoriaId == null).ToListAsync(cancelacion);
 

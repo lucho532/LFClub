@@ -6,8 +6,8 @@ namespace LaPecosa.Pruebas.Integracion.Categorias;
 
 /// <summary>
 /// Solamente el PRESIDENTE crea, desactiva, reactiva y borra categorías y equipos, asigna
-/// entrenadores, cambia a un jugador de categoría o de equipo y retira o reincorpora jugadores
-/// (constitución §20, RF-036, CE-006). Recorre todos los endpoints de escritura que la propia API
+/// entrenadores, cambia a un jugador de categoría o de equipo y reincorpora jugadores
+/// (constitución §20, RF-036, CE-006). Retirar es también de la familia desde la 006. Recorre todos los endpoints de escritura que la propia API
 /// expone, con identificadores reales, así que uno nuevo queda cubierto sin tocar esta prueba.
 /// </summary>
 [Collection(ColeccionApi.Nombre)]
@@ -24,12 +24,18 @@ public class SoloPresidentePruebas
     /// Endpoints de categorías y jugadores que cambian algo. La ficha del jugador (005) comparte el
     /// prefijo de ruta pero no es de esta funcionalidad: la cambia también la familia, y quién puede
     /// hacerlo se prueba en <c>Ficha/SoloLecturaPruebas</c>. Lo mismo agregar un hermano (006), que
-    /// es de la familia y se prueba en <c>Hermanos/QuienAgregaPruebas</c>.
+    /// es de la familia y se prueba en <c>Hermanos/QuienAgregaPruebas</c>, y retirar a un jugador,
+    /// que desde la 006 hace también su propia cuenta y se prueba en
+    /// <c>Categorias/RetiroJugadorPruebas</c> y <c>Hermanos/FamiliaRetiraPruebas</c>. Y la foto del
+    /// jugador (007), que como la ficha cambia también la familia y se prueba en
+    /// <c>Jugadores/FotoJugadorPruebas</c>.
     /// </summary>
     private List<Endpoint> DeEscritura => EndpointsDeLaApi.DeLaApi(_fabrica)
         .Where(endpoint => endpoint.Metodo != "GET"
             && !endpoint.Ruta.Contains("/ficha", StringComparison.Ordinal)
+            && !endpoint.Ruta.EndsWith("/foto", StringComparison.Ordinal)
             && !endpoint.Ruta.EndsWith("/hermanos", StringComparison.Ordinal)
+            && !endpoint.Ruta.EndsWith("/retiro", StringComparison.Ordinal)
             && (endpoint.Ruta.StartsWith("/api/clubes/{clubId}/categorias", StringComparison.Ordinal)
                 || endpoint.Ruta.StartsWith("/api/clubes/{clubId}/jugadores", StringComparison.Ordinal)))
         .ToList();
@@ -47,7 +53,7 @@ public class SoloPresidentePruebas
         var (enEspera, _) = await e.Sembrar.CrearJugadorEnEsperaAsync(e.Club, 2014);
         var delJugador = await _fabrica.CrearClienteDePrueba().ConSesionDeAsync(usuarioJugador);
         var delQueEspera = await _fabrica.CrearClienteDePrueba().ConSesionDeAsync(enEspera);
-        Assert.Equal(16, DeEscritura.Count);
+        Assert.Equal(15, DeEscritura.Count);
 
         // Los más cercanos a tener permiso: quien consulta todo, quien entrena esa categoría y dirige
         // ese equipo, y un jugador de esa categoría y de ese equipo.

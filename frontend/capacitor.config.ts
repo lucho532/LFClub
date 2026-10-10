@@ -15,6 +15,9 @@ const config: CapacitorConfig = {
   appId: 'com.lapecosa.app',
   appName: 'La Pecosa',
   webDir: 'dist',
+  // El fondo de la pantalla de arranque (values/colores_arranque.xml): mientras la web carga no se
+  // ve un destello blanco entre el arranque nativo y la animación de src/arranque.
+  backgroundColor: '#231F1E',
   ...(servidorDesarrollo ? { server: { url: servidorDesarrollo, cleartext: true } } : {}),
 };
 

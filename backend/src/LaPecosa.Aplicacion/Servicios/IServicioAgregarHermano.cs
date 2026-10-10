@@ -18,9 +18,10 @@ public interface IServicioAgregarHermano
     /// que hace la petición; si no, <c>404 no_encontrado</c>. Devuelve el hermano y si se creó: es
     /// falso cuando ese documento ya era de un jugador en espera de la misma cuenta en el club, que
     /// se devuelve sin cambiar nada. Datos no válidos: <c>400 datos_invalidos</c>. Documento de
-    /// otro integrante del club: <c>409 documento_repetido_en_club</c>. Documento de otra cuenta:
-    /// <c>409 documento_en_otra_cuenta</c>.
+    /// otro integrante del club: <c>409 documento_repetido_en_club</c>. Documento que otra cuenta
+    /// tiene en un rol que no es JUGADOR: <c>409 documento_en_otra_cuenta</c>. El de un jugador de
+    /// otra cuenta se admite, y el hermano lleva el aviso de si aprobarlo lo retirará de otro club.
     /// </summary>
-    Task<(JugadorDeSesionDto Hermano, bool Creado)> AgregarAsync(
+    Task<(HermanoAgregadoDto Hermano, bool Creado)> AgregarAsync(
         Guid usuarioRolId, UsuarioRol quienPregunta, AgregarHermanoDto datos, CancellationToken cancelacion = default);
 }

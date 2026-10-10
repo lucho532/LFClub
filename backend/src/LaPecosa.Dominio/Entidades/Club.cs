@@ -4,7 +4,9 @@ namespace LaPecosa.Dominio.Entidades;
 
 /// <summary>
 /// Representa una escuela o equipo que usa la plataforma.
-/// Su responsabilidad es guardar la configuración, la identidad y el estado actual del club.
+/// Su responsabilidad es guardar la configuración, la identidad y el estado actual del club. La
+/// identidad (colores y escudo) la cambian el DESARROLLADOR desde el panel y el PRESIDENTE desde
+/// "Datos del club" (constitución §7.2); vale el último cambio.
 /// No guarda el escudo (va aparte para no cargarlo en cada consulta) ni un historial de estados
 /// (§18): solo quién hizo el último cambio y cuándo.
 /// </summary>

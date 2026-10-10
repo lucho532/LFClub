@@ -1,4 +1,6 @@
+import { useCallback, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { ArranqueAnimado } from './arranque/ArranqueAnimado';
 import { ProveedorSesion } from './compartido/sesion/ProveedorSesion';
 import { RutaProtegida } from './compartido/sesion/RutaProtegida';
 import { ProveedorTema } from './compartido/tema/ProveedorTema';
@@ -18,11 +20,21 @@ import { DisposicionClub } from './privado/DisposicionClub';
 import { FichaJugador } from './privado/ficha/FichaJugador';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
+import { ListaJugadores } from './privado/jugadores/ListaJugadores';
 
-/** Rutas de la aplicación: las de la tabla "Pantallas" del plan. */
-export function App() {
+interface Props {
+  /** Si se muestra la animación de arranque encima mientras la aplicación carga (solo en Android). */
+  conArranque?: boolean;
+}
+
+/** Rutas de la aplicación: las de la tabla "Pantallas" del plan, con la animación de arranque encima. */
+export function App({ conArranque = false }: Props) {
+  const [arranque, setArranque] = useState(conArranque);
+  const terminarArranque = useCallback(() => setArranque(false), []);
+
   return (
     <ProveedorTema>
+      {arranque && <ArranqueAnimado alTerminar={terminarArranque} />}
       <ProveedorSesion>
         <BrowserRouter>
           <Routes>
@@ -50,6 +62,7 @@ export function App() {
                 <Route path="ingresos" element={<Ingresos />} />
                 <Route path="categorias" element={<Categorias />} />
                 <Route path="categorias/:categoriaId" element={<DetalleCategoria />} />
+                <Route path="jugadores" element={<ListaJugadores />} />
                 <Route path="jugadores/:usuarioRolId/ficha" element={<FichaJugador />} />
               </Route>
             </Route>

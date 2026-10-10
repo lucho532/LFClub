@@ -131,6 +131,7 @@ public class EliminarClubPruebas
         await _fabrica.Fichas.CrearFichaAsync(jugador);
         await _fabrica.Fichas.CrearDocumentoAsync(
             jugador, DocumentoPedido.CERTIFICADO_SALUD, SembradorFichas.Pdf(), "application/pdf");
+        await _fabrica.Jugadores.PonerFotoAsync(jugador, Imagenes.Png());
     }
 
     private Task<bool> ExisteClubAsync(Guid clubId) =>

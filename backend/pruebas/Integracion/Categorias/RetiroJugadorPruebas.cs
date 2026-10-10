@@ -167,20 +167,27 @@ public class RetiroJugadorPruebas
         Assert.Null((await e.IntegranteGuardadoAsync(e.IntegranteJugador.Id))!.RetiradoPorUsuarioId);
     }
 
+    // RF-042 y RF-043 de la 006: también se retira la cuenta del propio jugador, a nadie más.
     [Fact]
-    public async Task Solo_el_presidente_de_ese_club_retira_y_reincorpora_y_el_directivo_solo_ve_la_lista()
+    public async Task Retiran_el_presidente_y_el_propio_jugador_solo_el_presidente_reincorpora_y_el_directivo_solo_ve_la_lista()
     {
         var e = await EscenarioCategorias.CrearAsync(_fabrica);
         var (_, retirado) = await e.Sembrar.CrearJugadorAsync(e.Club, 2015);
+        var (_, otroJugador) = await e.Sembrar.CrearJugadorAsync(e.Club, 2015);
         await e.Sembrar.RetirarAsync(retirado, e.IntegrantePresidente);
 
         Assert.Single(await e.Directivo.ListaAsync(e.Retirados));
-        foreach (var (_, cliente) in e.QuienesNoGestionan)
+        foreach (var cliente in new[] { e.Directivo, e.Entrenador })
         {
             await AislamientoCategoriasPruebas.ComprobarAsync(cliente, HttpStatusCode.Forbidden, "rol_no_autorizado",
                 ("POST", e.Retiro(e.IntegranteJugador.Id), null),
                 ("POST", e.Reincorporacion(retirado.Id), null));
         }
+
+        await AislamientoCategoriasPruebas.ComprobarAsync(
+            e.Jugador, HttpStatusCode.Forbidden, "rol_no_autorizado", ("POST", e.Reincorporacion(retirado.Id), null));
+        await AislamientoCategoriasPruebas.ComprobarAsync(
+            e.Jugador, HttpStatusCode.NotFound, "no_encontrado", ("POST", e.Retiro(otroJugador.Id), null));
 
         foreach (var cliente in new[] { e.Entrenador, e.Jugador })
         {
@@ -194,7 +201,10 @@ public class RetiroJugadorPruebas
             ("POST", $"{enSuClub}/{retirado.Id}/reincorporacion", null));
         Assert.Empty(await e.PresidenteDeOtroClub.ListaAsync($"{enSuClub}/retirados"));
 
-        Assert.True((await e.IntegranteGuardadoAsync(e.IntegranteJugador.Id))!.Activo);
+        Assert.True((await e.IntegranteGuardadoAsync(otroJugador.Id))!.Activo);
         Assert.False((await e.IntegranteGuardadoAsync(retirado.Id))!.Activo);
+
+        Assert.Equal(HttpStatusCode.NoContent, (await e.Jugador.PostAsync(e.Retiro(e.IntegranteJugador.Id))).StatusCode);
+        Assert.False((await e.IntegranteGuardadoAsync(e.IntegranteJugador.Id))!.Activo);
     }
 }

@@ -22,6 +22,8 @@ public class SembradorHermanos
     /// Un hermano de ese jugador: misma cuenta y mismo club, rol JUGADOR, documento único, agregado
     /// desde él y creado después que él. Por defecto queda en espera, como al agregarlo desde la
     /// ficha; con <paramref name="activo"/> en falso queda retirado. Puede nacer ya en una categoría.
+    /// Con <paramref name="numeroDocumento"/> lleva ese número en lugar de uno único: el de un
+    /// jugador de otra cuenta, como lo deja agregar un hermano desde la 006 (RF-034).
     /// </summary>
     public Task<UsuarioRol> CrearHermanoAsync(
         UsuarioRol origen,
@@ -29,7 +31,8 @@ public class SembradorHermanos
         DateOnly? fechaNacimiento = null,
         bool activo = true,
         string nombres = "Luis",
-        Categoria? categoria = null) => _fabrica.ConContextoAsync(async contexto =>
+        Categoria? categoria = null,
+        string? numeroDocumento = null) => _fabrica.ConContextoAsync(async contexto =>
         {
             var ahora = DateTime.UtcNow;
             var hermano = new UsuarioRol
@@ -41,7 +44,7 @@ public class SembradorHermanos
                 Nombres = nombres,
                 Apellidos = origen.Apellidos,
                 TipoDocumento = TipoDocumento.TARJETA_IDENTIDAD,
-                NumeroDocumento = NormalizadorTexto.Documento(Sembrador.Unico("doc")),
+                NumeroDocumento = NormalizadorTexto.Documento(numeroDocumento ?? Sembrador.Unico("doc")),
                 FechaNacimiento = fechaNacimiento ?? origen.FechaNacimiento,
                 AgregadoDesdeUsuarioRolId = origen.Id,
                 CategoriaId = categoria?.Id,

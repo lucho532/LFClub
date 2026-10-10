@@ -61,6 +61,15 @@ export function IconoCategorias() {
   );
 }
 
+export function IconoJugadores() {
+  return (
+    <Icono>
+      <path d="M8 3 3.5 5.5 5 10l2-.8V21h10V9.2l2 .8 1.5-4.5L16 3" />
+      <path d="M8 3c.6 1.7 2.2 2.8 4 2.8S15.4 4.7 16 3" />
+    </Icono>
+  );
+}
+
 export function IconoDatosClub() {
   return (
     <Icono>

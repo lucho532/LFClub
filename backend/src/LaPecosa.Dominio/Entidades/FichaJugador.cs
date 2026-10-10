@@ -7,7 +7,9 @@ namespace LaPecosa.Dominio.Entidades;
 /// la seguridad social, los datos clínicos y quién la cambió por última vez.
 /// Su responsabilidad es guardar esos datos, todos opcionales (RF-002), y el sello del último
 /// cambio, que sustituye al anterior (RF-038). Hay como mucho una por jugador y club, y la fila
-/// nace con el primer cambio: una ficha que nadie ha cambiado no tiene fila.
+/// nace con el primer cambio: una ficha que nadie ha cambiado no tiene fila. Cargar o quitar la foto
+/// del jugador también sella el último cambio, aunque la foto vive en otra tabla
+/// (<see cref="FotoJugador"/>).
 /// No guarda la identidad, la categoría ni los equipos, que viven en <see cref="UsuarioRol"/>, ni
 /// el correo, el celular ni el responsable, que son de la cuenta (<see cref="Usuario"/>). No guarda
 /// los archivos (<see cref="DocumentoJugador"/>), ni historial, ni valores anteriores (§18).

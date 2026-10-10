@@ -34,6 +34,7 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioUsuarios, RepositorioUsuarios>();
         servicios.AddScoped<IRepositorioSolicitudesRecuperacion, RepositorioSolicitudesRecuperacion>();
         servicios.AddScoped<IRepositorioPertenencias, RepositorioPertenencias>();
+        servicios.AddScoped<IRepositorioRetiroEntreClubes, RepositorioRetiroEntreClubes>();
         servicios.AddScoped<IRepositorioClub, RepositorioClub>();
         servicios.AddScoped<IRepositorioEscudos, RepositorioEscudos>();
         servicios.AddScoped<IRepositorioFotosPerfil, RepositorioFotosPerfil>();
@@ -48,6 +49,8 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioAsignaciones, RepositorioAsignaciones>();
         servicios.AddScoped<IRepositorioFichas, RepositorioFichas>();
         servicios.AddScoped<IRepositorioDocumentosJugador, RepositorioDocumentosJugador>();
+        servicios.AddScoped<IRepositorioFotosJugador, RepositorioFotosJugador>();
+        servicios.AddScoped<IRepositorioResumenClub, RepositorioResumenClub>();
 
         servicios.Configure<OpcionesCorreo>(opciones =>
         {

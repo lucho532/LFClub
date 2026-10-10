@@ -1,27 +1,32 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { api } from '../../compartido/api/cliente';
 import { ErrorApi } from '../../compartido/api/errores';
 import type { ActualizarFichaDto, FichaJugadorDto } from '../../compartido/api/tiposFicha';
+import type { HermanoAgregadoDto } from '../../compartido/api/tiposSesion';
 import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { nombreCompleto, puedeVerCategorias } from '../categorias/textos';
 import { useClub } from '../contextoClub';
+import { BotonRetirarseDelClub } from './BotonRetirarseDelClub';
 import { DialogoAgregarHermano } from './DialogoAgregarHermano';
 import { FichaDeSoloLectura } from './FichaDeSoloLectura';
 import { FormularioFicha } from './FormularioFicha';
 import { SeccionDocumentos } from './SeccionDocumentos';
+import { SeccionFoto } from './SeccionFoto';
 import { SeccionIdentidad } from './SeccionIdentidad';
 import { UltimoCambio } from './UltimoCambio';
 
 /**
  * Pantalla de la ficha de un jugador, la misma para todos los roles. Carga la ficha y la reparte en
- * secciones. Muestra y permite solo lo que trae la respuesta: los grupos que la API no entrega no
+ * secciones, con la foto propia del jugador arriba (spec 007). Muestra y permite solo lo que trae la respuesta: los grupos que la API no entrega no
  * se pintan, y los botones dependen de `permisos`, no del rol. Quien no puede ver la ficha recibe
  * de la API el mismo "no encontrado" que si no existiera, y aquí se le dice lo mismo.
- * "Agregar un hermano" solo aparece en la ficha propia de la cuenta de un jugador (RF-032 de la
- * 006): un presidente, un directivo y un entrenador no lo ven, y la API se lo negaría.
+ * "Agregar un hermano" y "Retirar del club" solo aparecen en la ficha propia de la cuenta de un
+ * jugador (RF-032 y RF-043 de la 006): un presidente, un directivo, un entrenador y la ficha de un
+ * hermano no elegido no los muestran, y la API se lo negaría. Si se llegó desde la lista
+ * "Jugadores", el enlace de volver lleva a ella.
  */
 export function FichaJugador() {
   const { club } = useClub();
@@ -31,11 +36,15 @@ export function FichaJugador() {
   const ficha = carga.datos;
   const noLaVe = carga.fallo instanceof ErrorApi && carga.fallo.status === 404;
   const [agregando, setAgregando] = useState(false);
-  const [agregado, setAgregado] = useState<string | null>(null);
+  const [agregado, setAgregado] = useState<HermanoAgregadoDto | null>(null);
   const esLaPropia = club.miRol === 'JUGADOR' && ficha?.usuarioRolId === club.miUsuarioRolId;
+  const desdeLaLista = (useLocation().state as { desde?: string } | null)?.desde === 'jugadores';
 
-  // Quien ve las listas del club vuelve a la categoría del jugador; la familia, al inicio.
-  const volver = !puedeVerCategorias(club.miRol)
+  // Desde la lista se vuelve a ella; si no, quien ve las listas del club vuelve a la categoría del
+  // jugador, y la familia, al inicio.
+  const volver = desdeLaLista
+    ? { a: `/club/${club.clubId}/jugadores`, texto: 'Jugadores' }
+    : !puedeVerCategorias(club.miRol)
     ? { a: `/club/${club.clubId}`, texto: 'Inicio' }
     : ficha?.categoriaId
       ? { a: `/club/${club.clubId}/categorias/${ficha.categoriaId}`, texto: `Categoría ${ficha.categoriaAnio}` }
@@ -58,6 +67,7 @@ export function FichaJugador() {
       {!ficha && carga.cargando && <p className="texto-suave">Cargando…</p>}
       {ficha && (
         <>
+          <SeccionFoto clubId={club.clubId} ficha={ficha} rutaDeLaFicha={ruta} alCambiar={carga.fijar} />
           <div className="columna">
             <h1>{ficha.usuarioRolId === club.miUsuarioRolId ? 'Mi ficha' : `Ficha de ${nombreCompleto(ficha)}`}</h1>
             <UltimoCambio cambio={ficha.ultimoCambio} />
@@ -66,16 +76,23 @@ export function FichaJugador() {
                 <Boton variante="secundario" onClick={() => setAgregando(true)}>
                   Agregar un hermano
                 </Boton>
+                <BotonRetirarseDelClub clubId={club.clubId} ficha={ficha} />
               </div>
             )}
-            {agregado && <Aviso tono="exito">El ingreso de {agregado} está pendiente de aprobación del club.</Aviso>}
+            {agregado && (
+              <Aviso tono="exito">
+                El ingreso de {agregado.nombres} está pendiente de aprobación del club.
+                {agregado.retiraDeOtroClub &&
+                  ' Si el club lo aprueba, dejará de estar en el otro club donde está inscrito.'}
+              </Aviso>
+            )}
           </div>
           {agregando && (
             <DialogoAgregarHermano
               clubId={club.clubId}
               ficha={ficha}
               alAgregar={(hermano) => {
-                setAgregado(hermano.nombres);
+                setAgregado(hermano);
                 setAgregando(false);
               }}
               alCancelar={() => setAgregando(false)}
