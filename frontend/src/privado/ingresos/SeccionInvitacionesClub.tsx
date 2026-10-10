@@ -37,7 +37,7 @@ export function SeccionInvitacionesClub({ clubId, invitaciones }: Props) {
   const base = `/api/clubes/${clubId}/invitaciones`;
   const [correo, setCorreo] = useState('');
   const [errorCorreo, setErrorCorreo] = useState<string | undefined>();
-  const [rol, setRol] = useState<RolDeIngreso | ''>('');
+  const [rol, setRol] = useState<RolDeIngreso | ''>('JUGADOR');
   const [errorRol, setErrorRol] = useState<string | undefined>();
   const [error, setError] = useState<string | null>(null);
   const [hecho, setHecho] = useState<{ tono: 'info' | 'aviso'; texto: string } | null>(null);
