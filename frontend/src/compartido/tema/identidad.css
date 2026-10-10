@@ -1,0 +1,61 @@
+/*
+  Identidad visible del club. IdentidadClub.tsx pone `.con-identidad` y las variables derivadas
+  (identidadVisual.ts) solo cuando el club tiene color principal; sin él, nada de esto aplica y se
+  ve la identidad neutra de la plataforma. El menú lateral no necesita reglas aquí: base.css ya lo
+  pinta con las variables --lateral-*, que el club sobrescribe en su contenedor.
+
+  Los colores del club van como relleno o como marca decorativa, nunca como color de texto sobre
+  el fondo, para que se lean igual en los dos temas.
+*/
+
+/* Fondo de la pantalla apenas teñido con el color principal. `isolation` mantiene la marca de
+   agua del escudo por encima de este fondo y por debajo del contenido. */
+.disposicion.con-identidad,
+.centrado.con-identidad {
+  background: var(--fondo-club);
+  isolation: isolate;
+}
+
+/* La barra superior cierra con una franja del color principal. */
+.con-identidad .barra-superior {
+  border-bottom: 3px solid var(--color-club-principal);
+}
+
+/* Cada tarjeta lleva arriba una franja del color principal. */
+.con-identidad .tarjeta {
+  border-top: 4px solid var(--color-club-principal);
+}
+
+/* El título de cada pantalla lleva debajo una raya corta del acento. */
+.con-identidad .principal h1::after,
+.con-identidad.centrado h1::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 5px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--color-club-acento);
+}
+
+/* Muestra del menú en la vista previa del editor de identidad (EditorIdentidad.tsx). */
+.vista-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 10px;
+  background: var(--lateral-fondo);
+  color: var(--lateral-texto);
+}
+
+.vista-menu-item {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.vista-menu-activo {
+  background: var(--lateral-activo-fondo);
+  color: var(--lateral-activo-texto);
+}

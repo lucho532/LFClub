@@ -94,7 +94,8 @@
   }
 
   /* La pestaña activa no se rellena entera: el texto se resalta y el icono va en una píldora
-     con el color del club, que se distingue también por la forma y no solo por el color. */
+     con el color del ítem activo (el acento del club si se distingue del menú), que se
+     distingue también por la forma y no solo por el color. */
   .lateral-menu a[aria-current='page'] {
     background: transparent;
     color: var(--lateral-texto);
@@ -110,8 +111,8 @@
   }
 
   .lateral-menu a[aria-current='page'] .lateral-icono {
-    background: var(--color-club-principal);
-    color: var(--color-club-principal-texto);
+    background: var(--lateral-activo-fondo);
+    color: var(--lateral-activo-texto);
   }
 
   .lateral-texto {
