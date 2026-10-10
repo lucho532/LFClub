@@ -49,6 +49,7 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioAsignaciones, RepositorioAsignaciones>();
         servicios.AddScoped<IRepositorioFichas, RepositorioFichas>();
         servicios.AddScoped<IRepositorioDocumentosJugador, RepositorioDocumentosJugador>();
+        servicios.AddScoped<IRepositorioFotosJugador, RepositorioFotosJugador>();
 
         servicios.Configure<OpcionesCorreo>(opciones =>
         {

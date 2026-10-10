@@ -13,7 +13,9 @@ namespace LaPecosa.Dominio.Entidades;
 /// y §14.1): no existe una entidad Jugador aparte, y aquí el jugador es el integrante aprobado con
 /// el rol JUGADOR. De él cuelga su ficha (<see cref="FichaJugador"/> y
 /// <see cref="DocumentoJugador"/>), desde la que se cambia su documento de identidad y se corrige
-/// su identidad sobre esta misma fila, sin crear otro integrante (§10).
+/// su identidad sobre esta misma fila, sin crear otro integrante (§10). De él cuelga también su foto
+/// propia (<see cref="FotoJugador"/>), que se borra al retirarlo y, cuando exista esa operación, al
+/// cambiarlo de rol (§14.2).
 /// Una cuenta puede tener varios integrantes con rol JUGADOR en el mismo club: son los hermanos
 /// (§12.1.2). Cada uno es una fila propia, con su documento, su estado de ingreso, su categoría,
 /// su retiro y su ficha; el hermano agregado desde una ficha nace en espera y recuerda desde cuál
