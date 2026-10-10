@@ -156,3 +156,40 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* Lista "Jugadores": foto o iniciales y nombre en una línea; el nombre largo se corta sin desbordar. */
+.jugador-de-lista {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.foto-jugador-miniatura {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+.nombre-cortado {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.foto-jugador-grande {
+  width: 120px;
+  height: 120px;
+  font-size: 40px;
+}
+
+/* Cabecera de la ficha: la foto grande y, al lado o debajo, sus botones. */
+.foto-de-ficha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}

@@ -8,8 +8,9 @@ namespace LaPecosa.Aplicacion.Utilidades;
 /// <summary>
 /// Representa la comprobación de acceso que comparten todas las operaciones de la ficha del
 /// jugador (constitución §7.5 y §15; RF-012).
-/// Su responsabilidad es leer al jugador de la ficha, averiguar si es de la cuenta de quien
-/// pregunta y si quien pregunta entrena su categoría, aplicar <see cref="ReglaAccesoAFicha"/> y
+/// Su responsabilidad es leer al jugador de la ficha, averiguar si es el jugador de la petición
+/// (el integrante que pregunta, y no un hermano de su misma cuenta: RF-030 de la 006) y si quien
+/// pregunta entrena su categoría, aplicar <see cref="ReglaAccesoAFicha"/> y
 /// devolver el jugador con su alcance. Si el jugador no existe o quien pregunta no puede ver su
 /// ficha, responde el mismo <c>404 no_encontrado</c>, sin revelar cuál de los dos es el caso.
 /// No decide quién ve qué: eso es de la regla. No arma la respuesta ni cambia nada, y no comprueba
@@ -38,15 +39,17 @@ public class AccesoAFicha
         var jugador = await _jugadores.ObtenerParaFichaAsync(usuarioRolId, cancelacion)
             ?? throw ExcepcionDeAplicacion.NoEncontrado();
 
-        // "De su cuenta" se decide por la cuenta, no por el integrante (§12.3).
-        var esDeSuCuenta = jugador.UsuarioId == quienPregunta.UsuarioId;
+        // Se compara el integrante y no la cuenta: con un hijo elegido, la familia no llega a la
+        // ficha de su hermano hasta que cambie de jugador (RF-030).
+        var esElJugadorDeLaPeticion = jugador.Id == quienPregunta.Id;
 
         // La asignación se consulta en cada petición: quien la pierde deja de ver la ficha al instante.
         var entrenaSuCategoria = quienPregunta.Rol == Rol.ENTRENADOR
             && jugador.Categoria is { Activa: true } categoria
             && await _asignaciones.TieneActivaAsync(categoria.Id, quienPregunta.Id, cancelacion);
 
-        var alcance = ReglaAccesoAFicha.Evaluar(quienPregunta.Rol, esDeSuCuenta, jugador.Activo, entrenaSuCategoria);
+        var alcance = ReglaAccesoAFicha.Evaluar(
+            quienPregunta.Rol, esElJugadorDeLaPeticion, jugador.Activo, entrenaSuCategoria);
         if (!alcance.Ve)
         {
             throw ExcepcionDeAplicacion.NoEncontrado();

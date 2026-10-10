@@ -174,6 +174,54 @@ la spec 004:
 - Pendientes: siguen abiertas las siete decisiones de la §28. La spec 004 adapta el código a esta
   versión. Hasta que exista la elección de un presidente por otro PRESIDENTE (§12.5), cada club
   tiene un solo presidente
+
+Enmienda 4.1.0 → 4.2.0 (2026-10-10), decidida por el propietario del proyecto en las aclaraciones
+de la spec 006 (2026-10-09 y 2026-10-10):
+- §7.1: cuarta excepción acotada al aislamiento: el documento de un hermano o de un jugador que se
+  reincorpora puede consultarse en otros clubes, y aprobar al hermano retira de allí al jugador de
+  otra cuenta, sin entregar el nombre de ese club ni datos de esa cuenta
+- §10: un mismo documento puede estar en dos cuentas, solo por el hermano agregado (§12.1.2); el
+  inicio de sesión con ese documento abre la cuenta donde el jugador está activo
+- §8 (Jugador) y §14.1: la familia puede retirar a su propio jugador; aprobar un hermano en otro
+  club retira al jugador de otra cuenta con ese documento; la reincorporación se niega mientras el
+  documento esté activo con otra cuenta
+- §12.1.2: se admite el documento de un JUGADOR de otra cuenta en otro club, no el de otro rol
+- §20: pruebas ajustadas y nuevas
+- Principios modificados: ninguno renombrado. Secciones añadidas o eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 006 implementa esta versión
+
+Enmienda 4.2.0 → 4.3.0 (2026-10-10), decidida por el propietario del proyecto:
+- §7.2: el escudo y los colores de un club los configuran tanto el DESARROLLADOR, desde su panel,
+  como el PRESIDENTE de ese club, desde "Datos del club"
+- §8 (Presidente): nueva función de configurar el escudo y los colores de su club
+- §20: la prueba del panel ya no reserva al DESARROLLADOR el cambio de escudo y colores; prueba
+  nueva de que solo el PRESIDENTE de ese club, además del DESARROLLADOR, puede cambiarlos
+- Principios modificados: ninguno renombrado. Secciones añadidas o eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 007 implementa esta versión
+
+Enmienda 4.3.0 → 4.4.0 (2026-10-10), decidida por el propietario del proyecto en la spec 007:
+- §14.2 (nueva): cada jugador tiene una foto propia en su ficha, distinta de la foto de perfil de
+  la cuenta, que sigue siendo privada. La cargan la familia y el PRESIDENTE; la ven quienes pueden
+  ver a ese jugador. Se elimina definitivamente cuando el jugador deja de pertenecer al club
+- §8 (Presidente y Jugador): cargar, cambiar y quitar la foto del jugador
+- §12.2 y §14.1: la foto se elimina con la ficha al cambiar de rol y al retirar al jugador; es una
+  excepción expresa a la conservación de los datos del retirado
+- §20: pruebas nuevas de quién cambia y quién ve la foto, y de su eliminación
+- Principios modificados: ninguno renombrado. Secciones añadidas: §14.2. Eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 007 implementa esta versión
+
+Enmienda 4.4.0 → 4.5.0 (2026-10-10), decidida por el propietario del proyecto en la spec 008:
+- §12.6 (nueva): ficha básica de cada PRESIDENTE, DIRECTIVO y ENTRENADOR (nombre, rol, foto de
+  perfil y categorías y equipos que entrena, sin documento ni contacto), que abre cualquier
+  integrante de su club; y esas personas cambian por sí mismas su celular, nombres, apellidos y
+  fecha de nacimiento, pero no su documento
+- §14.2: la foto de perfil de una cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR la ven los
+  integrantes de los clubes donde tiene ese rol; la de una cuenta de jugador sigue siendo privada
+- §8 (Jugador): de los entrenadores, presidentes y directivos de su club ve la ficha básica, y no
+  solo el nombre y los apellidos del entrenador
+- §20: pruebas ajustadas y nuevas de la ficha básica, de la foto de perfil y de los datos propios
+- Principios modificados: ninguno renombrado. Secciones añadidas: §12.6. Eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 008 implementa esta versión
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -525,8 +573,14 @@ excepciones son:
   §12.4): encontrar la cuenta por su correo o su documento y listar los clubes a los que
   pertenece. Siempre quedan limitadas a esa cuenta.
 - Abrir una invitación por su enlace (ver §12.1): devuelve solo esa invitación y su club.
+- El documento de un jugador que pasa a otra cuenta (ver §10, §12.1.2 y §14.1). Al agregar un
+  hermano, al aprobarlo y al reincorporar a un jugador retirado se consulta, por ese número de
+  documento, si está en otros clubes, con qué rol y si está activo. Al aprobar al hermano, el
+  jugador activo de otra cuenta con ese documento queda retirado en su club. Es la única escritura
+  en un club desde otro club, y solo hace ese retiro.
 
-Ninguna excepción entrega datos de un club a quien no pertenece a él.
+Ninguna excepción entrega datos de un club a quien no pertenece a él. La cuarta solo revela que el
+documento está activo en otro club: nunca el nombre de ese club ni ningún dato de la otra cuenta.
 
 ### 7.2. Identidad y configuración de cada club
 
@@ -534,8 +588,9 @@ Los datos propios de cada club (nombre, escudo, colores, sede, dirección, datos
 de la mensualidad) son configuración de ese club almacenada en base de datos. No deben quedar
 escritos de forma fija en el código, y el código no debe asumir que el club es Valfor F.C.
 
-El escudo y los colores de un club los configura el DESARROLLADOR desde su panel de
-administración. La interfaz de cada club se muestra con su propia identidad.
+El escudo y los colores de un club los pueden configurar tanto el DESARROLLADOR, desde su panel de
+administración, como el PRESIDENTE de ese club, desde "Datos del club". La interfaz de cada club
+se muestra con su propia identidad.
 
 El resto de la configuración del club (nombre, sede, dirección, datos de contacto) la pueden
 editar tanto el DESARROLLADOR como el PRESIDENTE de ese club.
@@ -653,10 +708,12 @@ Es el presidente del club, que a su vez es su dueño. Administra el club complet
 Puede:
 
 - Gestionar la configuración del club y el contenido del sitio público.
+- Configurar el escudo y los colores de su club desde "Datos del club" (ver §7.2).
 - Gestionar categorías, entrenadores y jugadores.
 - Asignar entrenadores a categorías.
 - Crear equipos dentro de una categoría y decidir en qué equipos juega cada jugador (ver §11.3).
 - Retirar del club a un jugador que se fue y reincorporarlo (ver §14.1).
+- Cargar, cambiar y quitar la foto de cualquier jugador de su club (ver §14.2).
 - Definir el valor de la mensualidad del club y modificar el de jugadores concretos (ver §16.7).
 - Consultar las finanzas completas del club.
 - Registrar, anular y corregir pagos.
@@ -751,11 +808,15 @@ Puede, únicamente sobre su propio jugador:
 
 - Consultar la ficha, el calendario, las convocatorias, las estadísticas y las evaluaciones.
 - Consultar su categoría, los equipos en los que está y quiénes son los entrenadores de su
-  categoría. De un entrenador solamente ve el nombre y los apellidos.
+  categoría.
+- Abrir la ficha básica de cualquier PRESIDENTE, DIRECTIVO o ENTRENADOR de su club (ver §12.6).
+  De ellos no ve nada más: ni documento ni datos de contacto.
 - Consultar el estado de cuenta y los recibos.
 - Pagar mensualidades y arbitrajes.
 - Confirmar asistencia a entrenamientos y partidos.
 - Actualizar datos de contacto, médicos y documentos.
+- Cargar, cambiar y quitar la foto de su jugador (ver §14.2).
+- Retirar del club a su propio jugador (ver §14.1). No puede reincorporarlo.
 
 No accede a la ficha, los pagos ni los datos de contacto de otros jugadores.
 
@@ -805,6 +866,16 @@ El documento:
 - Puede existir en dos clubes distintos: es la misma persona, integrante de ambos, con un único
   inicio de sesión (ver §7.3 y §12.4).
 - No debe utilizarse como sustituto de las claves primarias internas.
+
+Normalmente un documento pertenece a una sola cuenta. La única forma de que esté en dos es agregar
+como hermano a un jugador que ya está en otra cuenta en otro club (ver §12.1.2). Al aprobarse, el
+jugador queda retirado del otro club (ver §14.1) y el documento queda en las dos cuentas. Nadie
+puede registrarse con un documento que ya tiene otra cuenta, ni cambiar su documento a uno así.
+
+Cuando un documento está en más de una cuenta, el inicio de sesión con ese documento abre una sola:
+la cuenta donde el jugador está activo; si no está activo en ninguna, aquella donde está en
+espera. Con la contraseña de cualquier otra cuenta, el ingreso se niega como cualquier ingreso con
+datos incorrectos (ver §12.4).
 
 Un jugador puede pasar de registro civil a tarjeta de identidad. Ese cambio actualiza el tipo y el
 número sobre el mismo registro; no crea otra persona.
@@ -939,6 +1010,14 @@ El jugador agregado:
   mensualidad hasta que el club lo aprueba (ver §12.1.1). Es el único ingreso que necesita
   aprobación.
 
+Si el documento del hermano ya lo tiene un JUGADOR de otra cuenta en otro club, se admite. La
+familia recibe el aviso de que, al aprobarse, dejará de estar en el otro club, y la sala de espera
+se lo advierte al PRESIDENTE antes de decidir, sin nombrar ese club ni dar datos de esa cuenta.
+Mientras espera, o si se le rechaza, nada cambia en el otro club; al aprobarse queda retirado de
+allí (ver §14.1). Si con otra cuenta ese documento es de un PRESIDENTE, un DIRECTIVO o un
+ENTRENADOR en cualquier club, no se admite y se explica el motivo. Cuando es de la misma cuenta en
+otro club no hay retiro: la familia lo tiene inscrito en los dos clubes.
+
 #### 12.1.1. Sala de espera
 
 La sala de espera existe solamente para el jugador agregado desde la ficha de un hermano (ver
@@ -990,7 +1069,8 @@ El rol asignado reemplaza al que tenía y pasa a ser su único rol.
 
 Cuando una cuenta nueva pasa de JUGADOR a ENTRENADOR o DIRECTIVO, la ficha de Jugador que se creó
 con su registro desaparece: se elimina. Es una eliminación física justificada (ver §14), porque
-esa ficha nunca correspondió a un jugador real.
+esa ficha nunca correspondió a un jugador real. Con ella se elimina su foto de jugador (ver
+§14.2).
 
 Un DIRECTIVO no invita ni asigna, cambia o retira roles.
 
@@ -1086,6 +1166,28 @@ puede reenviarla o corregir su correo; no invita presidentes adicionales.
 Un club puede tener más de un PRESIDENTE. A un presidente adicional lo elige otro PRESIDENTE de
 ese mismo club, dándole el rol a alguien que ya está registrado en el club.
 
+### 12.6. Ficha básica y datos propios de presidentes, directivos y entrenadores
+
+Cada integrante con rol PRESIDENTE, DIRECTIVO o ENTRENADOR tiene una ficha básica en su club. Muestra
+únicamente:
+
+- Su nombre completo.
+- Su rol en ese club.
+- Su foto de perfil, o sus iniciales si no tiene (ver §14.2).
+- Las categorías activas que entrena en ese club y los equipos activos que dirige en cada una.
+
+No muestra ni entrega el documento, la fecha de nacimiento, el correo, el celular ni ningún otro
+dato de la cuenta.
+
+La abre cualquier integrante del mismo club, con cualquier rol, también la cuenta de un jugador.
+Nadie de otro club la abre, tampoco el DESARROLLADOR. Desde cada club se ven solo el rol, las
+categorías y los equipos de ese club.
+
+Estas personas cambian por sí mismas, desde su perfil, su celular, sus nombres, sus apellidos y su
+fecha de nacimiento, con las reglas del registro (ver §12.1). El cambio vale en todos sus clubes.
+El tipo y el número de documento no los cambian, porque con ellos se inicia sesión (ver §10 y
+§12.4). Los datos de una cuenta de jugador se siguen cambiando desde la ficha de su jugador.
+
 ## 13. Histórico operativo y financiero
 
 La información histórica no debe depender exclusivamente del estado actual de una entidad.
@@ -1160,23 +1262,63 @@ solo se desactiva.
 
 ### 14.1. Retiro de un jugador
 
-Cuando un jugador se va del club, el PRESIDENTE lo retira. Nadie más puede hacerlo, y solo se
-retira a un jugador aprobado.
+Solo se retira a un jugador aprobado y activo. Un jugador queda retirado únicamente de estas tres
+formas:
+
+- Lo retira el PRESIDENTE de su club.
+- Lo retira su propia cuenta, con la opción "Retirar del club" de su ficha y después de
+  confirmarlo. La cuenta y sus demás jugadores no cambian.
+- Queda retirado al aprobarse, en otro club, un hermano de otra cuenta con su mismo documento (ver
+  §12.1.2). Ocurre en la misma operación que la aprobación: si el retiro no puede hacerse, la
+  aprobación tampoco. Nadie de su club ni de su familia lo confirma ni recibe aviso, y no queda
+  registrado quién lo retiró, porque es de otro club.
+
+Nadie más puede retirarlo.
 
 El jugador retirado:
 
 - Sale de su categoría y de sus equipos y deja de aparecer en las listas de jugadores.
 - No accede a ninguna información de ese club: al entrar solo ve un aviso de que ya no está en él.
   En sus otros clubes sigue con normalidad.
-- Conserva todos sus datos y su historial. Su correo y su documento siguen ocupados en ese club.
+- Conserva todos sus datos y su historial, salvo su foto, que se elimina (ver §14.2). Su correo y
+  su documento siguen ocupados en ese club.
 - No genera mensualidad (ver §16.7).
 
 El PRESIDENTE puede reincorporarlo: vuelve a entrar con su misma cuenta y se le ubica como a un
-jugador que acaba de entrar (ver §12.1). No recupera los equipos que tenía.
+jugador que acaba de entrar (ver §12.1). No recupera los equipos que tenía. Solo el PRESIDENTE
+reincorpora; la familia no.
+
+La reincorporación se niega mientras el documento del jugador esté activo con otra cuenta en otro
+club, con un motivo que no nombra ese club ni da datos de esa cuenta. Para recuperarlo, primero
+debe retirarlo el club donde está activo, por su PRESIDENTE o por su familia. Si el documento solo
+está activo con la misma cuenta, la reincorporación sigue igual.
 
 El PRESIDENTE y los DIRECTIVOS ven la lista de jugadores retirados de su club.
 
 El retiro no es un estado de ingreso (ver §12.1.1): se expresa con Activo.
+
+### 14.2. Foto del jugador
+
+Cada jugador tiene una foto propia, guardada en su ficha. Es distinta de la foto de perfil de la
+cuenta: los hermanos de una misma cuenta tienen cada uno la suya.
+
+La foto de perfil de la cuenta solo la carga, cambia y quita su dueño. La de una cuenta con rol
+PRESIDENTE, DIRECTIVO o ENTRENADOR en un club la ven los integrantes de ese club, únicamente en su
+ficha básica y junto a su nombre (ver §12.6). La de una cuenta de jugador es privada y solo la ve
+su dueño. Nadie de otro club ni el DESARROLLADOR obtiene la foto de perfil de otra cuenta.
+
+- La cargan, cambian y quitan la propia cuenta, sobre su jugador, y el PRESIDENTE, sobre cualquier
+  jugador de su club. Nadie más.
+- Debe ser una imagen PNG, JPEG o WebP de hasta 1 MB.
+- La ven únicamente quienes pueden ver a ese jugador: su propia cuenta, el PRESIDENTE y los
+  DIRECTIVOS de su club y los entrenadores de su categoría (ver §7.5). El DESARROLLADOR no la ve.
+  Nunca aparece en el sitio público.
+
+Cuando el jugador deja de pertenecer al club, su foto se elimina definitivamente: al retirarlo,
+de cualquiera de las tres formas de §14.1, y al eliminarse su ficha por el cambio de rol de la
+cuenta (ver §12.2). Es una eliminación física justificada y una excepción expresa a la
+conservación de los datos del jugador retirado: la foto de un menor no se guarda cuando ya no está
+en el club. Si se le reincorpora, vuelve sin foto.
 
 ## 15. Reglas de negocio en backend
 
@@ -1427,8 +1569,10 @@ Las pruebas deben validar principalmente:
 - Que las llaves de la pasarela de un club nunca se devuelven por la API.
 - Aislamiento entre clubes: que un usuario de un club no puede ver, contar ni consultar por
   identificador ningún dato de otro club.
-- Que solamente el DESARROLLADOR accede al panel de administración, crea clubes y cambia su
-  escudo y colores, y que solo existe una cuenta DESARROLLADOR.
+- Que solamente el DESARROLLADOR accede al panel de administración y crea clubes, y que solo
+  existe una cuenta DESARROLLADOR.
+- Que el escudo y los colores de un club solo los cambian el DESARROLLADOR y el PRESIDENTE de ese
+  club; ningún otro rol ni el PRESIDENTE de otro club.
 - Que el DESARROLLADOR no accede a fichas, datos médicos, finanzas ni pagos de ningún club.
 - Que la ficha de Jugador se elimina cuando la cuenta pasa a ENTRENADOR o DIRECTIVO.
 - Recuperación de contraseña.
@@ -1445,16 +1589,42 @@ Las pruebas deben validar principalmente:
   demás jugadores.
 - Aislamiento entre categorías y entre cuentas de jugador.
 - Que solamente el PRESIDENTE crea, desactiva, reactiva y borra categorías y equipos, asigna
-  entrenadores, cambia a un jugador de categoría o de equipo y retira o reincorpora jugadores.
+  entrenadores, cambia a un jugador de categoría o de equipo y reincorpora jugadores.
+- Que solamente el PRESIDENTE y la propia cuenta del jugador lo retiran del club, y que retirarlo
+  desde la cuenta no cambia la cuenta ni sus demás jugadores.
+- Que se admite como hermano el documento de un JUGADOR de otra cuenta en otro club, y no el de un
+  PRESIDENTE, un DIRECTIVO o un ENTRENADOR.
+- Que mientras ese hermano espera, o si se le rechaza, el otro club no cambia; y que al aprobarlo
+  el jugador de la otra cuenta queda retirado en la misma operación, o no se aprueba.
+- Que los avisos a la familia y al PRESIDENTE no revelan el nombre del otro club ni datos de la
+  otra cuenta.
+- Que con un documento en dos cuentas el inicio de sesión abre la del jugador activo, o la del que
+  está en espera, y niega la contraseña de la otra.
+- Que no se reincorpora a un jugador cuyo documento está activo con otra cuenta en otro club, y sí
+  cuando solo lo está con la misma cuenta.
+- Que no se puede registrar ni cambiar a un documento que ya tiene otra cuenta, aunque esté en dos.
 - Que un jugador que entra al club queda en la categoría de su año, o sin categoría si no existe,
   y que entra en ella al crearse.
 - Que un jugador nunca está en dos categorías ni en un equipo de otra categoría.
 - Que un PRESIDENTE o un DIRECTIVO asignado como entrenador conserva su único rol y su alcance.
 - Que un entrenador no accede a una categoría que no tiene asignada y sí ve todos los equipos de
   las suyas.
-- Que una cuenta de jugador solo ve su categoría, sus equipos y el nombre de sus entrenadores.
+- Que una cuenta de jugador solo ve su categoría, sus equipos, sus entrenadores y la ficha básica
+  de los presidentes, directivos y entrenadores de su club.
+- Que la ficha básica no entrega documento, fecha de nacimiento ni contacto, que la abre cualquier
+  integrante del club y que nadie de otro club ni el DESARROLLADOR la obtiene.
+- Que la foto de perfil de un PRESIDENTE, DIRECTIVO o ENTRENADOR solo la ven los integrantes de su
+  club, y que la de una cuenta de jugador solo la ve su dueño.
+- Que un PRESIDENTE, DIRECTIVO o ENTRENADOR cambia su celular, nombres, apellidos y fecha de
+  nacimiento, y que nadie cambia su documento.
 - Que solo se borra una categoría o un equipo que nunca tuvo jugadores ni entrenadores.
-- Que un jugador retirado no accede a ninguna información del club y conserva todos sus datos.
+- Que un jugador retirado no accede a ninguna información del club y conserva todos sus datos,
+  salvo su foto.
+- Que solamente la propia cuenta y el PRESIDENTE cargan, cambian y quitan la foto de un jugador,
+  que solo la ven quienes pueden ver a ese jugador, y que es distinta de la foto de perfil de la
+  cuenta.
+- Que la foto de un jugador se elimina al retirarlo, de cualquiera de las tres formas, y al
+  eliminarse su ficha por cambio de rol, y que al reincorporarlo vuelve sin foto.
 - Que una cuenta no convocada no puede ver ni consultar un partido próximo, y que sí ve todos los
   entrenamientos de su categoría.
 - Que los endpoints públicos no exponen documento, contacto, datos médicos ni pagos.
@@ -1636,4 +1806,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.1.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-08
+**Versión**: 4.5.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-10

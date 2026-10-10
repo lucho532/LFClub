@@ -3,6 +3,8 @@
 // specs/004-invitacion-con-rol/contracts/api.yaml y con los mismos nombres. Los de
 // specs/003-categorias-club/contracts/api.yaml están en tiposCategorias.ts.
 
+import type { ClubDeSesionDto } from './tiposSesion';
+
 export type Rol = 'DESARROLLADOR' | 'PRESIDENTE' | 'DIRECTIVO' | 'ENTRENADOR' | 'JUGADOR';
 export type EstadoClub = 'ACTIVO' | 'SUSPENDIDO' | 'DADO_DE_BAJA';
 export type EstadoEnvio = 'PENDIENTE' | 'ENVIADO' | 'FALLIDO';
@@ -42,18 +44,8 @@ export interface IdentidadClubDto {
   urlEscudo: string | null;
 }
 
-export interface ClubDeSesionDto {
-  clubId: string;
-  nombre: string;
-  rol: Rol;
-  estado: EstadoClub;
-  estadoIngreso: EstadoIngreso;
-  /** Verdadero si el club retiró a este jugador; no entra a él hasta que lo reincorporen. */
-  retirado: boolean;
-  identidad: IdentidadClubDto;
-  nombres: string;
-  apellidos: string;
-}
+// Los tipos de la sesión con varios jugadores (006) están en tiposSesion.ts.
+export type { ClubDeSesionDto };
 
 export interface SesionDto {
   usuarioId: string;
@@ -226,6 +218,10 @@ export interface IngresoEnEsperaDto {
   celular: string;
   nombreResponsable: string | null;
   registradoEn: string;
+  /** Jugador desde cuya ficha se agregó; `null` si ya no existe o no viene de un hermano. */
+  hermanoDe: string | null;
+  /** Si aprobarlo retirará a un jugador de otra cuenta en otro club; no dice cuál. */
+  retiraDeOtroClub: boolean;
 }
 
 /** Cuerpo opcional de la aprobación: al aprobar no se elige rol y la API solo admite JUGADOR. */

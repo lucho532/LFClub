@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>La Pecosa</title>
+    <!-- El balón de La Pecosa, generado por scripts/generar-balon.py. Declararlo evita que el
+         navegador muestre el icono que guardó de otra aplicación servida en la misma dirección. -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script>
       // Aplica el tema antes de pintar, para que la página no parpadee. Usa la misma clave y la
       // misma regla que src/compartido/tema/tema.ts: la elección guardada o, si no hay, el dispositivo.
@@ -17,8 +22,24 @@
           tema = oscuro ? 'oscuro' : 'claro';
         }
         document.documentElement.setAttribute('data-tema', tema);
+
+        // En la aplicación Android, la primera vez de cada apertura, el fondo es ya el del arranque
+        // para que no se vea un destello antes de la animación. La misma clave que
+        // src/arranque/debeMostrarArranque.ts; la animación quita la marca al terminar.
+        try {
+          var nativa = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+          if (nativa && !sessionStorage.getItem('lapecosa.arranqueVisto')) {
+            document.documentElement.setAttribute('data-arranque', '');
+          }
+        } catch (error) {}
       })();
     </script>
+    <style>
+      html[data-arranque],
+      html[data-arranque] body {
+        background: #231f1e;
+      }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -1,0 +1,123 @@
+/* Teléfono (hasta 720 px): el menú lateral pasa a una barra de pestañas fija abajo, la marca
+   del club sube a la barra superior y las pantallas ajustan títulos, márgenes y formularios. */
+
+@media (max-width: 720px) {
+  .solo-escritorio,
+  .lateral-marca {
+    display: none;
+  }
+
+  .solo-movil {
+    display: block;
+  }
+
+  .barra-superior {
+    padding: 8px 16px;
+  }
+
+  .barra-superior-marca {
+    display: flex;
+  }
+
+  /* El botón del perfil queda en la foto; el nombre se lee al abrir el menú. */
+  .menu-perfil-boton:not(.menu-perfil-con-nombre) {
+    padding: 2px;
+  }
+
+  .menu-perfil-boton:not(.menu-perfil-con-nombre) .menu-perfil-texto {
+    display: none;
+  }
+
+  .menu-perfil-con-nombre .menu-perfil-texto {
+    max-width: 30vw;
+  }
+
+  .contenido {
+    min-height: 100vh;
+  }
+
+  /* Hueco para que la barra de pestañas no tape el final de la pantalla. */
+  .principal {
+    gap: 16px;
+    padding: 20px 16px calc(96px + env(safe-area-inset-bottom));
+  }
+
+  .principal h1 {
+    font-size: 30px;
+  }
+
+  .principal h2 {
+    font-size: 18px;
+  }
+
+  .principal .tarjeta {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  /* En el teléfono los formularios en línea se apilan: cada campo y cada botón a todo el ancho. */
+  .principal form.fila > * {
+    flex: 1 1 100%;
+  }
+
+  /* El menú lateral pasa a ser una barra de pestañas fija abajo: icono sobre el texto. */
+  .disposicion > .lateral {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 15;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -6px 18px -10px rgb(0 0 0 / 50%);
+  }
+
+  .lateral-menu {
+    flex-direction: row;
+    gap: 2px;
+  }
+
+  .lateral-menu a {
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    min-height: 56px;
+    padding: 4px 2px;
+    font-size: 12px;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .lateral-menu a:not([aria-current='page']) {
+    color: var(--lateral-texto-suave);
+  }
+
+  /* La pestaña activa no se rellena entera: el texto se resalta y el icono va en una píldora
+     con el color del club, que se distingue también por la forma y no solo por el color. */
+  .lateral-menu a[aria-current='page'] {
+    background: transparent;
+    color: var(--lateral-texto);
+    font-weight: 800;
+  }
+
+  .lateral-icono {
+    justify-content: center;
+    width: 56px;
+    height: 30px;
+    margin-right: 0;
+    border-radius: 999px;
+  }
+
+  .lateral-menu a[aria-current='page'] .lateral-icono {
+    background: var(--color-club-principal);
+    color: var(--color-club-principal-texto);
+  }
+
+  .lateral-texto {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

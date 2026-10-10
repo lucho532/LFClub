@@ -11,11 +11,21 @@ interface Props {
 
 /**
  * Aplica la identidad de un club a todo lo que contiene: fija las variables de color del club en
- * su contenedor. Sin identidad, lo de dentro se ve con la identidad neutra de la plataforma.
+ * su contenedor y, si el club tiene escudo, lo pone de fondo como marca de agua clara
+ * (`.con-marca-agua`). Sin identidad, lo de dentro se ve con la identidad neutra de la plataforma
+ * y sin marca de agua.
  */
 export function IdentidadClub({ identidad, className, children }: Props) {
+  const escudo = identidad?.urlEscudo;
+  const estilo: Record<string, string> = { ...coloresClub(identidad) };
+  if (escudo) {
+    estilo['--escudo-marca'] = `url("${api.url(escudo)}")`;
+  }
+
+  const clases = [className, escudo ? 'con-marca-agua' : undefined].filter(Boolean).join(' ');
+
   return (
-    <div className={className} style={coloresClub(identidad) as CSSProperties}>
+    <div className={clases || undefined} style={estilo as CSSProperties}>
       {children}
     </div>
   );

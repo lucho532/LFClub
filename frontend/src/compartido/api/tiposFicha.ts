@@ -97,6 +97,8 @@ export interface FichaJugadorDto {
   documentos?: DocumentoDeFichaDto[];
   ultimoCambio?: UltimoCambioDto;
   permisos: PermisosDeFichaDto;
+  /** Fecha UTC de la última carga de la foto del jugador; `null` si no tiene (spec 007). */
+  fotoActualizadaEn: string | null;
 }
 
 /** Todo es opcional salvo el celular y, si el jugador es menor de 18 años, el responsable. */

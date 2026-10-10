@@ -9,7 +9,7 @@ namespace LaPecosa.Aplicacion.DTOs;
 public record MiCategoriaDto(CategoriaDeMiJugadorDto? Categoria);
 
 /// <summary>
-/// Representa la categoría del jugador de la cuenta, tal como la ve su familia.
+/// Representa la categoría del jugador con el que continúa la cuenta, tal como la ve su familia.
 /// Su responsabilidad es llevar el año, los nombres de los equipos en los que está y los
 /// entrenadores de la categoría.
 /// No lleva identificadores, el número de jugadores ni la lista de sus compañeros.

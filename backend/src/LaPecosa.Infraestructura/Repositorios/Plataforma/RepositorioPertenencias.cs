@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 namespace LaPecosa.Infraestructura.Repositorios.Plataforma;
 
 /// <summary>
-/// Representa el único acceso entre clubes de una cuenta (constitución §7.1, segunda excepción).
-/// Su responsabilidad es responder a qué clubes pertenece una cuenta y de qué cuenta es un
-/// documento. Por eso se salta el filtro de aislamiento, y cada consulta va acotada por cuenta o
-/// por documento.
+/// Representa el acceso entre clubes de una cuenta y de un número de documento (constitución §7.1,
+/// segunda y cuarta excepción).
+/// Su responsabilidad es responder a qué clubes pertenece una cuenta, cuáles son sus integrantes
+/// en uno de ellos y qué integrantes tienen un número de documento. Por eso se salta el filtro de
+/// aislamiento, y cada consulta va acotada por cuenta o por documento.
 /// No lista los integrantes de un club ni entrega datos de un club a quien no pertenece a él.
 /// </summary>
 public class RepositorioPertenencias : IRepositorioPertenencias
@@ -33,6 +34,17 @@ public class RepositorioPertenencias : IRepositorioPertenencias
             .ToListAsync(cancelacion);
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<UsuarioRol>> ListarDeLaCuentaEnClubAsync(
+        Guid usuarioId, Guid clubId, CancellationToken cancelacion = default) =>
+        await _contexto.UsuariosRol
+            .IgnoreQueryFilters()
+            .Include(integrante => integrante.Club)
+            .Where(integrante => integrante.UsuarioId == usuarioId && integrante.ClubId == clubId)
+            .OrderBy(integrante => integrante.CreadoEn)
+            .ThenBy(integrante => integrante.Id)
+            .ToListAsync(cancelacion);
+
+    /// <inheritdoc />
     public Task<UsuarioRol?> ObtenerAsync(Guid usuarioId, Guid clubId, CancellationToken cancelacion = default) =>
         _contexto.UsuariosRol
             .IgnoreQueryFilters()
@@ -49,6 +61,40 @@ public class RepositorioPertenencias : IRepositorioPertenencias
             .Where(integrante => integrante.NumeroDocumento == numeroDocumento)
             .Select(integrante => integrante.Usuario)
             .FirstOrDefaultAsync(cancelacion);
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<UsuarioRol>> ListarPorDocumentosAsync(
+        IReadOnlyCollection<string> numerosNormalizados, CancellationToken cancelacion = default)
+    {
+        if (numerosNormalizados.Count == 0)
+        {
+            return [];
+        }
+
+        return await _contexto.UsuariosRol
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(integrante => numerosNormalizados.Contains(integrante.NumeroDocumento))
+            .ToListAsync(cancelacion);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<Guid>> IdsDeLaCuentaConDocumentoAsync(
+        Guid usuarioId, string numeroDocumento, CancellationToken cancelacion = default) =>
+        await _contexto.UsuariosRol
+            .IgnoreQueryFilters()
+            .Where(integrante => integrante.UsuarioId == usuarioId && integrante.NumeroDocumento == numeroDocumento)
+            .Select(integrante => integrante.Id)
+            .ToListAsync(cancelacion);
+
+    /// <inheritdoc />
+    public Task<UsuarioRol?> ObtenerPorDocumentoEnClubAsync(
+        Guid clubId, string numeroDocumento, CancellationToken cancelacion = default) =>
+        _contexto.UsuariosRol
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                integrante => integrante.ClubId == clubId && integrante.NumeroDocumento == numeroDocumento, cancelacion);
 
     /// <inheritdoc />
     public Task<bool> ExisteDocumentoEnClubAsync(

@@ -22,13 +22,16 @@ public class CategoriasPorEstadoDelClubPruebas
     }
 
     /// <summary>
-    /// Los 22 endpoints de la funcionalidad, tal como los expone la API. Los de la ficha del jugador
-    /// (005) comparten el prefijo de ruta y se prueban en <c>Ficha/FichaPorEstadoDelClubPruebas</c>.
+    /// Los 22 endpoints de la funcionalidad, tal como los expone la API, más los 4 de la 007 que
+    /// comparten su prefijo (la lista "Jugadores" y la foto del jugador). Los de la ficha del jugador
+    /// (005) comparten el prefijo de ruta y se prueban en <c>Ficha/FichaPorEstadoDelClubPruebas</c>; el
+    /// de agregar un hermano (006), en <c>Hermanos/HermanosEntreClubesPruebas</c>.
     /// </summary>
     private List<Endpoint> DeCategorias => EndpointsDeLaApi.DeLaApi(_fabrica)
         .Where(endpoint => new[] { "/categorias", "/jugadores", "/mi-categoria" }
             .Any(parte => endpoint.Ruta.StartsWith("/api/clubes/{clubId}" + parte, StringComparison.Ordinal))
-            && !endpoint.Ruta.Contains("/ficha", StringComparison.Ordinal))
+            && !endpoint.Ruta.Contains("/ficha", StringComparison.Ordinal)
+            && !endpoint.Ruta.EndsWith("/hermanos", StringComparison.Ordinal))
         .ToList();
 
     [Fact]
@@ -56,14 +59,14 @@ public class CategoriasPorEstadoDelClubPruebas
     }
 
     [Fact]
-    public async Task En_un_club_suspendido_los_demas_reciben_el_aviso_en_los_22_endpoints()
+    public async Task En_un_club_suspendido_los_demas_reciben_el_aviso_en_los_26_endpoints()
     {
         var e = await EscenarioCategorias.CrearAsync(_fabrica);
         var (usuarioRetirado, retirado) = await e.Sembrar.CrearJugadorAsync(e.Club, 2015);
         await e.Sembrar.RetirarAsync(retirado, e.IntegrantePresidente);
         var delRetirado = await _fabrica.CrearClienteDePrueba().ConSesionDeAsync(usuarioRetirado);
         await CambiarEstadoAsync(e, EstadoClub.SUSPENDIDO);
-        Assert.Equal(22, DeCategorias.Count);
+        Assert.Equal(26, DeCategorias.Count);
 
         // También el retirado: primero se mira el estado del club (supuesto 6).
         foreach (var cliente in new[] { e.Directivo, e.Entrenador, e.Jugador, delRetirado })

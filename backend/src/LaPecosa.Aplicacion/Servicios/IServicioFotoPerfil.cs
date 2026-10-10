@@ -15,9 +15,14 @@ public interface IServicioFotoPerfil
 
     /// <summary>
     /// Guarda o reemplaza la foto. Si no es PNG, JPEG ni WebP: 400 <c>foto_no_es_imagen</c>; si pasa
-    /// de 1 MB: 400 <c>foto_demasiado_grande</c>. En ambos casos se conserva la anterior.
+    /// de 1 MB: 400 <c>foto_demasiado_grande</c>. En ambos casos se conserva la anterior. Devuelve
+    /// la sesión con la misma <paramref name="limitacion"/> con la que se pidió.
     /// </summary>
-    Task<SesionDto> GuardarAsync(Guid usuarioId, byte[]? contenido, CancellationToken cancelacion = default);
+    Task<SesionDto> GuardarAsync(
+        Guid usuarioId,
+        byte[]? contenido,
+        IReadOnlyCollection<Guid>? limitacion,
+        CancellationToken cancelacion = default);
 
     /// <summary>Quita la foto; no falla si no había ninguna.</summary>
     Task QuitarAsync(Guid usuarioId, CancellationToken cancelacion = default);

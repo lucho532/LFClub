@@ -8,7 +8,8 @@ namespace LaPecosa.Infraestructura.Repositorios;
 
 /// <summary>
 /// Representa el acceso a los ingresos del club de la petición con Entity Framework.
-/// Su responsabilidad es leer la sala de espera y los ingresos aprobados, y aprobar o borrar un
+/// Su responsabilidad es leer la sala de espera (cada ingreso con su cuenta y con el jugador desde
+/// cuya ficha se agregó) y los ingresos aprobados, y aprobar o borrar un
 /// ingreso con una sentencia condicionada a que siga en espera. Trabaja siempre con el filtro de
 /// aislamiento activo: sin club en el contexto no devuelve ni cambia nada.
 /// No se salta el filtro de aislamiento ni contiene reglas de negocio.
@@ -31,6 +32,7 @@ public class RepositorioIngresos : IRepositorioIngresos
         await EnEspera
             .AsNoTracking()
             .Include(integrante => integrante.Usuario)
+            .Include(integrante => integrante.AgregadoDesde)
             .OrderBy(integrante => integrante.CreadoEn)
             .ToListAsync(cancelacion);
 

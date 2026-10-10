@@ -13,6 +13,12 @@ public class OpcionesSesion
     /// <summary>Nombre de la reclamación del token que lleva el sello de seguridad.</summary>
     public const string ReclamacionSello = "sello";
 
+    /// <summary>
+    /// Nombre de la reclamación del token que lleva, una vez por cada uno, los integrantes a los
+    /// que está limitada una sesión iniciada con un documento.
+    /// </summary>
+    public const string ReclamacionJugadores = "jugadores";
+
     /// <summary>Clave con la que se firman los tokens. Mínimo 32 caracteres.</summary>
     public string ClaveFirma { get; set; } = string.Empty;
 

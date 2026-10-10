@@ -5,7 +5,11 @@ using LaPecosa.Pruebas.Integracion.Base;
 
 namespace LaPecosa.Pruebas.Integracion.Plataforma;
 
-/// <summary>Escudo del club: lo carga solo el DESARROLLADOR y se obtiene sin sesión (RF-008, research §10).</summary>
+/// <summary>
+/// Escudo del club: desde el panel lo carga solo el DESARROLLADOR, y se obtiene sin sesión (RF-008,
+/// research §10). El PRESIDENTE carga el de su propio club por la ruta del club (spec 007): ver
+/// <c>IdentidadPorElPresidentePruebas</c>.
+/// </summary>
 [Collection(ColeccionApi.Nombre)]
 public class EscudoPruebas
 {
@@ -117,7 +121,7 @@ public class EscudoPruebas
     }
 
     [Fact]
-    public async Task Solo_el_desarrollador_lo_carga()
+    public async Task Desde_el_panel_solo_lo_carga_el_desarrollador()
     {
         var club = await _fabrica.Sembrador.CrearClubAsync();
         var (presidente, _) = await _fabrica.Sembrador.CrearIntegranteAsync(club, Rol.PRESIDENTE);

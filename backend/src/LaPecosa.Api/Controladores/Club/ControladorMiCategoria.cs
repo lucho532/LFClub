@@ -32,7 +32,10 @@ public class ControladorMiCategoria : ControladorBase
         _servicio = servicio;
     }
 
-    /// <summary>La categoría, los equipos y los entrenadores del jugador de la cuenta.</summary>
+    /// <summary>
+    /// La categoría, los equipos y los entrenadores del jugador que hace la petición: el único de
+    /// la cuenta en el club o, si tiene varios, el elegido.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType<MiCategoriaDto>(StatusCodes.Status200OK)]
     public Task<MiCategoriaDto> Obtener(CancellationToken cancelacion) => _servicio.ObtenerAsync(Integrante, cancelacion);

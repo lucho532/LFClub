@@ -45,7 +45,8 @@ public class ControladorFotoPerfil : ControladorBase
     [ProducesResponseType<SesionDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]
     public async Task<SesionDto> Guardar(IFormFile? archivo, CancellationToken cancelacion) =>
-        await _servicio.GuardarAsync(UsuarioId, await ArchivoCargado.LeerAsync(archivo, cancelacion), cancelacion);
+        await _servicio.GuardarAsync(
+            UsuarioId, await ArchivoCargado.LeerAsync(archivo, cancelacion), Limitacion, cancelacion);
 
     /// <summary>Quita la foto de perfil de la cuenta con sesión.</summary>
     [HttpDelete]

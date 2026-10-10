@@ -9,22 +9,24 @@ namespace LaPecosa.Dominio.Reglas;
 /// ve y cambia todo de cualquier jugador de su club; el DIRECTIVO ve cualquier ficha con sus
 /// documentos, sin los datos clínicos y sin cambiar nada, también cuando entrena la categoría; el
 /// ENTRENADOR ve, con los datos clínicos y sin los documentos, solo a los jugadores activos de una
-/// categoría que entrena; y la cuenta del jugador ve y cambia la ficha de sus jugadores, menos los
-/// nombres, los apellidos y la fecha de nacimiento.
-/// No consulta la base de datos ni conoce HTTP: recibe ya resueltos de quién es el jugador, si
-/// está activo y si quien pregunta entrena su categoría. No decide qué responde la API a quien no
-/// tiene alcance.
+/// categoría que entrena; y la cuenta del jugador ve y cambia la ficha del jugador de la petición,
+/// menos los nombres, los apellidos y la fecha de nacimiento, y no la de un hermano (RF-030 de la
+/// 006).
+/// No consulta la base de datos ni conoce HTTP: recibe ya resueltos si el jugador es el de la
+/// petición, si está activo y si quien pregunta entrena su categoría. No decide qué responde la
+/// API a quien no tiene alcance.
 /// </summary>
 public static class ReglaAccesoAFicha
 {
     /// <summary>
     /// Evalúa el alcance sobre la ficha de un jugador.
-    /// <paramref name="esDeSuCuenta"/> indica que el jugador pertenece a la cuenta de quien pregunta;
+    /// <paramref name="esElJugadorDeLaPeticion"/> indica que el jugador de la ficha es el mismo
+    /// integrante que pregunta;
     /// <paramref name="entrenaSuCategoria"/>, que quien pregunta tiene una asignación activa en la
     /// categoría activa del jugador.
     /// </summary>
     public static AlcanceDeFicha Evaluar(
-        Rol rolDeQuienPregunta, bool esDeSuCuenta, bool jugadorActivo, bool entrenaSuCategoria) =>
+        Rol rolDeQuienPregunta, bool esElJugadorDeLaPeticion, bool jugadorActivo, bool entrenaSuCategoria) =>
         rolDeQuienPregunta switch
         {
             Rol.PRESIDENTE => new AlcanceDeFicha(true, true, true, true, true),
@@ -35,7 +37,7 @@ public static class ReglaAccesoAFicha
             Rol.ENTRENADOR when jugadorActivo && entrenaSuCategoria =>
                 new AlcanceDeFicha(true, true, false, false, false),
 
-            Rol.JUGADOR when esDeSuCuenta => new AlcanceDeFicha(true, true, true, true, false),
+            Rol.JUGADOR when esElJugadorDeLaPeticion => new AlcanceDeFicha(true, true, true, true, false),
 
             _ => AlcanceDeFicha.Ninguno,
         };

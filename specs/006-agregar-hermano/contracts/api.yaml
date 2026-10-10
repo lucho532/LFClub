@@ -1,0 +1,475 @@
+openapi: 3.1.0
+info:
+  title: La Pecosa - API de la funcionalidad 006 (agregar un hermano y elegir el jugador)
+  version: 0.6.0
+  description: |
+    Contrato de lo que esta funcionalidad añade o cambia respecto de los contratos de la 001 a la
+    005. Lo que no aparece aquí sigue igual.
+
+    Convenciones (las de las specs anteriores, más las marcadas como NUEVO):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - `/api/clubes/{clubId}/**` exige un integrante del usuario en ese club. Sin él responde 404.
+    - NUEVO: una cuenta puede tener varios integrantes en un club (hermanos). Todas las rutas
+      `/api/clubes/{clubId}/**` admiten la cabecera `X-Jugador-Elegido`, que dice cuál de ellos
+      hace la petición:
+        - Un solo integrante: la cabecera es opcional. Si llega con otro identificador, 404.
+        - Varios integrantes y cabecera con uno de ellos: ese es quien hace la petición.
+        - Varios integrantes y sin cabecera: 409 `jugador_sin_elegir`.
+        - Cabecera con un identificador que no es de la cuenta en ese club: 404 `no_encontrado`.
+    - NUEVO: un token obtenido entrando con un documento está limitado al integrante que tenía
+      ese documento. En un club donde la cuenta tiene varios integrantes, quien hace la petición
+      es siempre ese; la cabecera no lo cambia y, si se envía con otro identificador, 404.
+    - Tras decidir quién hace la petición se aplica lo de siempre a ese integrante: 403
+      `club_suspendido`, `club_dado_de_baja`, `ingreso_en_espera`, `integrante_retirado` o
+      `rol_no_autorizado`.
+    - NUEVO: una cuenta de jugador solo llega a la ficha y a los archivos del jugador que hace la
+      petición. Los de un hermano responden 404 `no_encontrado` (cambia la 005).
+    - INCREMENTO (RF-034 a RF-040): un mismo número de documento puede estar en jugadores de
+      cuentas distintas, en clubes distintos. `retiraDeOtroClub` es el único dato que la API
+      entrega sobre el otro club: un booleano, sin nombre de club ni datos de la otra cuenta. No
+      hay rutas nuevas.
+    - INCREMENTO (RF-041 a RF-043): la cuenta de un jugador puede retirarlo del club con la
+      operación de retiro de la 003, y la reincorporación se niega mientras su documento esté
+      activo con otra cuenta en otro club. Tampoco hay rutas nuevas.
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Hermanos
+  - name: Sesion
+  - name: Ingresos
+  - name: Ficha
+  - name: Jugadores
+
+paths:
+  # ------------------------------------------------------------------ Hermanos
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/hermanos:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+      - $ref: '#/components/parameters/jugadorElegido'
+    post:
+      tags: [Hermanos]
+      summary: NUEVO. Agrega un jugador a la cuenta, en este club, y lo deja en la sala de espera
+      description: |
+        Solo el rol JUGADOR. `{usuarioRolId}` debe ser el jugador que hace la petición; cualquier
+        otro, también un hermano, responde 404. Como quien hace la petición debe estar aprobado y
+        activo, no se agrega un hermano desde un jugador en espera ni retirado.
+
+        El hermano comparte el correo, el celular, el responsable y la contraseña de la cuenta.
+        Queda `EN_ESPERA`, sin categoría ni equipos. No se envía ningún correo.
+
+        INCREMENTO: si el documento es de un JUGADOR de otra cuenta en otro club, se admite
+        (RF-034). `retiraDeOtroClub` avisa de que, al aprobarse, ese jugador quedará retirado
+        allí. Agregarlo no cambia nada en el otro club (RF-035).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AgregarHermanoDto' }
+      responses:
+        '201':
+          description: El hermano, en espera
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HermanoAgregadoDto' }
+        '200':
+          description: |
+            Ese documento ya es de un jugador en espera de esta misma cuenta en este club: se
+            devuelve ese jugador, sin crear ni cambiar nada. `retiraDeOtroClub` se calcula en ese
+            momento.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HermanoAgregadoDto' }
+        '400':
+          description: |
+            `datos_invalidos`: falta un dato, el documento o la fecha no son válidos, la fecha es
+            futura, o el hermano es menor, la cuenta no tiene responsable y no se envió.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '403':
+          description: '`rol_no_autorizado` (PRESIDENTE, DIRECTIVO, ENTRENADOR), `ingreso_en_espera`, `integrante_retirado` o estado del club'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '404':
+          description: '`{usuarioRolId}` no es el jugador que hace la petición'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '409':
+          description: |
+            `documento_repetido_en_club`: ya lo tiene otro integrante del club, activo, retirado o en
+            espera. `documento_en_otra_cuenta`: CAMBIA; solo cuando, con otra cuenta, lo tiene en
+            cualquier club un integrante que no es JUGADOR (RF-039).
+            `jugador_sin_elegir`: la cuenta tiene varios jugadores y no se envió la cabecera.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  # -------------------------------------------------------------------- Sesion
+
+  /api/sesion:
+    post:
+      tags: [Sesion]
+      summary: CAMBIA. Iniciar sesión
+      description: |
+        La petición y la respuesta no cambian. Cambia el token: si `identificador` es un
+        documento, queda limitado a los integrantes de la cuenta que tienen ese número. Si es un
+        correo, no tiene limitación.
+
+        INCREMENTO (RF-040): si el documento está en más de una cuenta, abre una sola: aquella
+        donde el jugador está aprobado y activo; si no lo está en ninguna, aquella donde está en
+        espera; si tampoco, aquella donde está retirado. Con la contraseña de cualquier otra
+        cuenta responde el mismo 401 que con un dato incorrecto.
+      security: []
+      responses:
+        '200':
+          description: El token, como en la 001
+        '401':
+          description: '`credenciales_invalidas`, como en la 001; también con la contraseña de otra cuenta que tiene ese documento'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+    get:
+      tags: [Sesion]
+      summary: CAMBIA. La cuenta y sus clubes
+      description: |
+        Sigue devolviendo una entrada por club, también cuando la cuenta tiene varios jugadores
+        en él. Cada club gana `usuarioRolId` y `jugadores`.
+      responses:
+        '200':
+          description: La sesión
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SesionDto' }
+
+  /api/sesion/renovacion:
+    post:
+      tags: [Sesion]
+      summary: CAMBIA. Renovar el token
+      description: El token nuevo conserva la limitación del que se renueva.
+      responses:
+        '200':
+          description: El token, como en la 001
+
+  # ------------------------------------------------------------------ Ingresos
+
+  /api/clubes/{clubId}/ingresos/en-espera:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Ingresos]
+      summary: CAMBIA. La sala de espera
+      description: |
+        Solo PRESIDENTE. Cada ingreso gana `hermanoDe`.
+
+        INCREMENTO (RF-038): cada ingreso gana `retiraDeOtroClub`, calculado al abrir la sala de
+        espera y no al agregar al hermano.
+      responses:
+        '200':
+          description: Los ingresos en espera, del más antiguo al más reciente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/IngresoEnEsperaDto' }
+
+  /api/clubes/{clubId}/ingresos/{usuarioRolId}/aprobacion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    post:
+      tags: [Ingresos]
+      summary: CAMBIA. Aprobar un ingreso
+      description: |
+        Un hermano se aprueba con la misma operación de la 004. Queda APROBADO, con rol JUGADOR,
+        en la categoría activa de su año o sin categoría. La petición y la respuesta no cambian.
+
+        INCREMENTO (RF-036, RF-037): en la misma transacción queda retirado, en su club, todo
+        jugador aprobado y activo de otra cuenta con el mismo documento. Conserva su ficha y su
+        historial; su cuenta y sus demás jugadores no cambian; no se envía ningún aviso. Si la
+        baja no puede hacerse, la aprobación tampoco se hace. Se decide con lo que haya en el
+        momento de aprobar.
+      responses:
+        '200':
+          description: El ingreso aprobado, como en la 004
+        '409':
+          description: |
+            `ingreso_ya_aprobado`, como en la 004. NUEVO: `documento_en_otra_cuenta` si, desde
+            que se agregó, ese documento pasó a ser de un integrante de otra cuenta que no es
+            JUGADOR; no se aprueba ni se cambia nada.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  /api/clubes/{clubId}/ingresos/{usuarioRolId}/rechazo:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    post:
+      tags: [Ingresos]
+      summary: CAMBIA. Rechazar un ingreso
+      description: |
+        La petición y la respuesta no cambian. Cambia el efecto: se borra a ese jugador y nada
+        más. La cuenta, sus demás jugadores y las invitaciones con las que entraron se conservan.
+        Las invitaciones del club a ese correo solo se borran si a la cuenta no le queda ningún
+        integrante en el club. Si su documento es de un jugador de otra cuenta en otro club, ese
+        jugador no cambia (RF-035).
+      responses:
+        '204':
+          description: Rechazado
+
+  # --------------------------------------------------------------------- Ficha
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/ficha:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+      - $ref: '#/components/parameters/jugadorElegido'
+    get:
+      tags: [Ficha]
+      summary: CAMBIA. La ficha de un jugador
+      description: |
+        Para el rol JUGADOR, `{usuarioRolId}` debe ser el jugador que hace la petición. La ficha
+        de un hermano responde 404 `no_encontrado` hasta que la familia cambie de jugador. Lo
+        mismo vale para las demás operaciones de la ficha y de sus documentos (005). Los demás
+        roles no cambian.
+      responses:
+        '200':
+          description: La ficha, como en la 005
+        '404':
+          description: No es el jugador que hace la petición
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  # ---------------------------------------------------------------- Jugadores
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/retiro:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+      - $ref: '#/components/parameters/jugadorElegido'
+    post:
+      tags: [Jugadores]
+      summary: CAMBIA. Retirar del club a un jugador
+      description: |
+        INCREMENTO (RF-042, RF-043). La operación, la petición sin cuerpo y el efecto son los de la
+        003: el jugador sale de su categoría y de sus equipos, deja de entrar a este club y
+        conserva su ficha y su historial. Cambia quién puede llamarla:
+        - PRESIDENTE: cualquier jugador aprobado de su club, como hasta ahora.
+        - NUEVO. JUGADOR: solo el jugador que hace la petición (el elegido, o el de la sesión
+          con documento). La cuenta y sus demás jugadores no cambian. Queda registrado como autor
+          el nombre de ese jugador.
+        - DIRECTIVO y ENTRENADOR: 403 `rol_no_autorizado`, como hasta ahora.
+      responses:
+        '204':
+          description: Retirado
+        '403':
+          description: |
+            `rol_no_autorizado` para DIRECTIVO y ENTRENADOR. El jugador que ya está retirado o en
+            espera recibe `integrante_retirado` o `ingreso_en_espera` antes de llegar aquí.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '404':
+          description: |
+            `no_encontrado`. NUEVO: para el rol JUGADOR, `{usuarioRolId}` no es el jugador que
+            hace la petición, aunque sea un hermano de la misma cuenta.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '409':
+          description: '`no_es_jugador`, como en la 003'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/reincorporacion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    post:
+      tags: [Jugadores]
+      summary: CAMBIA. Reincorporar a un jugador retirado
+      description: |
+        INCREMENTO (RF-041). Solo PRESIDENTE, como hasta ahora; la familia no reincorpora. La
+        petición y la respuesta de éxito son las de la 003. NUEVO: se niega mientras el documento
+        del jugador esté en un integrante aprobado y activo de otra cuenta, en cualquier club. Si
+        solo lo está con la misma cuenta, sigue como hasta ahora. Se decide con lo que haya en el
+        momento de reincorporar.
+      responses:
+        '200':
+          description: El jugador reincorporado, como en la 003 (`ReincorporacionDto`)
+        '409':
+          description: |
+            `jugador_no_retirado`, como en la 003. NUEVO: `documento_activo_en_otro_club`; no se
+            cambia nada. El cuerpo no trae el nombre ni el identificador del otro club, ni ningún
+            dato de la otra cuenta.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    clubId:
+      name: clubId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    usuarioRolId:
+      name: usuarioRolId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    jugadorElegido:
+      name: X-Jugador-Elegido
+      in: header
+      required: false
+      description: |
+        El integrante de la cuenta con el que se continúa en este club. Obligatoria solo cuando
+        la cuenta tiene varios y la sesión no está limitada a uno. Vale en todas las rutas
+        `/api/clubes/{clubId}/**`, aunque aquí solo se declare en las que esta funcionalidad toca.
+      schema: { type: string, format: uuid }
+
+  schemas:
+    AgregarHermanoDto:
+      type: object
+      required: [nombres, apellidos, tipoDocumento, numeroDocumento, fechaNacimiento]
+      properties:
+        nombres: { type: string, maxLength: 80 }
+        apellidos: { type: string, maxLength: 80 }
+        tipoDocumento: { $ref: '#/components/schemas/TipoDocumento' }
+        numeroDocumento: { type: string, maxLength: 20 }
+        fechaNacimiento: { type: string, format: date }
+        nombreResponsable:
+          type: [string, 'null']
+          maxLength: 160
+          description: |
+            Obligatorio solo si el hermano es menor de 18 años y la cuenta no tiene responsable.
+            Si la cuenta ya lo tiene, se ignora.
+
+    JugadorDeSesionDto:
+      type: object
+      required: [usuarioRolId, nombres, apellidos, estadoIngreso, retirado]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        estadoIngreso: { $ref: '#/components/schemas/EstadoIngreso' }
+        retirado: { type: boolean }
+
+    HermanoAgregadoDto:
+      type: object
+      description: |
+        INCREMENTO. Los cinco campos de `JugadorDeSesionDto` más el aviso de RF-034. Solo lo
+        devuelve `POST …/hermanos`; el aviso no viaja en la sesión.
+      required: [usuarioRolId, nombres, apellidos, estadoIngreso, retirado, retiraDeOtroClub]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        estadoIngreso: { $ref: '#/components/schemas/EstadoIngreso' }
+        retirado: { type: boolean }
+        retiraDeOtroClub:
+          type: boolean
+          description: |
+            `true` si ese documento es ahora de un jugador aprobado y activo de otra cuenta en
+            otro club: al aprobarse el hermano, ese jugador dejará de estar allí.
+
+    SesionDto:
+      type: object
+      description: Como en la 001; solo cambia cada elemento de `clubes`.
+      required: [usuarioId, correo, esDesarrollador, versionFoto, clubes]
+      properties:
+        usuarioId: { type: string, format: uuid }
+        correo: { type: string }
+        esDesarrollador: { type: boolean }
+        versionFoto: { type: integer }
+        clubes:
+          type: array
+          description: Una entrada por club, aunque la cuenta tenga varios jugadores en él.
+          items: { $ref: '#/components/schemas/ClubDeSesionDto' }
+
+    ClubDeSesionDto:
+      type: object
+      description: |
+        Los campos de la 001 (`clubId`, `nombre`, `rol`, `estado`, `estadoIngreso`, `retirado`,
+        `identidad`, `nombres`, `apellidos`) siguen. Describen al único integrante de la cuenta
+        en el club; si la sesión está limitada, al de la limitación; si hay que elegir, al más
+        antiguo, y la aplicación los sustituye por los del jugador elegido.
+      required: [clubId, usuarioRolId, jugadores]
+      properties:
+        clubId: { type: string, format: uuid }
+        usuarioRolId:
+          type: string
+          format: uuid
+          description: NUEVO. El integrante al que se refieren los campos de la 001.
+        jugadores:
+          type: array
+          description: |
+            NUEVO. Los integrantes de la cuenta en este club entre los que hay que elegir, del
+            más antiguo al más reciente. Vacía si la cuenta tiene uno solo o si la sesión está
+            limitada a uno: en ese caso no se ofrece elegir ni cambiar.
+          items: { $ref: '#/components/schemas/JugadorDeSesionDto' }
+
+    IngresoEnEsperaDto:
+      type: object
+      description: Como en la 002, más `hermanoDe` y, desde el incremento, `retiraDeOtroClub`.
+      required: [usuarioRolId, nombres, apellidos, tipoDocumento, numeroDocumento, fechaNacimiento, correo, celular, registradoEn, retiraDeOtroClub]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        tipoDocumento: { $ref: '#/components/schemas/TipoDocumento' }
+        numeroDocumento: { type: string }
+        fechaNacimiento: { type: string, format: date }
+        correo: { type: string }
+        celular: { type: string }
+        nombreResponsable: { type: [string, 'null'] }
+        registradoEn: { type: string, format: date-time }
+        hermanoDe:
+          type: [string, 'null']
+          description: |
+            NUEVO. Nombres y apellidos del jugador desde cuya ficha se agregó. `null` si ese
+            jugador ya no existe.
+        retiraDeOtroClub:
+          type: boolean
+          description: |
+            INCREMENTO (RF-038). `true` si ese documento es ahora de un jugador aprobado y activo
+            de otra cuenta en otro club: aprobar este ingreso lo retirará de allí. No se entrega
+            el nombre del otro club ni ningún dato de la otra cuenta.
+
+    TipoDocumento:
+      type: string
+      enum: [REGISTRO_CIVIL, TARJETA_IDENTIDAD, CEDULA_CIUDADANIA, CEDULA_EXTRANJERIA]
+
+    EstadoIngreso:
+      type: string
+      enum: [EN_ESPERA, APROBADO]
+
+    Problema:
+      type: object
+      required: [title, status, codigo]
+      properties:
+        status: { type: integer }
+        codigo: { type: string }
+        title: { type: string }
+        errores:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }

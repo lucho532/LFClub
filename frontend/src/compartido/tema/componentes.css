@@ -44,12 +44,6 @@
   text-decoration: underline;
 }
 
-.boton-lateral {
-  background: transparent;
-  border-color: var(--lateral-texto-suave);
-  color: var(--lateral-texto);
-}
-
 .campo {
   display: flex;
   flex-direction: column;
@@ -217,4 +211,33 @@
   color: var(--color-club-principal-texto);
   font-weight: 800;
   object-fit: cover;
+}
+
+/* Lista en la que la familia elige con cuál de sus jugadores continúa. */
+.jugadores-a-elegir {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jugador-a-elegir {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 2px solid var(--borde-fuerte);
+  border-radius: 8px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
 }

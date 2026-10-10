@@ -60,6 +60,15 @@ public static class ErroresDeCategorias
     public static ExcepcionDeAplicacion NoEsJugador() => ExcepcionDeAplicacion.Conflicto(
         "no_es_jugador", "Esto solo se puede hacer con un jugador aprobado y activo del club.");
 
+    /// <summary>
+    /// 409: el documento del jugador está activo con otra cuenta en otro club, y mientras lo esté no
+    /// se le reincorpora (RF-041 de la 006). No nombra ese club ni da datos de la otra cuenta.
+    /// </summary>
+    public static ExcepcionDeAplicacion DocumentoActivoEnOtroClub() => ExcepcionDeAplicacion.Conflicto(
+        "documento_activo_en_otro_club",
+        "Este documento está activo en otro club. Para reincorporarlo, primero debe retirarse de allí, "
+        + "por su presidente o por su familia.");
+
     /// <summary>409: solo se reincorpora a un jugador que está retirado (RF-045).</summary>
     public static ExcepcionDeAplicacion JugadorNoRetirado() => ExcepcionDeAplicacion.Conflicto(
         "jugador_no_retirado", "Ese jugador no está retirado. No se cambió nada.");

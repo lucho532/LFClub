@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useFotoPerfil } from '../sesion/useFotoPerfil';
 
 interface Props {
@@ -12,22 +11,17 @@ export function inicialesDe(nombres: string, apellidos: string): string {
 }
 
 /**
- * Foto de perfil de la cuenta con sesión en la cabecera o, si no tiene, sus iniciales. Enlaza a
- * "Mi perfil", donde se carga, se cambia y se quita.
+ * Foto de perfil de la cuenta con sesión o, si no tiene, sus iniciales. Solo dibuja: el enlace a
+ * "Mi perfil", donde se carga, se cambia y se quita, está en el menú de perfil de la barra superior.
  */
 export function Avatar({ iniciales }: Props) {
   const foto = useFotoPerfil();
 
-  return (
-    <Link to="/perfil" className="fila" style={{ color: 'inherit', textDecoration: 'none' }}>
-      {foto ? (
-        <img className="distintivo" src={foto} alt="Tu foto de perfil" />
-      ) : (
-        <span className="distintivo" aria-hidden="true">
-          {iniciales}
-        </span>
-      )}
-      <span>Mi perfil</span>
-    </Link>
+  return foto ? (
+    <img className="distintivo" src={foto} alt="" />
+  ) : (
+    <span className="distintivo" aria-hidden="true">
+      {iniciales}
+    </span>
   );
 }

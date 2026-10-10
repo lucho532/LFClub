@@ -44,7 +44,10 @@ public class ServicioFotoPerfil : IServicioFotoPerfil
 
     /// <inheritdoc />
     public async Task<SesionDto> GuardarAsync(
-        Guid usuarioId, byte[]? contenido, CancellationToken cancelacion = default)
+        Guid usuarioId,
+        byte[]? contenido,
+        IReadOnlyCollection<Guid>? limitacion,
+        CancellationToken cancelacion = default)
     {
         var usuario = await CuentaAsync(usuarioId, cancelacion);
 
@@ -65,7 +68,7 @@ public class ServicioFotoPerfil : IServicioFotoPerfil
             },
             cancelacion);
 
-        return await _sesion.ObtenerAsync(usuarioId, cancelacion);
+        return await _sesion.ObtenerAsync(usuarioId, limitacion, cancelacion);
     }
 
     /// <inheritdoc />

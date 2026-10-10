@@ -331,6 +331,33 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.ToTable("FichasJugador", (string)null);
                 });
 
+            modelBuilder.Entity("LaPecosa.Dominio.Entidades.FotoJugador", b =>
+                {
+                    b.Property<Guid>("UsuarioRolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uuid");
+
+                    b.Property<byte[]>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTime>("GuardadaEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TipoContenido")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("UsuarioRolId");
+
+                    b.HasIndex("ClubId");
+
+                    b.ToTable("FotosJugador", (string)null);
+                });
+
             modelBuilder.Entity("LaPecosa.Dominio.Entidades.FotoPerfil", b =>
                 {
                     b.Property<Guid>("UsuarioId")
@@ -523,6 +550,9 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
+                    b.Property<Guid?>("AgregadoDesdeUsuarioRolId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Apellidos")
                         .IsRequired()
                         .HasMaxLength(80)
@@ -593,6 +623,8 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AgregadoDesdeUsuarioRolId");
 
                     b.HasIndex("AprobadoPorUsuarioId");
 
@@ -755,6 +787,25 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.Navigation("UsuarioRol");
                 });
 
+            modelBuilder.Entity("LaPecosa.Dominio.Entidades.FotoJugador", b =>
+                {
+                    b.HasOne("LaPecosa.Dominio.Entidades.Club", "Club")
+                        .WithMany()
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LaPecosa.Dominio.Entidades.UsuarioRol", "UsuarioRol")
+                        .WithOne()
+                        .HasForeignKey("LaPecosa.Dominio.Entidades.FotoJugador", "UsuarioRolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Club");
+
+                    b.Navigation("UsuarioRol");
+                });
+
             modelBuilder.Entity("LaPecosa.Dominio.Entidades.FotoPerfil", b =>
                 {
                     b.HasOne("LaPecosa.Dominio.Entidades.Usuario", "Usuario")
@@ -817,6 +868,11 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
 
             modelBuilder.Entity("LaPecosa.Dominio.Entidades.UsuarioRol", b =>
                 {
+                    b.HasOne("LaPecosa.Dominio.Entidades.UsuarioRol", "AgregadoDesde")
+                        .WithMany()
+                        .HasForeignKey("AgregadoDesdeUsuarioRolId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("LaPecosa.Dominio.Entidades.Usuario", null)
                         .WithMany()
                         .HasForeignKey("AprobadoPorUsuarioId")
@@ -843,6 +899,8 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("AgregadoDesde");
 
                     b.Navigation("Categoria");
 

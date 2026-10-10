@@ -8,7 +8,7 @@ namespace LaPecosa.Api.Configuracion;
 /// Representa la configuración de los controladores y de Swagger.
 /// Su responsabilidad es fijar el formato JSON del contrato (enumeraciones como texto), responder
 /// <c>datos_invalidos</c> cuando el cuerpo no se puede leer y documentar la API con el esquema de
-/// seguridad <c>sesion</c>.
+/// seguridad <c>sesion</c> y con la cabecera del jugador elegido en las operaciones de club.
 /// No registra servicios de negocio.
 /// </summary>
 public static class ConfiguracionApi
@@ -49,6 +49,7 @@ public static class ConfiguracionApi
                 BearerFormat = "JWT",
             });
             opciones.OperationFilter<FiltroOperacionAnonima>();
+            opciones.OperationFilter<FiltroJugadorElegido>();
             opciones.AddSecurityRequirement(documento => new OpenApiSecurityRequirement
             {
                 [new OpenApiSecuritySchemeReference("sesion", documento)] = [],

@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-type Variante = 'principal' | 'secundario' | 'peligro' | 'texto' | 'lateral';
+type Variante = 'principal' | 'secundario' | 'peligro' | 'texto';
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   variante?: Variante;

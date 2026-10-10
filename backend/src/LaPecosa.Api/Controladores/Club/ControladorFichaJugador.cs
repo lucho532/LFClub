@@ -14,9 +14,9 @@ namespace LaPecosa.Api.Controladores.Club;
 /// la ficha completa de cualquier jugador de su club, con categoría, sin ella o retirado; el
 /// DIRECTIVO ve cualquier ficha sin los datos clínicos, también si entrena la categoría, y no
 /// cambia nada; el ENTRENADOR ve, sin los documentos y sin cambiar nada, la de los jugadores
-/// activos de las categorías que entrena; y la cuenta de un jugador ve y cambia la de sus
-/// jugadores, menos los nombres, los apellidos y la fecha de nacimiento, que solo corrige el
-/// PRESIDENTE.
+/// activos de las categorías que entrena; y la cuenta de un jugador ve y cambia la del jugador
+/// con el que continúa, y no la de un hermano mientras no lo elija (RF-030 de la 006), menos los
+/// nombres, los apellidos y la fecha de nacimiento, que solo corrige el PRESIDENTE.
 /// No contiene reglas de negocio ni decide quién ve qué: <see cref="IntegranteDelClubAttribute"/>
 /// niega con <c>403</c> al rol que nunca puede hacer la operación, y los servicios responden
 /// <c>404</c> a quien no puede ver esa ficha, igual que si no existiera. No sirve los archivos de

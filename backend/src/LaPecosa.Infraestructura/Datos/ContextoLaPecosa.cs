@@ -69,6 +69,9 @@ public class ContextoLaPecosa : DbContext
     /// <summary>Archivos entregados para los documentos que pide la ficha.</summary>
     public DbSet<DocumentoJugador> DocumentosJugador => Set<DocumentoJugador>();
 
+    /// <summary>Fotos propias de los jugadores.</summary>
+    public DbSet<FotoJugador> FotosJugador => Set<FotoJugador>();
+
     /// <summary>Club de la petición; lo lee el filtro global en cada consulta.</summary>
     private Guid? ClubDeLaPeticion => _contextoClub.ClubId;
 

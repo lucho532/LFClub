@@ -8,9 +8,9 @@ import { SeccionInvitacionesClub } from './SeccionInvitacionesClub';
 import { SeccionSalaDeEspera } from './SeccionSalaDeEspera';
 
 /**
- * Apartado "Ingresos" del club, exclusivo de su presidente: la sala de espera, las invitaciones
- * enviadas y los ingresos aprobados. La API rechaza a cualquier otro rol, también al directivo;
- * aquí se le devuelve al inicio del club sin pedir ninguna lista.
+ * Apartado "Ingresos" del club, exclusivo de su presidente: las invitaciones enviadas, la sala de
+ * espera y los ingresos aprobados, en ese orden. La API rechaza a cualquier otro rol, también al
+ * directivo; aquí se le devuelve al inicio del club sin pedir ninguna lista.
  */
 export function Ingresos() {
   const { club } = useClub();
@@ -40,6 +40,7 @@ function SeccionesDeIngresos({ clubId }: { clubId: string }) {
       <div className="cabecera">
         <h1>Ingresos</h1>
       </div>
+      <SeccionInvitacionesClub clubId={clubId} invitaciones={invitaciones} />
       <SeccionSalaDeEspera
         clubId={clubId}
         enEspera={enEspera}
@@ -48,7 +49,6 @@ function SeccionesDeIngresos({ clubId }: { clubId: string }) {
           invitaciones.recargar();
         }}
       />
-      <SeccionInvitacionesClub clubId={clubId} invitaciones={invitaciones} />
       <SeccionIngresosAprobados aprobados={aprobados} />
     </>
   );

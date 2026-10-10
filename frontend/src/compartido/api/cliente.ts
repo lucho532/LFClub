@@ -1,8 +1,20 @@
 import { borrarToken, leerToken } from '../sesion/almacenToken';
+import { CABECERA_JUGADOR_ELEGIDO, leerJugadorElegido } from '../sesion/jugadorElegido';
 import { URL_API } from './configuracion';
 import { errorDeRespuesta, errorSinConexion } from './errores';
 
 type Metodo = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+const RUTA_DE_CLUB = /^\/api\/clubes\/([^/?]+)/;
+
+/**
+ * El jugador con el que la familia continúa en el club de esa ruta, o `null` si la ruta no es de
+ * un club o no hay elección: entonces la petición es la de siempre, sin cabecera.
+ */
+function jugadorElegidoPara(ruta: string): string | null {
+  const clubId = RUTA_DE_CLUB.exec(ruta)?.[1];
+  return clubId ? leerJugadorElegido(clubId) : null;
+}
 
 /** Si la API dice que la sesión ya no sirve, se borra y se vuelve al inicio de sesión. */
 function alPerderLaSesion(): void {
@@ -17,6 +29,11 @@ async function enviar(metodo: Metodo, ruta: string, cuerpo?: unknown): Promise<R
   const token = leerToken();
   if (token) {
     cabeceras.Authorization = `Bearer ${token}`;
+  }
+
+  const jugadorElegido = jugadorElegidoPara(ruta);
+  if (jugadorElegido) {
+    cabeceras[CABECERA_JUGADOR_ELEGIDO] = jugadorElegido;
   }
 
   let contenido: BodyInit | undefined;
@@ -54,7 +71,10 @@ async function comoJson<T>(respuesta: Response): Promise<T> {
   return (await respuesta.json()) as T;
 }
 
-/** Cliente de la API sobre `fetch`: añade la sesión y convierte los errores en `ErrorApi`. */
+/**
+ * Cliente de la API sobre `fetch`: añade la sesión y, en las rutas de un club, el jugador elegido,
+ * y convierte los errores en `ErrorApi`.
+ */
 export const api = {
   get: async <T>(ruta: string) => comoJson<T>(await enviar('GET', ruta)),
   post: async <T = void>(ruta: string, cuerpo?: unknown) => comoJson<T>(await enviar('POST', ruta, cuerpo)),

@@ -29,6 +29,10 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 
     public SembradorFichas Fichas => new(this);
 
+    public SembradorHermanos Hermanos => new(this);
+
+    public SembradorJugadores Jugadores => new(this);
+
     public async Task InitializeAsync()
     {
         await _baseDatos.StartAsync();

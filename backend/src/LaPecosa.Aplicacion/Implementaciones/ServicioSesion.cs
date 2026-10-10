@@ -4,6 +4,7 @@ using LaPecosa.Aplicacion.Mappers;
 using LaPecosa.Aplicacion.Servicios;
 using LaPecosa.Aplicacion.Utilidades;
 using LaPecosa.Dominio.Entidades;
+using LaPecosa.Dominio.Reglas;
 
 namespace LaPecosa.Aplicacion.Implementaciones;
 
@@ -11,8 +12,13 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// Representa el servicio de la sesión.
 /// Su responsabilidad es comprobar las credenciales sin revelar si una cuenta existe (RF-005),
 /// contar los fallos seguidos hasta bloquear la cuenta al quinto, emitir y renovar tokens y listar
-/// los clubes de la cuenta.
-/// No accede al contexto de Entity Framework ni conoce HTTP, y no normaliza la contraseña.
+/// los clubes de la cuenta. Un documento puede estar en varias cuentas (el hermano de la 006): abre
+/// la del jugador activo y solo admite su contraseña (research §15 de la 006). Si se entra con un
+/// documento, emite el token limitado a los integrantes de esa cuenta que tienen ese número, uno
+/// por club, y lo conserva al renovar: se guardan sus identificadores y no el número, para que
+/// cambiar el documento del jugador durante la sesión no la rompa (research §3 de la 006).
+/// No accede al contexto de Entity Framework ni conoce HTTP, y no normaliza la contraseña. No
+/// aplica la limitación a las peticiones: eso es de la autorización.
 /// </summary>
 public class ServicioSesion : IServicioSesion
 {
@@ -71,22 +77,30 @@ public class ServicioSesion : IServicioSesion
             await _usuarios.ReiniciarFallosDeSesionAsync(usuario.Id, cancelacion);
         }
 
-        return MapperSesion.AToken(_emisor.Emitir(usuario.Id, usuario.SelloSeguridad));
+        // Con el documento de un jugador la sesión queda limitada a él; con el correo, no (RF-026).
+        var jugadores = identificador.Contains('@')
+            ? null
+            : await _pertenencias.IdsDeLaCuentaConDocumentoAsync(
+                usuario.Id, NormalizadorTexto.Documento(identificador), cancelacion);
+
+        return MapperSesion.AToken(_emisor.Emitir(usuario.Id, usuario.SelloSeguridad, jugadores));
     }
 
     /// <inheritdoc />
-    public async Task<SesionDto> ObtenerAsync(Guid usuarioId, CancellationToken cancelacion = default)
+    public async Task<SesionDto> ObtenerAsync(
+        Guid usuarioId, IReadOnlyCollection<Guid>? limitacion, CancellationToken cancelacion = default)
     {
         var usuario = await CuentaConSesionAsync(usuarioId, cancelacion);
         var integrantes = await _pertenencias.ListarDeUsuarioAsync(usuarioId, cancelacion);
-        return MapperSesion.ASesion(usuario, integrantes);
+        return MapperSesion.ASesion(usuario, integrantes, limitacion);
     }
 
     /// <inheritdoc />
-    public async Task<TokenSesionDto> RenovarAsync(Guid usuarioId, CancellationToken cancelacion = default)
+    public async Task<TokenSesionDto> RenovarAsync(
+        Guid usuarioId, IReadOnlyCollection<Guid>? limitacion, CancellationToken cancelacion = default)
     {
         var usuario = await CuentaConSesionAsync(usuarioId, cancelacion);
-        return MapperSesion.AToken(_emisor.Emitir(usuario.Id, usuario.SelloSeguridad));
+        return MapperSesion.AToken(_emisor.Emitir(usuario.Id, usuario.SelloSeguridad, limitacion));
     }
 
     private Task<Usuario?> BuscarCuentaAsync(string identificador, CancellationToken cancelacion)
@@ -99,7 +113,18 @@ public class ServicioSesion : IServicioSesion
         // Con arroba es un correo; sin ella, un número de documento.
         return identificador.Contains('@')
             ? _usuarios.ObtenerPorCorreoAsync(identificador, cancelacion)
-            : _pertenencias.ObtenerCuentaPorDocumentoAsync(NormalizadorTexto.Documento(identificador), cancelacion);
+            : CuentaDelDocumentoAsync(NormalizadorTexto.Documento(identificador), cancelacion);
+    }
+
+    /// <summary>
+    /// La cuenta que abre ese número: si está en varias, la del jugador activo, luego la del que
+    /// espera y luego la del retirado (RF-040 de la 006). La contraseña solo se compara con esa.
+    /// </summary>
+    private async Task<Usuario?> CuentaDelDocumentoAsync(string numero, CancellationToken cancelacion)
+    {
+        var integrantes = await _pertenencias.ListarPorDocumentosAsync([numero], cancelacion);
+        var cuenta = ReglaDocumentoCompartido.CuentaQueAbre(integrantes);
+        return cuenta is null ? null : await _usuarios.ObtenerPorIdAsync(cuenta.Value, cancelacion);
     }
 
     private async Task<Usuario> CuentaConSesionAsync(Guid usuarioId, CancellationToken cancelacion) =>

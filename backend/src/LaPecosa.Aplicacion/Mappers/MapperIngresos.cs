@@ -22,8 +22,14 @@ public static class MapperIngresos
         invitacion.CreadaEn,
         invitacion.VenceEn);
 
-    /// <summary>Persona de la sala de espera, a partir de un integrante con su cuenta cargada.</summary>
-    public static IngresoEnEsperaDto AIngresoEnEspera(UsuarioRol integrante)
+    /// <summary>
+    /// Persona de la sala de espera, a partir de un integrante con su cuenta cargada y, si se
+    /// agregó desde la ficha de un hermano que sigue en el club, con ese jugador de origen. El
+    /// nombre del hermano se lee en el momento: no se copia en ninguna columna, porque solo se
+    /// muestra mientras el ingreso está en espera y no es histórico (§13).
+    /// <paramref name="retiraDeOtroClub"/> llega ya calculado por el servicio.
+    /// </summary>
+    public static IngresoEnEsperaDto AIngresoEnEspera(UsuarioRol integrante, bool retiraDeOtroClub)
     {
         var cuenta = integrante.Usuario
             ?? throw new InvalidOperationException("El integrante en espera debe venir con su cuenta cargada.");
@@ -38,7 +44,9 @@ public static class MapperIngresos
             cuenta.Correo,
             cuenta.Celular ?? string.Empty,
             cuenta.NombreResponsable,
-            integrante.CreadoEn);
+            integrante.CreadoEn,
+            integrante.AgregadoDesde is { } origen ? $"{origen.Nombres} {origen.Apellidos}" : null,
+            retiraDeOtroClub);
     }
 
     /// <summary>

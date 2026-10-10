@@ -1,0 +1,47 @@
+/* Inicio del club por rol (spec 007). Separado de fichas.css para no pasar de 250 líneas. */
+
+/* Las cuatro cifras del resumen: dos por fila en el teléfono, cuatro en escritorio. */
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.cifra {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.cifra dt {
+  color: var(--texto-suave);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cifra dd {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+/* Las categorías del entrenador: el enlace y, al lado o debajo, cuántos jugadores y qué dirige. */
+.lista-de-inicio {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-de-inicio li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+}

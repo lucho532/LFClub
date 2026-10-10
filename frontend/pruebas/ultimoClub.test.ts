@@ -13,6 +13,8 @@ function club(clubId: string, estadoIngreso: EstadoIngreso = 'APROBADO', retirad
     identidad: { colorPrincipal: null, colorAcento: null, urlEscudo: null },
     nombres: 'Ana',
     apellidos: 'Pérez',
+    usuarioRolId: `integrante-${clubId}`,
+    jugadores: [],
   };
 }
 

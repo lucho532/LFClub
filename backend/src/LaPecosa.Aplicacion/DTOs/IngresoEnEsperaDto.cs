@@ -4,8 +4,10 @@ namespace LaPecosa.Aplicacion.DTOs;
 
 /// <summary>
 /// Representa a una persona de la sala de espera tal como la ve el PRESIDENTE de su club (RF-017).
-/// Su responsabilidad es llevar sus datos y desde cuándo espera, para que el PRESIDENTE decida si
-/// aprueba o rechaza su ingreso.
+/// Su responsabilidad es llevar sus datos, desde cuándo espera, de qué jugador del club es hermano
+/// (RF-015 de la 006) y si aprobarlo retirará a un jugador de otra cuenta en otro club (RF-038 de
+/// la 006), para que el PRESIDENTE decida si aprueba o rechaza su ingreso. De ese otro club no
+/// lleva nada más que el aviso: ni su nombre ni datos de la otra cuenta.
 /// No sale por ningún otro endpoint: es el único lugar donde la API entrega el nombre del
 /// responsable. No lleva rol: quien está en espera es siempre JUGADOR y lo sigue siendo al
 /// aprobarse (RF-016).
@@ -20,6 +22,14 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// <param name="Celular">Celular de contacto.</param>
 /// <param name="NombreResponsable">Nombre del padre, madre o responsable; nulo si no lo indicó.</param>
 /// <param name="RegistradoEn">Fecha en que se registró en el club, en UTC.</param>
+/// <param name="HermanoDe">
+/// Nombres y apellidos del jugador desde cuya ficha se agregó; <c>null</c> si ese jugador ya no
+/// existe o si el ingreso no viene de la ficha de un hermano.
+/// </param>
+/// <param name="RetiraDeOtroClub">
+/// Si aprobar este ingreso retirará a un jugador de otra cuenta en otro club. Se calcula al
+/// consultar y no se guarda.
+/// </param>
 public record IngresoEnEsperaDto(
     Guid UsuarioRolId,
     string Nombres,
@@ -30,4 +40,6 @@ public record IngresoEnEsperaDto(
     string Correo,
     string Celular,
     string? NombreResponsable,
-    DateTime RegistradoEn);
+    DateTime RegistradoEn,
+    string? HermanoDe,
+    bool RetiraDeOtroClub);

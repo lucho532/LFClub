@@ -171,6 +171,22 @@ public class RegistroConInvitacionPruebas
         Assert.Equal(HttpStatusCode.Created, valido.StatusCode);
     }
 
+    // Research §16 de la 006: basta con que el número tenga dueño, aunque esté en dos cuentas.
+    [Fact]
+    public async Task Un_documento_que_esta_en_dos_cuentas_tampoco_se_registra()
+    {
+        var club = await _fabrica.Sembrador.CrearClubAsync();
+        var (_, enUna) = await _fabrica.Sembrador.CrearIntegranteAsync(await _fabrica.Sembrador.CrearClubAsync(), Rol.JUGADOR);
+        await _fabrica.Sembrador.CrearIntegranteAsync(
+            await _fabrica.Sembrador.CrearClubAsync(), await _fabrica.Sembrador.CrearCuentaAsync(), Rol.JUGADOR, enUna.NumeroDocumento);
+        var (_, token) = await _fabrica.Sembrador.CrearInvitacionAsync(club);
+
+        var respuesta = await _fabrica.CrearClienteDePrueba().PostAsync("/api/invitaciones/registro", Datos(token, enUna.NumeroDocumento));
+
+        Assert.Equal(HttpStatusCode.Conflict, respuesta.StatusCode);
+        Assert.Equal("documento_en_otra_cuenta", await ClienteDePrueba.CodigoAsync(respuesta));
+    }
+
     [Fact]
     public async Task Los_datos_no_validos_responden_400_por_campo_y_no_gastan_la_invitacion()
     {

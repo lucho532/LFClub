@@ -9,7 +9,8 @@ namespace LaPecosa.Infraestructura.Datos.Configuraciones;
 /// Representa la configuración de persistencia de <see cref="UsuarioRol"/>.
 /// Su responsabilidad es fijar la tabla, las longitudes, el documento único por club (RF-017), el
 /// borrado en cascada desde el club, la referencia a quien aprobó el ingreso, el índice de la
-/// sala de espera y, del jugador, su categoría actual y los datos de su retiro.
+/// sala de espera y, del jugador, su categoría actual, los datos de su retiro y el jugador desde
+/// cuya ficha se agregó.
 /// No contiene reglas de negocio.
 /// </summary>
 public class ConfiguracionUsuarioRol : IEntityTypeConfiguration<UsuarioRol>
@@ -59,6 +60,12 @@ public class ConfiguracionUsuarioRol : IEntityTypeConfiguration<UsuarioRol>
         builder.HasOne<Usuario>()
             .WithMany()
             .HasForeignKey(integrante => integrante.RetiradoPorUsuarioId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // El jugador de origen puede dejar el club: su hermano se queda, sin decir de quién lo es.
+        builder.HasOne(integrante => integrante.AgregadoDesde)
+            .WithMany()
+            .HasForeignKey(integrante => integrante.AgregadoDesdeUsuarioRolId)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasIndex(integrante => new { integrante.ClubId, integrante.CategoriaId });

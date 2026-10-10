@@ -11,8 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace LaPecosa.Pruebas.Integracion.Base;
 
 /// <summary>
-/// Cliente HTTP de las pruebas: inicia sesión, envía peticiones con el token y lee las respuestas
-/// con el mismo formato JSON del contrato.
+/// Cliente HTTP de las pruebas: inicia sesión, envía peticiones con el token y, si se le indica,
+/// con el jugador elegido, y lee las respuestas con el mismo formato JSON del contrato.
 /// </summary>
 public class ClienteDePrueba
 {
@@ -20,6 +20,8 @@ public class ClienteDePrueba
     {
         Converters = { new JsonStringEnumConverter() },
     };
+
+    public const string CabeceraJugadorElegido = "X-Jugador-Elegido";
 
     private readonly FabricaApi _fabrica;
 
@@ -54,6 +56,37 @@ public class ClienteDePrueba
             contexto.Usuarios.AsNoTracking().FirstAsync(cuenta => cuenta.Id == usuario.Id));
         var emisor = _fabrica.Services.GetRequiredService<IEmisorTokenSesion>();
         UsarToken(emisor.Emitir(actual.Id, actual.SelloSeguridad).Token);
+        return this;
+    }
+
+    /// <summary>
+    /// Abre una sesión limitada a esos integrantes, como la que deja entrar con el documento de un
+    /// jugador, sin pasar por el inicio de sesión.
+    /// </summary>
+    public async Task<ClienteDePrueba> ConSesionLimitadaAsync(Usuario usuario, params Guid[] jugadores)
+    {
+        var actual = await _fabrica.ConContextoAsync(contexto =>
+            contexto.Usuarios.AsNoTracking().FirstAsync(cuenta => cuenta.Id == usuario.Id));
+        var emisor = _fabrica.Services.GetRequiredService<IEmisorTokenSesion>();
+        UsarToken(emisor.Emitir(actual.Id, actual.SelloSeguridad, jugadores).Token);
+        return this;
+    }
+
+    /// <summary>
+    /// Pone en las peticiones siguientes la cabecera <c>X-Jugador-Elegido</c> con ese integrante,
+    /// o la quita si es nulo.
+    /// </summary>
+    public ClienteDePrueba ElegirJugador(Guid? usuarioRolId) => ElegirJugador(usuarioRolId?.ToString());
+
+    /// <summary>Pone la cabecera con un texto cualquiera, para probar los que no son un identificador.</summary>
+    public ClienteDePrueba ElegirJugador(string? valor)
+    {
+        Http.DefaultRequestHeaders.Remove(CabeceraJugadorElegido);
+        if (valor is not null)
+        {
+            Http.DefaultRequestHeaders.TryAddWithoutValidation(CabeceraJugadorElegido, valor);
+        }
+
         return this;
     }
 

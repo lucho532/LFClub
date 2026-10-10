@@ -1,21 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ClubDeSesionDto } from '../compartido/api/tipos';
+import type { ClubDeSesionDto } from '../compartido/api/tiposSesion';
 import { Aviso } from '../compartido/componentes/Aviso';
 import { Boton } from '../compartido/componentes/Boton';
 import { BotonTema } from '../compartido/componentes/BotonTema';
+import { jugadorDe } from '../compartido/sesion/jugadorElegido';
 import { useSesion } from '../compartido/sesion/useSesion';
 import { Escudo, IdentidadClub } from '../compartido/tema/IdentidadClub';
 import { AvisoClubNoDisponible } from './AvisoClubNoDisponible';
+import { BotonCambiarJugador } from './BotonCambiarJugador';
 import { DesplegableClubes } from './DesplegableClubes';
 
 /**
  * Lo único que ve de un club quien tiene su ingreso en espera: el nombre y la identidad del club,
  * que ya trae la sesión, y el aviso de que su ingreso está pendiente. Quien se registra con una
- * invitación ya no pasa por aquí: entra directamente. Queda para el jugador agregado desde la
- * ficha de un hermano, hasta que el presidente lo apruebe. No tiene menú y no pide nada al club:
- * la API se lo negaría. Conserva el tema, el cambio de club y el cierre de sesión. "Actualizar"
- * recarga la sesión; si ya fue aprobada, entra al club.
+ * invitación no pasa por aquí: entra directamente. Es lo que ve la familia cuando elige al
+ * jugador que agregó desde la ficha de un hermano, hasta que el presidente lo apruebe. No tiene
+ * menú y no pide nada al club: la API se lo negaría. Conserva el tema, el cambio de club, el
+ * cierre de sesión y, si la familia entró con el correo, "Cambiar de jugador" (RF-013).
+ * "Actualizar" recarga la sesión; si ya fue aprobado, entra al club.
  * Si el club está suspendido o dado de baja muestra ese aviso, como a cualquier otro integrante.
  */
 export function SalaDeEspera({ club }: { club: ClubDeSesionDto }) {
@@ -29,10 +32,10 @@ export function SalaDeEspera({ club }: { club: ClubDeSesionDto }) {
     setSinCambios(false);
     const actual = await recargar();
     // Si la aprobaron, esta pantalla deja de mostrarse; si sigue aquí, se le dice que nada cambió.
-    const sigueEnEspera = actual?.clubes.some(
-      (candidato) => candidato.clubId === club.clubId && candidato.estadoIngreso === 'EN_ESPERA',
-    );
-    setSinCambios(sigueEnEspera === true);
+    // Se mira al jugador elegido, no al más antiguo de la cuenta, que puede estar ya aprobado.
+    const delClub = actual?.clubes.find((candidato) => candidato.clubId === club.clubId);
+    const sigueEnEspera = delClub !== undefined && (jugadorDe(delClub) ?? delClub).estadoIngreso === 'EN_ESPERA';
+    setSinCambios(sigueEnEspera);
     setActualizando(false);
   }
 
@@ -53,12 +56,12 @@ export function SalaDeEspera({ club }: { club: ClubDeSesionDto }) {
       <main className="tarjeta">
         {club.estado === 'ACTIVO' ? (
           <>
-            <h2>Tu ingreso está pendiente de aprobación</h2>
+            <h2>El ingreso de {club.nombres} está pendiente de aprobación</h2>
             <p>
-              Hola, {club.nombres}. Ya estás registrado en {club.nombre}. Cuando el club apruebe tu ingreso
-              podrás entrar; no tienes que registrarte de nuevo.
+              {club.nombres} ya está registrado en {club.nombre}. Cuando el club apruebe su ingreso podrá
+              entrar; no hay que registrarlo de nuevo.
             </p>
-            {sinCambios && <Aviso tono="info">Tu ingreso sigue pendiente de aprobación.</Aviso>}
+            {sinCambios && <Aviso tono="info">Su ingreso sigue pendiente de aprobación.</Aviso>}
             <Boton onClick={() => void actualizar()} cargando={actualizando} textoCargando="Actualizando…">
               Actualizar
             </Boton>
@@ -69,6 +72,7 @@ export function SalaDeEspera({ club }: { club: ClubDeSesionDto }) {
             tieneOtrosClubes={(sesion?.clubes.length ?? 0) > 1}
           />
         )}
+        <BotonCambiarJugador club={club} />
         <DesplegableClubes clubId={club.clubId} />
         <Boton variante="secundario" onClick={cerrarSesion}>
           Cerrar sesión

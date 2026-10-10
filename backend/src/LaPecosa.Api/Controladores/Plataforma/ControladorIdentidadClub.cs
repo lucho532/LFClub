@@ -10,8 +10,9 @@ namespace LaPecosa.Api.Controladores.Plataforma;
 /// Representa los endpoints del panel de administración para la identidad de un club: colores y
 /// escudo.
 /// Su responsabilidad es recibir la petición y delegar en <see cref="IServicioIdentidadClub"/>.
-/// No contiene reglas de negocio ni valida la imagen; solo admite a la cuenta DESARROLLADOR, de
-/// modo que ni el presidente del propio club puede cambiar su escudo o sus colores (RF-008).
+/// No contiene reglas de negocio ni valida la imagen; solo admite a la cuenta DESARROLLADOR. No es
+/// la única entrada: desde la 007 el PRESIDENTE cambia la identidad de su propio club con
+/// <c>ControladorIdentidadDelClub</c>, con las mismas reglas, y vale el último cambio.
 /// </summary>
 [Route("api/plataforma/clubes/{clubId:guid}")]
 [Tags("Plataforma")]

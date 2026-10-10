@@ -1,0 +1,213 @@
+/* Armazón con sesión: menú lateral, barra superior, menú de perfil, botón de tema y marca de
+   agua con el escudo del club. Lo propio del teléfono (barra de pestañas inferior) está en
+   movil.css. Sin desplazamiento horizontal a 360 px. */
+
+.lateral-icono {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.barra-superior {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px clamp(16px, 4vw, 32px);
+  border-bottom: 1px solid var(--borde);
+  background: var(--superficie);
+}
+
+.barra-superior-marca {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-family: 'Barlow Condensed', Barlow, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.barra-superior-marca span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barra-superior-marca .distintivo {
+  width: 40px;
+  height: 40px;
+}
+
+.barra-superior-acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-left: auto;
+}
+
+/* Botón redondo con solo un dibujo; su nombre accesible lo lleva el propio botón. */
+.boton-icono {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 50%;
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.menu-perfil {
+  position: relative;
+  min-width: 0;
+}
+
+.menu-perfil-boton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 3px 14px 3px 3px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-perfil-boton .distintivo {
+  width: 38px;
+  height: 38px;
+  font-size: 15px;
+}
+
+.menu-perfil-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.menu-perfil-texto span,
+.menu-perfil-encabezado > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-perfil-texto .texto-suave {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.menu-perfil-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: min(280px, calc(100vw - 32px));
+  padding: 6px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: var(--superficie);
+  box-shadow: 0 16px 32px -12px rgb(0 0 0 / 40%);
+}
+
+.menu-perfil-encabezado {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borde);
+  margin-bottom: 4px;
+}
+
+.menu-perfil-panel > a,
+.menu-perfil-panel > button {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menu-perfil-panel > a:hover,
+.menu-perfil-panel > button:hover {
+  background: var(--superficie-suave);
+}
+
+.menu-perfil-panel .solo-movil {
+  padding: 4px 12px 8px;
+}
+
+/* Con un solo club el desplegable no se pinta y su hueco tampoco. */
+.menu-perfil-panel .solo-movil:empty {
+  display: none;
+}
+
+.solo-movil {
+  display: none;
+}
+
+/* Marca de agua: el escudo del club, grande y muy claro, detrás de todo el contenido. Se mezcla
+   con el fondo para que el fondo blanco o negro de la imagen no se vea como una caja: en el tema
+   claro conserva sus colores; en el oscuro queda como una silueta clara de un solo tono. */
+.con-marca-agua::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--escudo-marca) no-repeat center / min(62vmin, 560px);
+  opacity: 0.09;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+[data-tema='oscuro'] .con-marca-agua::before {
+  filter: grayscale(1) invert(1);
+  mix-blend-mode: screen;
+  opacity: 0.07;
+}
+
+@media (min-width: 721px) {
+  /* El menú lateral se queda fijo al desplazarse por la pantalla. */
+  .disposicion > .lateral {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  /* Con menú lateral, el escudo se centra en la parte de la pantalla que queda a su derecha. */
+  .disposicion.con-marca-agua::before {
+    left: 240px;
+  }
+}

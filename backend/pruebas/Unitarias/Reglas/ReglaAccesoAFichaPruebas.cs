@@ -7,7 +7,7 @@ public class ReglaAccesoAFichaPruebas
 {
     private static readonly bool[] Ambos = [true, false];
 
-    // Con categoría, sin ella o retirado, sea o no de su cuenta y entrene o no la categoría.
+    // Con categoría, sin ella o retirado, sea o no el de la petición y entrene o no la categoría.
     [Fact]
     public void El_presidente_ve_y_cambia_todo_de_cualquier_jugador()
     {
@@ -35,7 +35,7 @@ public class ReglaAccesoAFichaPruebas
     public void El_entrenador_ve_con_datos_clinicos_y_sin_documentos_al_jugador_activo_de_su_categoria() =>
         Assert.Equal(
             new AlcanceDeFicha(true, true, false, false, false),
-            ReglaAccesoAFicha.Evaluar(Rol.ENTRENADOR, esDeSuCuenta: false, jugadorActivo: true, entrenaSuCategoria: true));
+            ReglaAccesoAFicha.Evaluar(Rol.ENTRENADOR, esElJugadorDeLaPeticion: false, jugadorActivo: true, entrenaSuCategoria: true));
 
     // RF-008: otra categoría o sin categoría (no la entrena) y retirado (no está activo).
     [Theory]
@@ -55,7 +55,7 @@ public class ReglaAccesoAFichaPruebas
 
     // RF-005, RF-016 y RF-017: todo menos corregir nombres, apellidos y fecha de nacimiento.
     [Fact]
-    public void La_cuenta_del_jugador_ve_y_cambia_la_ficha_de_su_jugador_sin_corregir_la_identidad()
+    public void La_cuenta_del_jugador_ve_y_cambia_la_ficha_del_jugador_de_la_peticion_sin_corregir_la_identidad()
     {
         foreach (var activo in Ambos)
         {
@@ -63,7 +63,7 @@ public class ReglaAccesoAFichaPruebas
             {
                 Assert.Equal(
                     new AlcanceDeFicha(true, true, true, true, false),
-                    ReglaAccesoAFicha.Evaluar(Rol.JUGADOR, esDeSuCuenta: true, activo, entrena));
+                    ReglaAccesoAFicha.Evaluar(Rol.JUGADOR, esElJugadorDeLaPeticion: true, activo, entrena));
             }
         }
     }
@@ -77,7 +77,7 @@ public class ReglaAccesoAFichaPruebas
             {
                 Assert.Equal(
                     AlcanceDeFicha.Ninguno,
-                    ReglaAccesoAFicha.Evaluar(Rol.JUGADOR, esDeSuCuenta: false, activo, entrena));
+                    ReglaAccesoAFicha.Evaluar(Rol.JUGADOR, esElJugadorDeLaPeticion: false, activo, entrena));
             }
         }
     }

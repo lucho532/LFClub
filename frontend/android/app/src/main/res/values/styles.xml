@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+        <!-- Mientras carga la web se ve el mismo fondo del arranque, no una pantalla blanca. -->
+        <item name="android:windowBackground">@color/fondo_arranque</item>
+    </style>
+
+    <!-- Pantalla de arranque: el balón de La Pecosa sobre el fondo oscuro. Desde Android 12 gira;
+         antes se ve quieto (fondo_arranque). Después sigue la animación de la web. -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/fondo_arranque</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/balon_arranque_animado</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+        <item name="android:windowBackground">@drawable/fondo_arranque</item>
+    </style>
+</resources>

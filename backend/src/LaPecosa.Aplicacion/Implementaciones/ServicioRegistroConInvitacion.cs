@@ -13,10 +13,11 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// <summary>
 /// Representa el servicio de registro con invitación.
 /// Su responsabilidad es comprobar que la invitación está vigente, que el correo no tiene cuenta y
-/// que el documento no se repite en el club ni pertenece a otra cuenta (una persona tiene un único
-/// inicio de sesión), y crear la cuenta y el integrante en la misma transacción en que la
-/// invitación queda usada. Quien se registra entra directamente al club con el rol de su
-/// invitación, aprobado y sin sala de espera (RF-008); si es JUGADOR queda además, en esa misma
+/// que el documento no se repite en el club ni pertenece a ninguna otra cuenta, aunque esté en dos
+/// (una persona tiene un único inicio de sesión; solo el hermano de la 006 comparte número), y
+/// crear la cuenta y el integrante en la misma transacción en que la invitación queda usada.
+/// Quien se registra entra directamente al club con el rol de su invitación, aprobado y sin sala
+/// de espera (RF-008); si es JUGADOR queda además, en esa misma
 /// transacción y con el club bloqueado, en la categoría activa de su año de nacimiento, o sin
 /// categoría si el club no la tiene (RF-011).
 /// No acepta un correo, un club ni un rol enviados por quien se registra, y no puede crear una

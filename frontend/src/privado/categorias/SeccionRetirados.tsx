@@ -21,10 +21,12 @@ interface Props {
 
 /**
  * Jugadores retirados del club, del retiro más reciente al más antiguo: quién es, su año de
- * nacimiento, quién lo retiró y cuándo (RF-044). El nombre abre su ficha, que el club conserva
- * completa mientras dura el retiro (RF-034). El presidente puede reincorporar a cada uno, que
- * vuelve a entrar con su misma cuenta y queda en la categoría activa de su año o sin categoría; el
- * directivo solo ve la lista.
+ * nacimiento, quién lo retiró (el presidente o su propia familia; nadie si quedó retirado al
+ * aprobarse un hermano en otro club) y cuándo (RF-044). El nombre abre su ficha, que el club
+ * conserva completa mientras dura el retiro (RF-034). El presidente puede reincorporar a cada uno,
+ * que vuelve a entrar con su misma cuenta y queda en la categoría activa de su año o sin
+ * categoría, salvo que su documento esté activo con otra cuenta en otro club: entonces se muestra
+ * el motivo que da la API. El directivo solo ve la lista.
  */
 export function SeccionRetirados({ clubId, esPresidente, retirados, alCambiar }: Props) {
   const { ocupado, mensaje, ejecutar } = useAccion();

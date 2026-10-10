@@ -13,9 +13,9 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// Su responsabilidad es resolver el acceso, validar con las reglas del registro y, con el club
 /// bloqueado, actualizar la misma fila del jugador y sellar el último cambio solo si algo quedó
 /// distinto. Al cambiar el documento impide el número que ya tiene otro integrante del club o que
-/// usa otra cuenta, y traduce la violación del índice único al mismo 409. Al corregir la fecha de
-/// nacimiento ubica al jugador activo que no tiene categoría, con la regla de la 003, y nunca
-/// mueve a quien ya tiene una (RF-025).
+/// usa alguna otra cuenta, y traduce la violación del índice único al mismo 409. Al corregir la
+/// fecha de nacimiento ubica al jugador activo que no tiene categoría, con la regla de la 003, y
+/// nunca mueve a quien ya tiene una (RF-025).
 /// No cambia la cuenta, la contraseña ni las sesiones abiertas; no toca los nombres ya copiados en
 /// una aprobación o un retiro (§13); no exige el responsable aunque el jugador pase a ser menor;
 /// no accede al contexto de Entity Framework ni conoce HTTP.
@@ -156,8 +156,8 @@ public class ServicioIdentidadJugador : IServicioIdentidadJugador
 
     /// <summary>
     /// Lanza el 409 que corresponde si ese número ya lo tiene otro integrante del club, activo o
-    /// retirado (RF-023), o si lo usa otra cuenta en otro club. Si es de la misma cuenta en otro
-    /// club se admite: es la misma persona (§10).
+    /// retirado (RF-023), o si lo usa alguna otra cuenta en otro club, aunque también lo tenga la
+    /// misma. Si solo es de la misma cuenta en otro club se admite: es la misma persona (§10).
     /// </summary>
     private async Task ExigirNumeroLibreAsync(UsuarioRol jugador, string numero, CancellationToken cancelacion)
     {
@@ -166,8 +166,8 @@ public class ServicioIdentidadJugador : IServicioIdentidadJugador
             throw ErroresDeFicha.DocumentoRepetidoEnClub();
         }
 
-        var cuenta = await _pertenencias.ObtenerCuentaPorDocumentoAsync(numero, cancelacion);
-        if (cuenta is not null && cuenta.Id != jugador.UsuarioId)
+        var conEseNumero = await _pertenencias.ListarPorDocumentosAsync([numero], cancelacion);
+        if (conEseNumero.Any(integrante => integrante.UsuarioId != jugador.UsuarioId))
         {
             throw ErroresDeFicha.DocumentoEnOtraCuenta();
         }

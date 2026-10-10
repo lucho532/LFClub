@@ -9,11 +9,17 @@ namespace LaPecosa.Dominio.Entidades;
 /// (nombre, documento y fecha de nacimiento), su estado de ingreso y, cuando el club lo aprobó
 /// desde la sala de espera, quién lo hizo, cuándo y con qué rol. Quien entra con una invitación
 /// nace aprobado, con el rol de la invitación y sin datos de aprobación. De un jugador guarda
-/// además su categoría actual y, si el club lo retiró, quién lo hizo y cuándo (constitución §11.2
+/// además su categoría actual y, si quedó retirado, quién lo hizo y cuándo (constitución §11.2
 /// y §14.1): no existe una entidad Jugador aparte, y aquí el jugador es el integrante aprobado con
 /// el rol JUGADOR. De él cuelga su ficha (<see cref="FichaJugador"/> y
 /// <see cref="DocumentoJugador"/>), desde la que se cambia su documento de identidad y se corrige
-/// su identidad sobre esta misma fila, sin crear otro integrante (§10).
+/// su identidad sobre esta misma fila, sin crear otro integrante (§10). De él cuelga también su foto
+/// propia (<see cref="FotoJugador"/>), que se borra al retirarlo y, cuando exista esa operación, al
+/// cambiarlo de rol (§14.2).
+/// Una cuenta puede tener varios integrantes con rol JUGADOR en el mismo club: son los hermanos
+/// (§12.1.2). Cada uno es una fila propia, con su documento, su estado de ingreso, su categoría,
+/// su retiro y su ficha; el hermano agregado desde una ficha nace en espera y recuerda desde cuál
+/// se agregó.
 /// No guarda el correo, la contraseña, el celular ni el responsable, que son de la cuenta, ni los
 /// datos de salud o los archivos, que son de la ficha; y nunca lleva el rol DESARROLLADOR.
 /// No guarda un historial de estados, de categorías ni de retiros, ni ningún rastro de un rechazo:
@@ -41,8 +47,8 @@ public class UsuarioRol : IPerteneceAClub
 
     /// <summary>
     /// Estado de ingreso. Quien entra con una invitación, del club o de presidente, nace
-    /// <c>APROBADO</c> (RF-008). <c>EN_ESPERA</c> queda para el jugador agregado desde la ficha de
-    /// un hermano, que espera a que el PRESIDENTE lo apruebe (constitución §12.1.1).
+    /// <c>APROBADO</c> (RF-008). Nace <c>EN_ESPERA</c> el jugador que la familia agrega desde la
+    /// ficha de un hermano, hasta que el PRESIDENTE lo aprueba (constitución §12.1.1).
     /// </summary>
     public EstadoIngreso EstadoIngreso { get; set; }
 
@@ -87,7 +93,9 @@ public class UsuarioRol : IPerteneceAClub
     /// <summary>
     /// Número de documento, sin espacios ni puntos y en minúsculas. Único dentro del club, también
     /// frente a los retirados (RF-017). Con él se inicia sesión: al cambiarlo desde la ficha se
-    /// entra con el nuevo.
+    /// entra con el nuevo. Puede estar en integrantes de dos cuentas, en clubes distintos, solo por
+    /// el hermano agregado con el documento de un jugador de otra cuenta (§10); entonces abre la
+    /// cuenta del jugador activo.
     /// </summary>
     public string NumeroDocumento { get; set; } = string.Empty;
 
@@ -112,7 +120,9 @@ public class UsuarioRol : IPerteneceAClub
 
     /// <summary>
     /// Obligatorio. Verdadero por defecto, también para las filas que ya existen. Falso significa
-    /// retirado del club (§14.1); solo puede ser falso en un JUGADOR aprobado (RF-041).
+    /// retirado del club (§14.1); solo puede ser falso en un JUGADOR aprobado (RF-041). Queda
+    /// retirado de tres formas: lo retira el PRESIDENTE, lo retira su propia cuenta, o queda
+    /// retirado al aprobarse en otro club un hermano de otra cuenta con su mismo documento.
     /// </summary>
     public bool Activo { get; set; } = true;
 
@@ -123,8 +133,9 @@ public class UsuarioRol : IPerteneceAClub
     public DateTime? RetiradoEn { get; set; }
 
     /// <summary>
-    /// Opcional. Cuenta de quien lo retiró. Foránea a <see cref="Usuario"/>; pasa a nulo si esa
-    /// cuenta se elimina.
+    /// Opcional. Cuenta de quien lo retiró: la del PRESIDENTE o la del propio jugador. Nula si
+    /// quedó retirado al aprobarse un hermano en otro club, que no deja autor. Foránea a
+    /// <see cref="Usuario"/>; pasa a nulo si esa cuenta se elimina.
     /// </summary>
     public Guid? RetiradoPorUsuarioId { get; set; }
 
@@ -132,6 +143,16 @@ public class UsuarioRol : IPerteneceAClub
     /// Opcional. Nombres y apellidos de quien lo retiró, copiados en ese momento (§13).
     /// </summary>
     public string? RetiradoPorNombre { get; set; }
+
+    /// <summary>
+    /// Opcional. Foránea a <see cref="UsuarioRol"/> (la misma tabla), borrado a nulo. Solo lo
+    /// tiene el hermano agregado desde una ficha: es el jugador desde cuya ficha se agregó. Nulo
+    /// en quien entró con invitación.
+    /// </summary>
+    public Guid? AgregadoDesdeUsuarioRolId { get; set; }
+
+    /// <summary>Jugador desde cuya ficha se agregó a este hermano.</summary>
+    public UsuarioRol? AgregadoDesde { get; set; }
 
     /// <summary>Equipos de su categoría en los que juega; puede no haber ninguno (RF-026).</summary>
     public List<JugadorEquipo> Equipos { get; set; } = [];
