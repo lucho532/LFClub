@@ -38,33 +38,33 @@ paths:
   /api/clubes/{clubId}/jugadores:
     parameters:
       - $ref: '#/components/parameters/clubId'
-#007-T006     get:
-#007-T006       tags: [Jugadores]
-#007-T006       summary: NUEVO. Jugadores activos del club, agrupados por categoría
-#007-T006       description: |
-#007-T006         PRESIDENTE, DIRECTIVO y ENTRENADOR. Solo jugadores aprobados y activos: sin retirados ni
-#007-T006         hermanos en espera.
-#007-T006         - PRESIDENTE y DIRECTIVO: todos, y al final el grupo "Sin categoría" (`categoria: null`) si
-#007-T006           hay jugadores sin categoría.
-#007-T006         - ENTRENADOR: solo los de las categorías activas en las que tiene una asignación activa, de
-#007-T006           todos sus equipos; nunca el grupo "Sin categoría". Sin categorías asignadas, lista vacía.
-#007-T006         Orden: grupos por año de la categoría, de menor a mayor, y "Sin categoría" al final;
-#007-T006         jugadores por apellidos y nombres. No se devuelven grupos vacíos.
-#007-T006       responses:
-#007-T006         '200':
-#007-T006           description: Los grupos, ya ordenados
-#007-T006           content:
-#007-T006             application/json:
-#007-T006               schema:
-#007-T006                 type: array
-#007-T006                 items: { $ref: '#/components/schemas/GrupoDeJugadoresDto' }
-#007-T006         '401': { $ref: '#/components/responses/SinSesion' }
-#007-T006         '403':
-#007-T006           description: '`rol_no_autorizado` para la cuenta de un jugador, y los demás 403 de siempre'
-#007-T006           content:
-#007-T006             application/problem+json:
-#007-T006               schema: { $ref: '#/components/schemas/Problema' }
-#007-T006         '404': { $ref: '#/components/responses/NoEncontrado' }
+    get:
+      tags: [Jugadores]
+      summary: NUEVO. Jugadores activos del club, agrupados por categoría
+      description: |
+        PRESIDENTE, DIRECTIVO y ENTRENADOR. Solo jugadores aprobados y activos: sin retirados ni
+        hermanos en espera.
+        - PRESIDENTE y DIRECTIVO: todos, y al final el grupo "Sin categoría" (`categoria: null`) si
+          hay jugadores sin categoría.
+        - ENTRENADOR: solo los de las categorías activas en las que tiene una asignación activa, de
+          todos sus equipos; nunca el grupo "Sin categoría". Sin categorías asignadas, lista vacía.
+        Orden: grupos por año de la categoría, de menor a mayor, y "Sin categoría" al final;
+        jugadores por apellidos y nombres. No se devuelven grupos vacíos.
+      responses:
+        '200':
+          description: Los grupos, ya ordenados
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GrupoDeJugadoresDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403':
+          description: '`rol_no_autorizado` para la cuenta de un jugador, y los demás 403 de siempre'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
   # ------------------------------------------------------------------ Foto del jugador
 

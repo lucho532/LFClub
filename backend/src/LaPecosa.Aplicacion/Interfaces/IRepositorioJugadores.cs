@@ -28,6 +28,12 @@ public interface IRepositorioJugadores
     /// </summary>
     Task<UsuarioRol?> ObtenerParaFichaAsync(Guid usuarioRolId, CancellationToken cancelacion = default);
 
+    /// <summary>
+    /// Todos los jugadores del club (aprobados y no retirados), cada uno con su categoría y con los
+    /// equipos en los que juega, en una sola consulta (spec 007).
+    /// </summary>
+    Task<IReadOnlyList<UsuarioRol>> ListarDelClubAsync(CancellationToken cancelacion = default);
+
     /// <summary>Jugadores del club sin categoría, cada uno sin equipos.</summary>
     Task<IReadOnlyList<UsuarioRol>> ListarSinCategoriaAsync(CancellationToken cancelacion = default);
 

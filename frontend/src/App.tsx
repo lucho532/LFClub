@@ -20,6 +20,7 @@ import { DisposicionClub } from './privado/DisposicionClub';
 import { FichaJugador } from './privado/ficha/FichaJugador';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
+import { ListaJugadores } from './privado/jugadores/ListaJugadores';
 
 interface Props {
   /** Si se muestra la animación de arranque encima mientras la aplicación carga (solo en Android). */
@@ -61,6 +62,7 @@ export function App({ conArranque = false }: Props) {
                 <Route path="ingresos" element={<Ingresos />} />
                 <Route path="categorias" element={<Categorias />} />
                 <Route path="categorias/:categoriaId" element={<DetalleCategoria />} />
+                <Route path="jugadores" element={<ListaJugadores />} />
                 <Route path="jugadores/:usuarioRolId/ficha" element={<FichaJugador />} />
               </Route>
             </Route>

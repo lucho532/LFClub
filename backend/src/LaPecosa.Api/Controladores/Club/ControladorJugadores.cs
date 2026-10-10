@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace LaPecosa.Api.Controladores.Club;
 
 /// <summary>
-/// Representa los endpoints de los jugadores de un club en lo que toca a su categoría: la lista
-/// "Sin categoría", la lista de retirados, ubicar o cambiar de categoría a un jugador, retirarlo y
-/// reincorporarlo.
+/// Representa los endpoints de los jugadores de un club: la lista "Jugadores" agrupada por
+/// categoría (spec 007) y, en lo que toca a su categoría, la lista "Sin categoría", la lista de
+/// retirados, ubicar o cambiar de categoría a un jugador, retirarlo y reincorporarlo.
 /// Su responsabilidad es recibir la petición y delegar en los servicios.
-/// No contiene reglas de negocio: las listas las ven el PRESIDENTE y los DIRECTIVOS; solo el
+/// No contiene reglas de negocio: la lista "Jugadores" la ven el PRESIDENTE, los DIRECTIVOS y los
+/// ENTRENADORES, cada uno con el alcance que decide su servicio; las otras dos listas, el
+/// PRESIDENTE y los DIRECTIVOS; solo el
 /// PRESIDENTE ubica y reincorpora, y retiran el PRESIDENTE y la cuenta del propio jugador, lo que
 /// comprueba <see cref="IntegranteDelClubAttribute"/> en cada acción y, para la familia, el
 /// servicio de retiro. No devuelve de un jugador su documento, su correo ni su celular: esos datos están en su
@@ -29,15 +31,30 @@ public class ControladorJugadores : ControladorBase
     private readonly IServicioConsultaCategorias _consulta;
     private readonly IServicioUbicacionJugador _ubicacion;
     private readonly IServicioRetiroJugador _retiro;
+    private readonly IServicioListaJugadores _lista;
 
     /// <summary>Crea el controlador con sus servicios.</summary>
     public ControladorJugadores(
-        IServicioConsultaCategorias consulta, IServicioUbicacionJugador ubicacion, IServicioRetiroJugador retiro)
+        IServicioConsultaCategorias consulta,
+        IServicioUbicacionJugador ubicacion,
+        IServicioRetiroJugador retiro,
+        IServicioListaJugadores lista)
     {
         _consulta = consulta;
         _ubicacion = ubicacion;
         _retiro = retiro;
+        _lista = lista;
     }
+
+    /// <summary>
+    /// Jugadores activos del club agrupados por categoría: todos para el PRESIDENTE y los
+    /// DIRECTIVOS; para un ENTRENADOR, solo los de sus categorías.
+    /// </summary>
+    [HttpGet]
+    [IntegranteDelClub(Rol.PRESIDENTE, Rol.DIRECTIVO, Rol.ENTRENADOR)]
+    [ProducesResponseType<IReadOnlyList<GrupoDeJugadoresDto>>(StatusCodes.Status200OK)]
+    public Task<IReadOnlyList<GrupoDeJugadoresDto>> Listar(CancellationToken cancelacion) =>
+        _lista.ListarAsync(Integrante, cancelacion);
 
     /// <summary>Jugadores aprobados y no retirados que todavía no tienen categoría.</summary>
     [HttpGet("sin-categoria")]

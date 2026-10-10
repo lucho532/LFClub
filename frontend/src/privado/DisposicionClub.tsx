@@ -15,6 +15,7 @@ import {
   IconoFicha,
   IconoIngresos,
   IconoInicio,
+  IconoJugadores,
 } from '../compartido/componentes/Iconos';
 import { MenuPerfil } from '../compartido/componentes/MenuPerfil';
 import { nombreDeRol } from '../compartido/formato';
@@ -29,6 +30,7 @@ import { puedeVerCategorias, rutaDeFicha } from './categorias/textos';
 import type { ContextoDelClub } from './contextoClub';
 import { DesplegableClubes } from './DesplegableClubes';
 import { ElegirJugador } from './ElegirJugador';
+import { puedeVerJugadores } from './jugadores/textos';
 import { SalaDeEspera } from './SalaDeEspera';
 
 /** Códigos con los que la API dice que la sesión guardada ya no refleja la relación con el club. */
@@ -146,6 +148,11 @@ function AplicacionDelClub({ clubId, deSesion }: Props) {
           {rol === 'PRESIDENTE' && (
             <EnlaceMenu a={`/club/${clubId}/ingresos`} icono={<IconoIngresos />}>
               Ingresos
+            </EnlaceMenu>
+          )}
+          {rol && puedeVerJugadores(rol) && (
+            <EnlaceMenu a={`/club/${clubId}/jugadores`} icono={<IconoJugadores />}>
+              Jugadores
             </EnlaceMenu>
           )}
           {rol && puedeVerCategorias(rol) && (

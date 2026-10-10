@@ -30,7 +30,7 @@ public class AccesoClubPruebas
         // Un presidente: el rol con más permisos, pero de otro club.
         var (ajeno, _) = await _fabrica.Sembrador.CrearIntegranteAsync(otroClub, Rol.PRESIDENTE);
         var cliente = await _fabrica.CrearClienteDePrueba().ConSesionDeAsync(ajeno);
-        Assert.Equal(39, DeClub.Count);
+        Assert.Equal(40, DeClub.Count);
 
         foreach (var endpoint in DeClub)
         {
@@ -64,7 +64,7 @@ public class AccesoClubPruebas
         var delContrato = EndpointsDeLaApi.DelContrato().Select(par => par.Endpoint.ToString()).Order().ToList();
         var deLaApi = EndpointsDeLaApi.DeLaApi(_fabrica).Select(endpoint => endpoint.ToString()).Order().ToList();
 
-        Assert.Equal(61, delContrato.Count);
+        Assert.Equal(62, delContrato.Count);
         Assert.Equal(delContrato, deLaApi);
     }
 
