@@ -8,7 +8,8 @@ namespace LaPecosa.Aplicacion.Interfaces;
 /// documento a los jugadores aprobados y activos de las demás cuentas, en cualquier club.
 /// No decide si se admite el documento ni a quién hay que retirar: eso es de
 /// <c>ReglaDocumentoCompartido</c>. No toca la ficha, los documentos, la identidad, el estado de
-/// ingreso ni la cuenta del retirado, y nunca devuelve datos del otro club.
+/// ingreso ni la cuenta del retirado, y nunca devuelve datos del otro club. Sí borra su foto
+/// propia, que no se conserva cuando deja el club (§14.2, spec 007).
 /// </summary>
 public interface IRepositorioRetiroEntreClubes
 {
@@ -23,8 +24,9 @@ public interface IRepositorioRetiroEntreClubes
     /// <summary>
     /// Retira a todo integrante con ese número de documento ya normalizado, de una cuenta distinta
     /// de <paramref name="cuentaQueQueda"/>, con rol JUGADOR, aprobado y activo, en cualquier club:
-    /// lo saca de sus equipos, lo deja inactivo y sin categoría, con <paramref name="retiradoEn"/> y
-    /// sin autor (supuesto 6 de la 006). Devuelve cuántos retiró; cero si no había ninguno.
+    /// lo saca de sus equipos, borra su foto, lo deja inactivo y sin categoría, con
+    /// <paramref name="retiradoEn"/> y sin autor (supuesto 6 de la 006). Devuelve cuántos retiró;
+    /// cero si no había ninguno.
     /// </summary>
     Task<int> RetirarDeOtrasCuentasAsync(
         string numeroDocumento, Guid cuentaQueQueda, DateTime retiradoEn, CancellationToken cancelacion = default);

@@ -26,11 +26,14 @@ public class SoloPresidentePruebas
     /// hacerlo se prueba en <c>Ficha/SoloLecturaPruebas</c>. Lo mismo agregar un hermano (006), que
     /// es de la familia y se prueba en <c>Hermanos/QuienAgregaPruebas</c>, y retirar a un jugador,
     /// que desde la 006 hace también su propia cuenta y se prueba en
-    /// <c>Categorias/RetiroJugadorPruebas</c> y <c>Hermanos/FamiliaRetiraPruebas</c>.
+    /// <c>Categorias/RetiroJugadorPruebas</c> y <c>Hermanos/FamiliaRetiraPruebas</c>. Y la foto del
+    /// jugador (007), que como la ficha cambia también la familia y se prueba en
+    /// <c>Jugadores/FotoJugadorPruebas</c>.
     /// </summary>
     private List<Endpoint> DeEscritura => EndpointsDeLaApi.DeLaApi(_fabrica)
         .Where(endpoint => endpoint.Metodo != "GET"
             && !endpoint.Ruta.Contains("/ficha", StringComparison.Ordinal)
+            && !endpoint.Ruta.EndsWith("/foto", StringComparison.Ordinal)
             && !endpoint.Ruta.EndsWith("/hermanos", StringComparison.Ordinal)
             && !endpoint.Ruta.EndsWith("/retiro", StringComparison.Ordinal)
             && (endpoint.Ruta.StartsWith("/api/clubes/{clubId}/categorias", StringComparison.Ordinal)

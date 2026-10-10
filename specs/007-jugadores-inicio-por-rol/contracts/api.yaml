@@ -72,169 +72,169 @@ paths:
     parameters:
       - $ref: '#/components/parameters/clubId'
       - $ref: '#/components/parameters/usuarioRolId'
-#007-T009     get:
-#007-T009       tags: [Ficha]
-#007-T009       summary: NUEVO. La foto del jugador
-#007-T009       description: |
-#007-T009         Cualquier rol del club, con el alcance de la ficha (005): la cuenta del jugador que hace la
-#007-T009         petición, el PRESIDENTE, los DIRECTIVOS y el ENTRENADOR de una categoría activa que
-#007-T009         entrena, si el jugador está activo. A cualquier otro, y si el jugador no tiene foto, 404
-#007-T009         `no_encontrado`. Respuesta con `Cache-Control: private, no-store`.
-#007-T009       responses:
-#007-T009         '200':
-#007-T009           description: La imagen
-#007-T009           content:
-#007-T009             image/png: { schema: { type: string, format: binary } }
-#007-T009             image/jpeg: { schema: { type: string, format: binary } }
-#007-T009             image/webp: { schema: { type: string, format: binary } }
-#007-T009         '401': { $ref: '#/components/responses/SinSesion' }
-#007-T009         '403': { $ref: '#/components/responses/NoAutorizado' }
-#007-T009         '404': { $ref: '#/components/responses/NoEncontrado' }
-#007-T010     put:
-#007-T010       tags: [Ficha]
-#007-T010       summary: NUEVO. Carga o reemplaza la foto del jugador
-#007-T010       description: |
-#007-T010         PRESIDENTE, sobre cualquier jugador activo de su club, y la cuenta del jugador, sobre el
-#007-T010         jugador que hace la petición (no sobre un hermano no elegido). DIRECTIVO y ENTRENADOR: 403
-#007-T010         `rol_no_autorizado`. Cuenta como cambio de la ficha: actualiza su último cambio. Si se
-#007-T010         rechaza, la foto anterior no cambia.
-#007-T010       requestBody:
-#007-T010         required: true
-#007-T010         content:
-#007-T010           multipart/form-data:
-#007-T010             schema:
-#007-T010               type: object
-#007-T010               required: [archivo]
-#007-T010               properties:
-#007-T010                 archivo:
-#007-T010                   type: string
-#007-T010                   format: binary
-#007-T010                   description: PNG, JPEG o WebP de hasta 1 MB, reconocido por su contenido
-#007-T010       responses:
-#007-T010         '200':
-#007-T010           description: La ficha del jugador, con la nueva `fotoActualizadaEn` y el nuevo último cambio
-#007-T010           content:
-#007-T010             application/json:
-#007-T010               schema: { $ref: '#/components/schemas/FichaJugadorDtoCambio' }
-#007-T010         '400':
-#007-T010           description: '`foto_no_es_imagen` o `foto_demasiado_grande`'
-#007-T010           content:
-#007-T010             application/problem+json:
-#007-T010               schema: { $ref: '#/components/schemas/Problema' }
-#007-T010         '401': { $ref: '#/components/responses/SinSesion' }
-#007-T010         '403': { $ref: '#/components/responses/NoAutorizado' }
-#007-T010         '404': { $ref: '#/components/responses/NoEncontrado' }
-#007-T010         '409':
-#007-T010           description: '`jugador_retirado`: un jugador retirado no tiene foto'
-#007-T010           content:
-#007-T010             application/problem+json:
-#007-T010               schema: { $ref: '#/components/schemas/Problema' }
-#007-T010     delete:
-#007-T010       tags: [Ficha]
-#007-T010       summary: NUEVO. Quita la foto del jugador
-#007-T010       description: |
-#007-T010         Mismos roles y alcance que la carga. Si no tenía foto no cambia nada y responde igual.
-#007-T010         Cuenta como cambio de la ficha.
-#007-T010       responses:
-#007-T010         '200':
-#007-T010           description: La ficha del jugador, con `fotoActualizadaEn` en null
-#007-T010           content:
-#007-T010             application/json:
-#007-T010               schema: { $ref: '#/components/schemas/FichaJugadorDtoCambio' }
-#007-T010         '401': { $ref: '#/components/responses/SinSesion' }
-#007-T010         '403': { $ref: '#/components/responses/NoAutorizado' }
-#007-T010         '404': { $ref: '#/components/responses/NoEncontrado' }
+    get:
+      tags: [Ficha]
+      summary: NUEVO. La foto del jugador
+      description: |
+        Cualquier rol del club, con el alcance de la ficha (005): la cuenta del jugador que hace la
+        petición, el PRESIDENTE, los DIRECTIVOS y el ENTRENADOR de una categoría activa que
+        entrena, si el jugador está activo. A cualquier otro, y si el jugador no tiene foto, 404
+        `no_encontrado`. Respuesta con `Cache-Control: private, no-store`.
+      responses:
+        '200':
+          description: La imagen
+          content:
+            image/png: { schema: { type: string, format: binary } }
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Ficha]
+      summary: NUEVO. Carga o reemplaza la foto del jugador
+      description: |
+        PRESIDENTE, sobre cualquier jugador activo de su club, y la cuenta del jugador, sobre el
+        jugador que hace la petición (no sobre un hermano no elegido). DIRECTIVO y ENTRENADOR: 403
+        `rol_no_autorizado`. Cuenta como cambio de la ficha: actualiza su último cambio. Si se
+        rechaza, la foto anterior no cambia.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [archivo]
+              properties:
+                archivo:
+                  type: string
+                  format: binary
+                  description: PNG, JPEG o WebP de hasta 1 MB, reconocido por su contenido
+      responses:
+        '200':
+          description: La ficha del jugador, con la nueva `fotoActualizadaEn` y el nuevo último cambio
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FichaJugadorDtoCambio' }
+        '400':
+          description: '`foto_no_es_imagen` o `foto_demasiado_grande`'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409':
+          description: '`jugador_retirado`: un jugador retirado no tiene foto'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+    delete:
+      tags: [Ficha]
+      summary: NUEVO. Quita la foto del jugador
+      description: |
+        Mismos roles y alcance que la carga. Si no tenía foto no cambia nada y responde igual.
+        Cuenta como cambio de la ficha.
+      responses:
+        '200':
+          description: La ficha del jugador, con `fotoActualizadaEn` en null
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FichaJugadorDtoCambio' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
   # ------------------------------------------------------------------ Resumen del club
 
   /api/clubes/{clubId}/resumen:
     parameters:
       - $ref: '#/components/parameters/clubId'
-#007-T018     get:
-#007-T018       tags: [Club]
-#007-T018       summary: NUEVO. Las cuatro cifras del inicio del PRESIDENTE y de los DIRECTIVOS
-#007-T018       description: |
-#007-T018         Solo PRESIDENTE y DIRECTIVO, también si entrenan una categoría. Se calcula en cada
-#007-T018         consulta. ENTRENADOR y JUGADOR: 403 `rol_no_autorizado`.
-#007-T018       responses:
-#007-T018         '200':
-#007-T018           description: El resumen
-#007-T018           content:
-#007-T018             application/json:
-#007-T018               schema: { $ref: '#/components/schemas/ResumenClubDto' }
-#007-T018         '401': { $ref: '#/components/responses/SinSesion' }
-#007-T018         '403': { $ref: '#/components/responses/NoAutorizado' }
-#007-T018         '404': { $ref: '#/components/responses/NoEncontrado' }
+    get:
+      tags: [Club]
+      summary: NUEVO. Las cuatro cifras del inicio del PRESIDENTE y de los DIRECTIVOS
+      description: |
+        Solo PRESIDENTE y DIRECTIVO, también si entrenan una categoría. Se calcula en cada
+        consulta. ENTRENADOR y JUGADOR: 403 `rol_no_autorizado`.
+      responses:
+        '200':
+          description: El resumen
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResumenClubDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
   # ------------------------------------------------------------------ Identidad por el PRESIDENTE
 
   /api/clubes/{clubId}/colores:
     parameters:
       - $ref: '#/components/parameters/clubId'
-#007-T014     put:
-#007-T014       tags: [Club]
-#007-T014       summary: NUEVO. El PRESIDENTE cambia los colores de su club
-#007-T014       description: |
-#007-T014         Solo PRESIDENTE del club de la ruta; los demás roles 403 `rol_no_autorizado`. Mismas
-#007-T014         reglas que `PUT /api/plataforma/clubes/{clubId}/colores` (001): dos colores `#RRGGBB`.
-#007-T014         El contraste no se comprueba aquí: es un aviso de la pantalla que no impide guardar. Vale
-#007-T014         el último cambio, venga del PRESIDENTE o del DESARROLLADOR.
-#007-T014       requestBody:
-#007-T014         required: true
-#007-T014         content:
-#007-T014           application/json:
-#007-T014             schema: { $ref: '#/components/schemas/ActualizarColoresDto' }
-#007-T014       responses:
-#007-T014         '200':
-#007-T014           description: El club con su nueva identidad (`ClubDto` de la 001 y la 005)
-#007-T014           content:
-#007-T014             application/json:
-#007-T014               schema: { $ref: '#/components/schemas/ClubDto' }
-#007-T014         '400':
-#007-T014           description: '`datos_invalidos`'
-#007-T014           content:
-#007-T014             application/problem+json:
-#007-T014               schema: { $ref: '#/components/schemas/Problema' }
-#007-T014         '401': { $ref: '#/components/responses/SinSesion' }
-#007-T014         '403': { $ref: '#/components/responses/NoAutorizado' }
-#007-T014         '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Club]
+      summary: NUEVO. El PRESIDENTE cambia los colores de su club
+      description: |
+        Solo PRESIDENTE del club de la ruta; los demás roles 403 `rol_no_autorizado`. Mismas
+        reglas que `PUT /api/plataforma/clubes/{clubId}/colores` (001): dos colores `#RRGGBB`.
+        El contraste no se comprueba aquí: es un aviso de la pantalla que no impide guardar. Vale
+        el último cambio, venga del PRESIDENTE o del DESARROLLADOR.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ActualizarColoresDto' }
+      responses:
+        '200':
+          description: El club con su nueva identidad (`ClubDto` de la 001 y la 005)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClubDto' }
+        '400':
+          description: '`datos_invalidos`'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
   /api/clubes/{clubId}/escudo:
     parameters:
       - $ref: '#/components/parameters/clubId'
-#007-T014     put:
-#007-T014       tags: [Club]
-#007-T014       summary: NUEVO. El PRESIDENTE carga o reemplaza el escudo de su club
-#007-T014       description: |
-#007-T014         Solo PRESIDENTE del club de la ruta. Mismas reglas que
-#007-T014         `PUT /api/plataforma/clubes/{clubId}/escudo` (001). Sube la versión del escudo, así que
-#007-T014         `identidad.urlEscudo` cambia y todos los integrantes ven el nuevo.
-#007-T014       requestBody:
-#007-T014         required: true
-#007-T014         content:
-#007-T014           multipart/form-data:
-#007-T014             schema:
-#007-T014               type: object
-#007-T014               required: [archivo]
-#007-T014               properties:
-#007-T014                 archivo:
-#007-T014                   type: string
-#007-T014                   format: binary
-#007-T014                   description: PNG, JPEG o WebP de hasta 1 MB, reconocido por su contenido
-#007-T014       responses:
-#007-T014         '200':
-#007-T014           description: El club con su nueva identidad
-#007-T014           content:
-#007-T014             application/json:
-#007-T014               schema: { $ref: '#/components/schemas/ClubDto' }
-#007-T014         '400':
-#007-T014           description: '`escudo_no_es_imagen` o `escudo_demasiado_grande`; se conserva el anterior'
-#007-T014           content:
-#007-T014             application/problem+json:
-#007-T014               schema: { $ref: '#/components/schemas/Problema' }
-#007-T014         '401': { $ref: '#/components/responses/SinSesion' }
-#007-T014         '403': { $ref: '#/components/responses/NoAutorizado' }
-#007-T014         '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Club]
+      summary: NUEVO. El PRESIDENTE carga o reemplaza el escudo de su club
+      description: |
+        Solo PRESIDENTE del club de la ruta. Mismas reglas que
+        `PUT /api/plataforma/clubes/{clubId}/escudo` (001). Sube la versión del escudo, así que
+        `identidad.urlEscudo` cambia y todos los integrantes ven el nuevo.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [archivo]
+              properties:
+                archivo:
+                  type: string
+                  format: binary
+                  description: PNG, JPEG o WebP de hasta 1 MB, reconocido por su contenido
+      responses:
+        '200':
+          description: El club con su nueva identidad
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClubDto' }
+        '400':
+          description: '`escudo_no_es_imagen` o `escudo_demasiado_grande`; se conserva el anterior'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
   # ------------------------------------------- Endpoints existentes que cambian
 

@@ -7,10 +7,11 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// Representa la ficha de un jugador en un club tal como la recibe quien la consulta (RF-001).
 /// Su responsabilidad es llevar la identidad, el contacto, el contacto de emergencia, la seguridad
 /// social y, solo para quien puede verlos, los datos clínicos y los documentos; además del último
-/// cambio y de lo que quien pregunta puede hacer con ella.
+/// cambio, de lo que quien pregunta puede hacer con ella y de la fecha de la foto del jugador
+/// (spec 007), que la pantalla usa para pedirla o mostrar sus iniciales.
 /// No lleva en <c>null</c> lo que no se puede ver: <see cref="DatosClinicos"/>,
 /// <see cref="Documentos"/> y <see cref="UltimoCambio"/> se omiten del JSON cuando son nulos
-/// (RF-010, RF-015). No contiene el contenido de ningún archivo.
+/// (RF-010, RF-015). No contiene el contenido de ningún archivo ni la foto.
 /// </summary>
 /// <param name="UsuarioRolId">Identificador del jugador (su integrante) en este club.</param>
 /// <param name="Nombres">Nombres del jugador.</param>
@@ -30,6 +31,7 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// <param name="Documentos">Los dos documentos pedidos, entregados o pendientes; ausente para quien no puede verlos.</param>
 /// <param name="UltimoCambio">Último cambio de la ficha; ausente si nadie la ha cambiado.</param>
 /// <param name="Permisos">Lo que quien pregunta puede hacer en esta ficha.</param>
+/// <param name="FotoActualizadaEn">Fecha UTC de la última carga de la foto del jugador; nula si no tiene.</param>
 public record FichaJugadorDto(
     Guid UsuarioRolId,
     string Nombres,
@@ -48,4 +50,5 @@ public record FichaJugadorDto(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] DatosClinicosDto? DatosClinicos,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<DocumentoDeFichaDto>? Documentos,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] UltimoCambioDto? UltimoCambio,
-    PermisosDeFichaDto Permisos);
+    PermisosDeFichaDto Permisos,
+    DateTime? FotoActualizadaEn);

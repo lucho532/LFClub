@@ -8,7 +8,8 @@ namespace LaPecosa.Infraestructura.Repositorios.Plataforma;
 /// <summary>
 /// Representa, con Entity Framework, la única escritura en un club desde otro club (constitución
 /// §7.1, cuarta excepción): el retiro por número de documento del jugador de otra cuenta.
-/// Su responsabilidad es bloquear varios clubes en orden y retirar con sentencias condicionadas.
+/// Su responsabilidad es bloquear varios clubes en orden y retirar con sentencias condicionadas,
+/// borrando también la foto propia de los que retira (§14.2, spec 007).
 /// Por eso se salta el filtro de aislamiento, y cada sentencia va acotada a un número de documento
 /// o a los clubes que se le indican.
 /// No decide a quién retirar ni lee datos para devolverlos: solo cuenta cuántos retiró.
@@ -52,6 +53,12 @@ public class RepositorioRetiroEntreClubes : IRepositorioRetiroEntreClubes
         await _contexto.JugadoresEquipo
             .IgnoreQueryFilters()
             .Where(fila => aRetirar.Any(integrante => integrante.Id == fila.UsuarioRolId))
+            .ExecuteDeleteAsync(cancelacion);
+
+        // Antes de retirarlos: después ya no estarían activos y la condición no los encontraría.
+        await _contexto.FotosJugador
+            .IgnoreQueryFilters()
+            .Where(foto => aRetirar.Any(integrante => integrante.Id == foto.UsuarioRolId))
             .ExecuteDeleteAsync(cancelacion);
 
         return await aRetirar.ExecuteUpdateAsync(

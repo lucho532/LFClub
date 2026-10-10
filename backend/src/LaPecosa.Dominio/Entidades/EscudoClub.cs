@@ -4,6 +4,7 @@ namespace LaPecosa.Dominio.Entidades;
 /// Representa la imagen del escudo de un club.
 /// Su responsabilidad es guardar los bytes y el tipo de contenido, separados de <see cref="Club"/>
 /// para no cargarlos en cada consulta (research §10).
+/// Lo cargan el DESARROLLADOR desde el panel y el PRESIDENTE del club desde "Datos del club".
 /// No guarda la versión del escudo (va en el club) ni valida la imagen.
 /// </summary>
 public class EscudoClub : IPerteneceAClub

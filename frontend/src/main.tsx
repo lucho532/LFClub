@@ -8,6 +8,7 @@ import './compartido/tema/base.css';
 import './compartido/tema/disposicion.css';
 import './compartido/tema/componentes.css';
 import './compartido/tema/fichas.css';
+import './compartido/tema/inicio.css';
 import './compartido/tema/movil.css';
 
 // Se decide una sola vez, fuera de React: la animación se ve una vez por apertura.
