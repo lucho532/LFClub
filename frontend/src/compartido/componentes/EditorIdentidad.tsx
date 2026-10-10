@@ -106,13 +106,20 @@ export function EditorIdentidad({ identidad, nombre, guardarColores, guardarEscu
           {(['claro', 'oscuro'] as Tema[]).map((tema) => (
             <div key={tema} data-tema={tema} className="tarjeta" style={{ background: 'var(--fondo)', color: 'var(--texto)' }}>
               <span className="texto-suave">Tema {NOMBRE_DEL_TEMA[tema]}</span>
-              <IdentidadClub identidad={vistaPrevia} className="fila">
-                <span className="boton boton-principal">{nombre}</span>
-                <span
-                  className="etiqueta"
-                  style={{ background: 'var(--color-club-acento)', color: 'var(--color-club-acento-texto)' }}
-                >
-                  Acento
+              <IdentidadClub identidad={vistaPrevia} className="columna">
+                {/* Muestra del menú lateral: su fondo y el ítem activo, como se verán en el club. */}
+                <span className="vista-menu">
+                  <span className="vista-menu-item vista-menu-activo">Inicio</span>
+                  <span className="vista-menu-item">Jugadores</span>
+                </span>
+                <span className="fila">
+                  <span className="boton boton-principal">{nombre}</span>
+                  <span
+                    className="etiqueta"
+                    style={{ background: 'var(--color-club-acento)', color: 'var(--color-club-acento-texto)' }}
+                  >
+                    Acento
+                  </span>
                 </span>
               </IdentidadClub>
             </div>
