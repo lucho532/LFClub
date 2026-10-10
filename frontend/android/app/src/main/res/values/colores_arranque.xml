@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo de la pantalla de arranque y del icono: el mismo de la animación de la web
+         (src/arranque/arranque.css), para que el paso de una a otra no se note. -->
+    <color name="fondo_arranque">#231F1E</color>
+</resources>

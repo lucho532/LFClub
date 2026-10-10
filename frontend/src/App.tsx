@@ -1,4 +1,6 @@
+import { useCallback, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { ArranqueAnimado } from './arranque/ArranqueAnimado';
 import { ProveedorSesion } from './compartido/sesion/ProveedorSesion';
 import { RutaProtegida } from './compartido/sesion/RutaProtegida';
 import { ProveedorTema } from './compartido/tema/ProveedorTema';
@@ -19,10 +21,19 @@ import { FichaJugador } from './privado/ficha/FichaJugador';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
 
-/** Rutas de la aplicación: las de la tabla "Pantallas" del plan. */
-export function App() {
+interface Props {
+  /** Si se muestra la animación de arranque encima mientras la aplicación carga (solo en Android). */
+  conArranque?: boolean;
+}
+
+/** Rutas de la aplicación: las de la tabla "Pantallas" del plan, con la animación de arranque encima. */
+export function App({ conArranque = false }: Props) {
+  const [arranque, setArranque] = useState(conArranque);
+  const terminarArranque = useCallback(() => setArranque(false), []);
+
   return (
     <ProveedorTema>
+      {arranque && <ArranqueAnimado alTerminar={terminarArranque} />}
       <ProveedorSesion>
         <BrowserRouter>
           <Routes>
