@@ -12,9 +12,10 @@ namespace LaPecosa.Api.Controladores.Club;
 /// "Sin categoría", la lista de retirados, ubicar o cambiar de categoría a un jugador, retirarlo y
 /// reincorporarlo.
 /// Su responsabilidad es recibir la petición y delegar en los servicios.
-/// No contiene reglas de negocio: las listas las ven el PRESIDENTE y los DIRECTIVOS, y solo el
-/// PRESIDENTE cambia algo, lo que comprueba <see cref="IntegranteDelClubAttribute"/> en cada
-/// acción. No devuelve de un jugador su documento, su correo ni su celular: esos datos están en su
+/// No contiene reglas de negocio: las listas las ven el PRESIDENTE y los DIRECTIVOS; solo el
+/// PRESIDENTE ubica y reincorpora, y retiran el PRESIDENTE y la cuenta del propio jugador, lo que
+/// comprueba <see cref="IntegranteDelClubAttribute"/> en cada acción y, para la familia, el
+/// servicio de retiro. No devuelve de un jugador su documento, su correo ni su celular: esos datos están en su
 /// ficha, que tiene su propio controlador (<see cref="ControladorFichaJugador"/>) y su propia regla
 /// de acceso.
 /// </summary>
@@ -61,9 +62,12 @@ public class ControladorJugadores : ControladorBase
     public Task<CategoriaDetalleDto> Ubicar(Guid usuarioRolId, UbicarJugadorDto datos, CancellationToken cancelacion) =>
         _ubicacion.UbicarAsync(usuarioRolId, datos, cancelacion);
 
-    /// <summary>Retira del club a un jugador aprobado.</summary>
+    /// <summary>
+    /// Retira del club a un jugador aprobado: el PRESIDENTE a cualquiera; la cuenta de un jugador,
+    /// solo al jugador de la petición (404 con cualquier otro).
+    /// </summary>
     [HttpPost("{usuarioRolId:guid}/retiro")]
-    [IntegranteDelClub(Rol.PRESIDENTE)]
+    [IntegranteDelClub(Rol.PRESIDENTE, Rol.JUGADOR)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
     public async Task<IActionResult> Retirar(Guid usuarioRolId, CancellationToken cancelacion)
@@ -72,7 +76,10 @@ public class ControladorJugadores : ControladorBase
         return NoContent();
     }
 
-    /// <summary>Reincorpora a un jugador retirado.</summary>
+    /// <summary>
+    /// Reincorpora a un jugador retirado; solo el PRESIDENTE. Se niega mientras su documento esté
+    /// activo con otra cuenta en otro club.
+    /// </summary>
     [HttpPost("{usuarioRolId:guid}/reincorporacion")]
     [IntegranteDelClub(Rol.PRESIDENTE)]
     [ProducesResponseType<ReincorporacionDto>(StatusCodes.Status200OK)]

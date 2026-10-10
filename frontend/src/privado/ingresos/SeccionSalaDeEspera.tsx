@@ -16,6 +16,9 @@ interface Props {
   alCambiar: () => void;
 }
 
+/** Lo que se le dice al presidente cuando aprobar retira al jugador de otra cuenta en otro club. */
+const AVISO_OTRO_CLUB = 'Este documento está activo en otro club. Si apruebas su ingreso, quedará retirado de allí.';
+
 /** La API responde 409 o 404 cuando otra persona se adelantó: el ingreso ya no está pendiente. */
 const yaNoEstaPendiente = (fallo: unknown): fallo is ErrorApi =>
   fallo instanceof ErrorApi && (fallo.status === 409 || fallo.status === 404);
@@ -24,8 +27,9 @@ const yaNoEstaPendiente = (fallo: unknown): fallo is ErrorApi =>
  * Sala de espera del club, que solo ve su presidente: las personas pendientes de aprobación, de
  * la más antigua a la más reciente, cada una como una ficha con sus datos. Quien se registra con
  * una invitación no pasa por aquí: llega el jugador que una familia agregó desde la ficha de un
- * hermano, y de cada uno se dice de quién es hermano. Desde aquí se aprueba o se rechaza un
- * ingreso. Al aprobar no se elige rol: la persona entra siempre como jugador.
+ * hermano, y de cada uno se dice de quién es hermano y si aprobarlo lo retirará de otro club donde
+ * está activo con otra cuenta, sin decir cuál. Desde aquí se aprueba o se rechaza un ingreso. Al
+ * aprobar no se elige rol: la persona entra siempre como jugador.
  */
 export function SeccionSalaDeEspera({ clubId, enEspera, alCambiar }: Props) {
   const base = `/api/clubes/${clubId}/ingresos`;
@@ -90,6 +94,7 @@ export function SeccionSalaDeEspera({ clubId, enEspera, alCambiar }: Props) {
             {persona.nombres} {persona.apellidos}
           </h3>
           {persona.hermanoDe && <p className="texto-suave">Hermano de {persona.hermanoDe}</p>}
+          {persona.retiraDeOtroClub && <Aviso tono="aviso">{AVISO_OTRO_CLUB}</Aviso>}
           <dl className="ficha-datos">
             <Dato nombre={nombreDeTipoDocumento(persona.tipoDocumento)} valor={persona.numeroDocumento} />
             <Dato nombre="Fecha de nacimiento" valor={dia(persona.fechaNacimiento)} />
@@ -127,6 +132,7 @@ export function SeccionSalaDeEspera({ clubId, enEspera, alCambiar }: Props) {
           entrará al club como <strong>jugador</strong> y quedará en la categoría de su año de nacimiento, si el
           club la tiene.
         </p>
+        {porAprobar?.retiraDeOtroClub && <Aviso tono="aviso">{AVISO_OTRO_CLUB}</Aviso>}
       </DialogoConfirmacion>
 
       <DialogoConfirmacion

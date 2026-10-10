@@ -220,6 +220,8 @@ export interface IngresoEnEsperaDto {
   registradoEn: string;
   /** Jugador desde cuya ficha se agregó; `null` si ya no existe o no viene de un hermano. */
   hermanoDe: string | null;
+  /** Si aprobarlo retirará a un jugador de otra cuenta en otro club; no dice cuál. */
+  retiraDeOtroClub: boolean;
 }
 
 /** Cuerpo opcional de la aprobación: al aprobar no se elige rol y la API solo admite JUGADOR. */

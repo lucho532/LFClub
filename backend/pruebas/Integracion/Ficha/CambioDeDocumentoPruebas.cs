@@ -106,6 +106,30 @@ public class CambioDeDocumentoPruebas
         Assert.Equal(e.Ana.NumeroDocumento, (await e.JugadorGuardadoAsync(e.Ana.Id)).NumeroDocumento);
     }
 
+    // Research §16 de la 006: con el número en dos cuentas, la respuesta no depende de cuál devuelva la consulta.
+    [Fact]
+    public async Task Un_numero_que_esta_en_dos_cuentas_responde_409_a_una_tercera_y_lo_conserva_quien_ya_lo_tiene()
+    {
+        var e = await EscenarioFicha.CrearAsync(_fabrica);
+        var (_, ajeno) = await e.Base.Sembrar.CrearJugadorAsync(e.Base.OtroClub, 2014);
+        var hermano = await _fabrica.Hermanos.CrearHermanoAsync(
+            e.Ana, EstadoIngreso.APROBADO, numeroDocumento: ajeno.NumeroDocumento);
+        var tercerClub = await _fabrica.Sembrador.CrearClubAsync();
+        var (cuentaTercera, tercero) = await e.Base.Sembrar.CrearJugadorAsync(tercerClub, 2014);
+        var cliente = await _fabrica.CrearClienteDePrueba().ConSesionDeAsync(cuentaTercera);
+
+        var respuesta = await cliente.PutAsync(
+            $"{EscenarioFicha.Ficha(tercerClub.Id, tercero.Id)}/documento-identidad", Cuerpo(ajeno.NumeroDocumento));
+
+        Assert.Equal(HttpStatusCode.Conflict, respuesta.StatusCode);
+        Assert.Equal("documento_en_otra_cuenta", await ClienteDePrueba.CodigoAsync(respuesta));
+
+        // El hermano conserva su número y puede cambiar el tipo.
+        var delHermano = await e.Presidente.PutAsync(
+            e.DocumentoIdentidad(hermano.Id), Cuerpo(ajeno.NumeroDocumento, "REGISTRO_CIVIL"));
+        Assert.Equal(HttpStatusCode.OK, delHermano.StatusCode);
+    }
+
     // El documento se cambia club por club: el otro club conserva el anterior, que sigue sirviendo para entrar.
     [Fact]
     public async Task Una_persona_en_dos_clubes_lo_cambia_en_uno_y_el_otro_conserva_el_anterior()

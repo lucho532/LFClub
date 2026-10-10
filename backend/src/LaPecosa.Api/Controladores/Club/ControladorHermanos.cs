@@ -34,11 +34,12 @@ public class ControladorHermanos : ControladorBase
 
     /// <summary>
     /// Agrega un jugador a la cuenta, en este club, y lo deja en la sala de espera. Responde 200,
-    /// sin crear nada, si ese documento ya es de un jugador en espera de la misma cuenta.
+    /// sin crear nada, si ese documento ya es de un jugador en espera de la misma cuenta. Avisa si
+    /// aprobarlo retirará a un jugador de otra cuenta en otro club, sin decir cuál.
     /// </summary>
     [HttpPost]
-    [ProducesResponseType<JugadorDeSesionDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType<JugadorDeSesionDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<HermanoAgregadoDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType<HermanoAgregadoDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]
     [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
     public async Task<IActionResult> Agregar(Guid usuarioRolId, AgregarHermanoDto datos, CancellationToken cancelacion)

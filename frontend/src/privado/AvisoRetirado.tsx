@@ -10,8 +10,9 @@ import { BotonCambiarJugador } from './BotonCambiarJugador';
 import { DesplegableClubes } from './DesplegableClubes';
 
 /**
- * Lo único que ve de un club el jugador al que ese club retiró (RF-043): el nombre y la identidad
- * del club, que ya trae la sesión, y el aviso de que ya no está en él. No tiene menú y no pide
+ * Lo único que ve de un club el jugador retirado de él (RF-043), lo haya retirado el club, su
+ * familia o la aprobación de un hermano en otro club: el nombre y la identidad del club, que ya
+ * trae la sesión, y el aviso de que ya no está en él. No tiene menú y no pide
  * nada al club: la API se lo negaría. Conserva el tema, el cambio de club, porque el retiro es de
  * cada club, el cierre de sesión y, si la familia tiene más jugadores y entró con el correo,
  * "Cambiar de jugador", porque el retiro es de cada jugador. Si el club está suspendido o dado de baja muestra ese aviso,

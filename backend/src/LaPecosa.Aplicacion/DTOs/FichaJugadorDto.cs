@@ -19,7 +19,7 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// <param name="NumeroDocumento">Número de su documento de identidad.</param>
 /// <param name="FechaNacimiento">Fecha de nacimiento.</param>
 /// <param name="EsMenorDeEdad">Verdadero si hoy tiene menos de 18 años; entonces el responsable es obligatorio.</param>
-/// <param name="Retirado">Verdadero si el club lo retiró.</param>
+/// <param name="Retirado">Verdadero si está retirado del club, lo retirara quien lo retirara.</param>
 /// <param name="CategoriaId">Su categoría, o nulo si no tiene.</param>
 /// <param name="CategoriaAnio">Año de su categoría, o nulo si no tiene.</param>
 /// <param name="Equipos">Nombres de los equipos de su categoría en los que juega.</param>

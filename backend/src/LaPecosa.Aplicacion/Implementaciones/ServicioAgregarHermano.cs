@@ -6,6 +6,7 @@ using LaPecosa.Aplicacion.Utilidades;
 using LaPecosa.Aplicacion.Validadores;
 using LaPecosa.Dominio.Entidades;
 using LaPecosa.Dominio.Enumeraciones;
+using LaPecosa.Dominio.Reglas;
 
 namespace LaPecosa.Aplicacion.Implementaciones;
 
@@ -15,12 +16,14 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// Su responsabilidad es comprobar que la ficha es la del jugador que hace la petición, validar la
 /// identidad con las reglas del registro y, con el club bloqueado, crear otro integrante de la
 /// misma cuenta en el mismo club: rol JUGADOR, en espera, sin categoría y con el jugador de origen.
-/// Impide el documento que ya tiene otro integrante del club, en cualquier estado, y el que usa
-/// otra cuenta; admite el de la misma cuenta en otro club, que es el mismo niño (§10). Si ese
-/// documento ya es de un jugador en espera de la misma cuenta, lo devuelve sin crear ni cambiar
-/// nada, para que confirmar dos veces deje un solo jugador (RF-009). Guarda el responsable en la
-/// cuenta solo si no lo tenía y el hermano es menor.
-/// No crea la ficha ni sus documentos, que nacen con su primer cambio; no envía correos; no cuenta
+/// Impide el documento que ya tiene otro integrante del club, en cualquier estado, y el que otra
+/// cuenta tiene en un rol que no es JUGADOR (RF-039 de la 006). Admite el de la misma cuenta en
+/// otro club, que es el mismo niño (§10), y el de un jugador de otra cuenta en otro club, con el
+/// aviso de si aprobarlo lo retirará de allí (RF-034, <see cref="ReglaDocumentoCompartido"/>). Si
+/// ese documento ya es de un jugador en espera de la misma cuenta, lo devuelve sin crear ni cambiar
+/// nada, para que confirmar dos veces deje un solo jugador (RF-009), con el aviso calculado en ese
+/// momento. Guarda el responsable en la cuenta solo si no lo tenía y el hermano es menor.
+/// No escribe nada en el otro club (RF-035): eso lo hace la aprobación. No crea la ficha ni sus documentos, que nacen con su primer cambio; no envía correos; no cuenta
 /// cuántos jugadores tiene la cuenta (RF-010); no aprueba al hermano ni lo ubica en una categoría.
 /// No comprueba el rol ni el estado de quien agrega: lo hizo la autorización. No accede al
 /// contexto de Entity Framework ni conoce HTTP.
@@ -49,7 +52,7 @@ public class ServicioAgregarHermano : IServicioAgregarHermano
     }
 
     /// <inheritdoc />
-    public async Task<(JugadorDeSesionDto Hermano, bool Creado)> AgregarAsync(
+    public async Task<(HermanoAgregadoDto Hermano, bool Creado)> AgregarAsync(
         Guid usuarioRolId, UsuarioRol quienPregunta, AgregarHermanoDto datos, CancellationToken cancelacion = default)
     {
         // Solo desde la ficha propia: la de un hermano y la de un jugador ajeno no existen (RF-029).
@@ -76,16 +79,19 @@ public class ServicioAgregarHermano : IServicioAgregarHermano
                     var clubId = await _club.BloquearAsync(cancelacion);
 
                     var conEseDocumento = await _pertenencias.ObtenerPorDocumentoEnClubAsync(clubId, numero, cancelacion);
+                    var enOtrasCuentas = ReglaDocumentoCompartido.Evaluar(
+                        await _pertenencias.ListarPorDocumentosAsync([numero], cancelacion), quienPregunta.UsuarioId);
+                    var retiraDeOtroClub = enOtrasCuentas == DocumentoEnOtraCuenta.ConBaja;
+
                     if (conEseDocumento is not null)
                     {
                         return conEseDocumento.UsuarioId == quienPregunta.UsuarioId
                             && conEseDocumento.EstadoIngreso == EstadoIngreso.EN_ESPERA
-                            ? (MapperSesion.AJugadorDeSesion(conEseDocumento), false)
+                            ? (Agregado(conEseDocumento, retiraDeOtroClub), false)
                             : throw ErroresDeFicha.DocumentoRepetidoEnClub();
                     }
 
-                    var duenia = await _pertenencias.ObtenerCuentaPorDocumentoAsync(numero, cancelacion);
-                    if (duenia is not null && duenia.Id != quienPregunta.UsuarioId)
+                    if (enOtrasCuentas == DocumentoEnOtraCuenta.NoAdmitido)
                     {
                         throw ErroresDeFicha.DocumentoEnOtraCuenta();
                     }
@@ -116,7 +122,7 @@ public class ServicioAgregarHermano : IServicioAgregarHermano
                     _pertenencias.Agregar(hermano);
                     await _unidadDeTrabajo.GuardarAsync(cancelacion);
 
-                    return (MapperSesion.AJugadorDeSesion(hermano), true);
+                    return (Agregado(hermano, retiraDeOtroClub), true);
                 },
                 cancelacion);
         }
@@ -126,5 +132,12 @@ public class ServicioAgregarHermano : IServicioAgregarHermano
             // Lo garantiza el índice único, como en el registro y en el cambio de documento.
             throw ErroresDeFicha.DocumentoRepetidoEnClub();
         }
+    }
+
+    private static HermanoAgregadoDto Agregado(UsuarioRol hermano, bool retiraDeOtroClub)
+    {
+        var jugador = MapperSesion.AJugadorDeSesion(hermano);
+        return new HermanoAgregadoDto(
+            jugador.UsuarioRolId, jugador.Nombres, jugador.Apellidos, jugador.EstadoIngreso, jugador.Retirado, retiraDeOtroClub);
     }
 }

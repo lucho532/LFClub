@@ -3,7 +3,7 @@ import { api } from '../../compartido/api/cliente';
 import { ErrorApi, mensajeDe } from '../../compartido/api/errores';
 import type { TipoDocumento } from '../../compartido/api/tipos';
 import type { FichaJugadorDto } from '../../compartido/api/tiposFicha';
-import type { AgregarHermanoDto, JugadorDeSesionDto } from '../../compartido/api/tiposSesion';
+import type { AgregarHermanoDto, HermanoAgregadoDto } from '../../compartido/api/tiposSesion';
 import { Campo } from '../../compartido/componentes/Campo';
 import { DialogoConfirmacion } from '../../compartido/componentes/DialogoConfirmacion';
 import { esMenorDeEdad } from '../../compartido/edad';
@@ -17,8 +17,8 @@ interface Props {
   clubId: string;
   /** La ficha desde la que se agrega: la del jugador con el que continúa la familia. */
   ficha: FichaJugadorDto;
-  /** Recibe al hermano tal como lo devolvió la API, ya en espera. */
-  alAgregar: (hermano: JugadorDeSesionDto) => void;
+  /** Recibe al hermano tal como lo devolvió la API, ya en espera y con el aviso de otro club. */
+  alAgregar: (hermano: HermanoAgregadoDto) => void;
   alCancelar: () => void;
 }
 
@@ -60,7 +60,7 @@ export function DialogoAgregarHermano({ clubId, ficha, alAgregar, alCancelar }: 
         fechaNacimiento: datos.fechaNacimiento || null,
         nombreResponsable: pideResponsable ? datos.nombreResponsable : null,
       };
-      const hermano = await api.post<JugadorDeSesionDto>(
+      const hermano = await api.post<HermanoAgregadoDto>(
         `/api/clubes/${clubId}/jugadores/${ficha.usuarioRolId}/hermanos`,
         cuerpo,
       );

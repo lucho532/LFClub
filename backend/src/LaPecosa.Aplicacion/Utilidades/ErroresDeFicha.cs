@@ -28,8 +28,10 @@ public static class ErroresDeFicha
         "documento_repetido_en_club", "Ese documento ya está registrado en el club.");
 
     /// <summary>
-    /// 409: ese número de documento ya lo usa otra cuenta en otro club. Sin esta regla, que es la
-    /// del registro, el inicio de sesión con documento no sabría a qué cuenta entrar.
+    /// 409: ese número de documento ya lo usa otra cuenta en otro club. Al registrarse y al cambiar
+    /// el documento desde la ficha, con cualquier rol; al agregar o aprobar un hermano, solo cuando
+    /// la otra cuenta lo tiene en un rol que no es JUGADOR (RF-039 de la 006): el de un jugador se
+    /// admite y su club lo pierde al aprobarse.
     /// </summary>
     public static ExcepcionDeAplicacion DocumentoEnOtraCuenta() => ExcepcionDeAplicacion.Conflicto(
         "documento_en_otra_cuenta", "Ese documento ya está registrado con otra cuenta.");

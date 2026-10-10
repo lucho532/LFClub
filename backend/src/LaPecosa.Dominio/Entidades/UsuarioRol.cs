@@ -9,7 +9,7 @@ namespace LaPecosa.Dominio.Entidades;
 /// (nombre, documento y fecha de nacimiento), su estado de ingreso y, cuando el club lo aprobó
 /// desde la sala de espera, quién lo hizo, cuándo y con qué rol. Quien entra con una invitación
 /// nace aprobado, con el rol de la invitación y sin datos de aprobación. De un jugador guarda
-/// además su categoría actual y, si el club lo retiró, quién lo hizo y cuándo (constitución §11.2
+/// además su categoría actual y, si quedó retirado, quién lo hizo y cuándo (constitución §11.2
 /// y §14.1): no existe una entidad Jugador aparte, y aquí el jugador es el integrante aprobado con
 /// el rol JUGADOR. De él cuelga su ficha (<see cref="FichaJugador"/> y
 /// <see cref="DocumentoJugador"/>), desde la que se cambia su documento de identidad y se corrige
@@ -91,7 +91,9 @@ public class UsuarioRol : IPerteneceAClub
     /// <summary>
     /// Número de documento, sin espacios ni puntos y en minúsculas. Único dentro del club, también
     /// frente a los retirados (RF-017). Con él se inicia sesión: al cambiarlo desde la ficha se
-    /// entra con el nuevo.
+    /// entra con el nuevo. Puede estar en integrantes de dos cuentas, en clubes distintos, solo por
+    /// el hermano agregado con el documento de un jugador de otra cuenta (§10); entonces abre la
+    /// cuenta del jugador activo.
     /// </summary>
     public string NumeroDocumento { get; set; } = string.Empty;
 
@@ -116,7 +118,9 @@ public class UsuarioRol : IPerteneceAClub
 
     /// <summary>
     /// Obligatorio. Verdadero por defecto, también para las filas que ya existen. Falso significa
-    /// retirado del club (§14.1); solo puede ser falso en un JUGADOR aprobado (RF-041).
+    /// retirado del club (§14.1); solo puede ser falso en un JUGADOR aprobado (RF-041). Queda
+    /// retirado de tres formas: lo retira el PRESIDENTE, lo retira su propia cuenta, o queda
+    /// retirado al aprobarse en otro club un hermano de otra cuenta con su mismo documento.
     /// </summary>
     public bool Activo { get; set; } = true;
 
@@ -127,8 +131,9 @@ public class UsuarioRol : IPerteneceAClub
     public DateTime? RetiradoEn { get; set; }
 
     /// <summary>
-    /// Opcional. Cuenta de quien lo retiró. Foránea a <see cref="Usuario"/>; pasa a nulo si esa
-    /// cuenta se elimina.
+    /// Opcional. Cuenta de quien lo retiró: la del PRESIDENTE o la del propio jugador. Nula si
+    /// quedó retirado al aprobarse un hermano en otro club, que no deja autor. Foránea a
+    /// <see cref="Usuario"/>; pasa a nulo si esa cuenta se elimina.
     /// </summary>
     public Guid? RetiradoPorUsuarioId { get; set; }
 

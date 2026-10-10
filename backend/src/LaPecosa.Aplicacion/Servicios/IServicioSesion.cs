@@ -16,7 +16,9 @@ public interface IServicioSesion
 {
     /// <summary>
     /// Inicia sesión. Cuenta inexistente, contraseña incorrecta y cuenta bloqueada fallan con el
-    /// mismo 401 <c>credenciales_invalidas</c>. Con un documento, el token queda limitado a los
+    /// mismo 401 <c>credenciales_invalidas</c>. Un documento que está en varias cuentas abre la del
+    /// jugador activo (si no hay, la del que espera; si tampoco, la del retirado), y la contraseña
+    /// de otra de esas cuentas recibe el mismo 401. Con un documento, el token queda limitado a los
     /// integrantes de la cuenta que tienen ese número; con el correo no tiene limitación.
     /// </summary>
     Task<TokenSesionDto> IniciarAsync(IniciarSesionDto datos, CancellationToken cancelacion = default);

@@ -19,7 +19,7 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// <param name="Rol">Rol de la persona en ese club.</param>
 /// <param name="Estado">Estado actual del club.</param>
 /// <param name="EstadoIngreso">Estado de ingreso de la persona en ese club.</param>
-/// <param name="Retirado">Verdadero si el club retiró a este jugador; no entra a él hasta que lo reincorporen.</param>
+/// <param name="Retirado">Verdadero si este jugador está retirado del club; no entra a él hasta que lo reincorporen.</param>
 /// <param name="Identidad">Identidad visual del club.</param>
 /// <param name="Nombres">Nombres del integrante en ese club.</param>
 /// <param name="Apellidos">Apellidos del integrante en ese club.</param>

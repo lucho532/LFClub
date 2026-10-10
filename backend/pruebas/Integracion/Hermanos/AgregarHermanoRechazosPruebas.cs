@@ -94,20 +94,23 @@ public class AgregarHermanoRechazosPruebas
         Assert.Null((await e.FamiliaGuardadaAsync()).NombreResponsable);
     }
 
-    // Supuesto 1 y §10.
+    // RF-034 y RF-039 de la 006 (cambia el supuesto 1) y §10.
     [Fact]
-    public async Task El_documento_de_otra_cuenta_en_otro_club_responde_409_y_el_de_la_misma_cuenta_se_admite()
+    public async Task El_documento_de_un_jugador_de_otra_cuenta_se_admite_el_de_un_presidente_no_y_el_de_la_misma_cuenta_si()
     {
         var e = await EscenarioHermanos.CrearAsync(_fabrica);
         var (_, deOtraCuenta) = await _fabrica.Categorias.CrearJugadorAsync(e.OtroClub, 2014);
+        var (_, presidente) = await _fabrica.Sembrador.CrearIntegranteAsync(e.OtroClub, Rol.PRESIDENTE);
         var elMismoEnOtroClub = await _fabrica.Sembrador.CrearIntegranteAsync(e.OtroClub, e.Familia, Rol.JUGADOR);
         var familia = await e.ClienteDeLaFamiliaAsync(e.Ana.Id);
 
         var ajeno = await familia.PostAsync(e.Hermanos(e.Ana.Id), Datos(deOtraCuenta.NumeroDocumento));
+        var dePresidente = await familia.PostAsync(e.Hermanos(e.Ana.Id), Datos(presidente.NumeroDocumento));
         var propio = await familia.PostAsync(e.Hermanos(e.Ana.Id), Datos(elMismoEnOtroClub.NumeroDocumento));
 
-        Assert.Equal(HttpStatusCode.Conflict, ajeno.StatusCode);
-        Assert.Equal("documento_en_otra_cuenta", await ClienteDePrueba.CodigoAsync(ajeno));
+        Assert.Equal(HttpStatusCode.Created, ajeno.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, dePresidente.StatusCode);
+        Assert.Equal("documento_en_otra_cuenta", await ClienteDePrueba.CodigoAsync(dePresidente));
         Assert.Equal(HttpStatusCode.Created, propio.StatusCode);
         Assert.Equal(elMismoEnOtroClub.NumeroDocumento, (await e.JugadoresDeLaFamiliaAsync()).Last().NumeroDocumento);
 

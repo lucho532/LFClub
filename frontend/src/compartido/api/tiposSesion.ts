@@ -10,8 +10,16 @@ export interface JugadorDeSesionDto {
   nombres: string;
   apellidos: string;
   estadoIngreso: EstadoIngreso;
-  /** Verdadero si el club lo retiró. */
+  /** Verdadero si está retirado del club: por el club, por su familia o por otro club. */
   retirado: boolean;
+}
+
+/**
+ * El hermano que la familia acaba de agregar: lo mismo que `JugadorDeSesionDto` más el aviso de
+ * que, si el club lo aprueba, dejará de estar en otro club donde está inscrito. No dice cuál.
+ */
+export interface HermanoAgregadoDto extends JugadorDeSesionDto {
+  retiraDeOtroClub: boolean;
 }
 
 /**
@@ -26,7 +34,7 @@ export interface ClubDeSesionDto {
   rol: Rol;
   estado: EstadoClub;
   estadoIngreso: EstadoIngreso;
-  /** Verdadero si el club retiró a este jugador; no entra a él hasta que lo reincorporen. */
+  /** Verdadero si este jugador está retirado del club; no entra a él hasta que lo reincorporen. */
   retirado: boolean;
   identidad: IdentidadClubDto;
   nombres: string;
