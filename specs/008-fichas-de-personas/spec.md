@@ -18,7 +18,7 @@ debería dejarme."
 
 **Plataforma**: La Pecosa
 
-**Constitución aplicable**: versión 4.5.0, en especial §7.1, §7.5, §8, §10, §12.3, §12.6, §14.2,
+**Constitución aplicable**: versión 4.5.1, en especial §7.1, §7.5, §8, §10, §12.3, §12.6, §14.2,
 §15, §20 y §24.
 
 **Depende de**: spec 001 (foto de perfil y "Mi perfil"), spec 003 (categorías, equipos y
@@ -114,7 +114,7 @@ cuáles no son enlace.
 1. **Dado** la familia en su inicio, **cuando** pulsa el nombre de un entrenador de la categoría de
    su jugador, **entonces** se abre la ficha básica de ese entrenador.
 2. **Dado** el PRESIDENTE, un DIRECTIVO o un ENTRENADOR en una pantalla que muestra jugadores que
-   puede ver (lista de jugadores, detalle de una categoría, inicio del entrenador), **cuando** pulsa
+   puede ver (lista de jugadores, detalle de una categoría, jugadores sin categoría), **cuando** pulsa
    el nombre de un jugador, **entonces** se abre el detalle de ese jugador con lo que su rol puede
    ver (spec 007).
 3. **Dado** cualquier rol en el detalle de una categoría o en un resumen que muestra entrenadores,
@@ -127,8 +127,10 @@ cuáles no son enlace.
    texto normal.
 6. **Dado** el PRESIDENTE o un DIRECTIVO en la lista de retirados, **cuando** pulsa el nombre de un
    jugador retirado, **entonces** se abre su ficha, como ya permite la spec 005.
-7. **Dado** el PRESIDENTE en la sala de espera, **cuando** pulsa el nombre de un hermano que espera
-   aprobación, **entonces** se abre la ficha que hoy le permite revisar antes de decidir.
+7. **Dado** el PRESIDENTE en la sala de espera, **cuando** mira a un hermano que espera
+   aprobación, **entonces** su nombre se muestra como texto, porque su tarjeta ya muestra los
+   datos que revisa antes de decidir, y el nombre del hermano desde cuya ficha se agregó abre la
+   ficha de ese hermano.
 8. **Dado** una ficha abierta desde un nombre, **cuando** quien la consulta vuelve atrás,
    **entonces** regresa a la pantalla desde la que la abrió.
 9. **Dado** el propio nombre de quien mira en una pantalla del club, **cuando** lo pulsa,

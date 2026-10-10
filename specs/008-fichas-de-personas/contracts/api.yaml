@@ -1,0 +1,309 @@
+openapi: 3.1.0
+info:
+  title: La Pecosa - API de la funcionalidad 008 (fichas de personas y datos propios)
+  version: 0.8.0
+  description: |
+    Contrato de lo que esta funcionalidad añade o cambia respecto de los contratos de la 001 a la
+    007. Lo que no aparece aquí sigue igual. Añade 4 endpoints: el contrato completo pasa de 68 a
+    72, y los de `/api/clubes/{clubId}/**` de 46 a 48. Cambia, solo añadiendo campos, las
+    respuestas de cinco endpoints existentes.
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - `/api/clubes/{clubId}/**` exige un integrante del usuario en ese club. Sin él, también el
+      DESARROLLADOR, responde 404 `no_encontrado`.
+    - Tras decidir quién hace la petición (cabecera `X-Jugador-Elegido` de la 006) se aplica lo de
+      siempre: 403 `club_suspendido`, `club_dado_de_baja`, `ingreso_en_espera`,
+      `integrante_retirado` o `rol_no_autorizado`. En un club suspendido solo pasa el PRESIDENTE.
+    - Una ficha básica que no existe, que es de otro club o que pertenece a un integrante JUGADOR
+      responde 404 `no_encontrado`, sin distinguir los casos.
+    - Ninguna respuesta de la ficha básica lleva documento, fecha de nacimiento, correo ni celular.
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Personas
+  - name: Cuenta
+
+paths:
+  # ------------------------------------------------------------------ Ficha básica
+
+  /api/clubes/{clubId}/personas/{usuarioRolId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Personas]
+      summary: NUEVO. Ficha básica de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
+      description: |
+        Cualquier rol del club, también la cuenta de un jugador, sin límite de categoría (RF-003).
+        Solo lo de este club: el rol, y las categorías activas con los equipos activos que dirige
+        en cada una (RF-001, RF-005).
+      responses:
+        '200':
+          description: La ficha básica
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FichaBasicaDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/personas/{usuarioRolId}/foto:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Personas]
+      summary: NUEVO. Foto de perfil de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
+      description: |
+        Mismo acceso que la ficha básica (RF-007). Es la foto de perfil de la cuenta de ese
+        integrante, la misma que carga en "Mi perfil". Se sirve con `Cache-Control: private,
+        no-store` y `X-Content-Type-Options: nosniff`. La foto de perfil de una cuenta que en
+        este club es JUGADOR no sale por aquí (404, RF-008).
+      responses:
+        '200':
+          description: La imagen
+          content:
+            image/png: { schema: { type: string, format: binary } }
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404':
+          description: '`no_encontrado`: no tiene foto, no es de este club o no tiene ficha básica'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  # ------------------------------------------------------------------ Datos propios
+
+  /api/cuenta/datos-propios:
+    get:
+      tags: [Cuenta]
+      summary: NUEVO. Datos personales de la cuenta con sesión, para "Mi perfil"
+      description: |
+        Solo para una cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR en algún club (RF-015).
+        Si la tiene en varios, se toman del integrante más antiguo; tras el primer cambio son
+        iguales en todos. Una cuenta que solo tiene jugadores recibe 404: sus datos están en la
+        ficha de cada jugador (RF-017).
+      responses:
+        '200':
+          description: Los datos
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DatosPropiosDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Cuenta]
+      summary: NUEVO. Cambia nombres, apellidos, fecha de nacimiento y celular
+      description: |
+        Valida con las reglas del registro y aplica nombres, apellidos y fecha de nacimiento a
+        todos los integrantes de la cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR, en todos sus
+        clubes, y el celular a la cuenta, en una sola transacción (RF-016). No toca los
+        integrantes JUGADOR de la cuenta ni los nombres ya copiados en aprobaciones, retiros o
+        últimos cambios. El cuerpo no admite documento ni correo: si vienen, se ignoran (RF-018,
+        RF-019).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CambiarDatosPropiosDto' }
+      responses:
+        '200':
+          description: Los datos ya guardados
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DatosPropiosDto' }
+        '400':
+          description: '`datos_invalidos`, con `errores` por campo; no cambia nada'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  # ------------------------------------------------------------------ Respuestas que cambian
+  # Solo añaden campos; el resto de cada respuesta sigue como en su spec.
+  #
+  # GET /api/clubes/{clubId}/mi-categoria          EntrenadorParaFamiliaDto + usuarioRolId, versionFoto
+  # GET /api/clubes/{clubId}/jugadores/{id}/ficha   UltimoCambioDto + autorFicha
+  #     (y toda operación que responde FichaJugadorDto)
+  # GET /api/clubes/{clubId}/retirados             JugadorRetiradoDto + retiradoPorFicha
+  # GET /api/clubes/{clubId}/ingresos/aprobados    IngresoAprobadoDto + ficha, aprobadoPorFicha
+  # GET /api/clubes/{clubId}/ingresos/en-espera    IngresoEnEsperaDto + hermanoDeFicha
+  #
+  # Las rutas exactas son las que ya existen en el código; tasks.md las confirma contra Swagger.
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    clubId:
+      name: clubId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    usuarioRolId:
+      name: usuarioRolId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    SinSesion:
+      description: Sin sesión o sesión no válida
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoAutorizado:
+      description: '`ingreso_en_espera`, `integrante_retirado`, `club_suspendido` y los demás 403 de la pertenencia al club'
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoEncontrado:
+      description: '`no_encontrado`: no existe, es de otro club o quien pregunta no puede verlo'
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [codigo, title, status]
+      properties:
+        codigo: { type: string }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        errores:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+    Rol:
+      type: string
+      enum: [PRESIDENTE, DIRECTIVO, ENTRENADOR, JUGADOR]
+
+    TipoDocumento:
+      type: string
+      enum: [REGISTRO_CIVIL, TARJETA_IDENTIDAD, CEDULA_CIUDADANIA, CEDULA_EXTRANJERIA]
+
+    FichaBasicaDto:
+      type: object
+      additionalProperties: false
+      required: [usuarioRolId, nombres, apellidos, rol, versionFoto, categorias]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        rol:
+          description: PRESIDENTE, DIRECTIVO o ENTRENADOR; nunca JUGADOR
+          allOf: [{ $ref: '#/components/schemas/Rol' }]
+        versionFoto:
+          type: integer
+          description: 0 si no tiene foto de perfil; cambia cada vez que la reemplaza
+        categorias:
+          type: array
+          description: Categorías activas que entrena en este club, por año; vacía si no entrena
+          items: { $ref: '#/components/schemas/CategoriaDeFichaBasicaDto' }
+
+    CategoriaDeFichaBasicaDto:
+      type: object
+      additionalProperties: false
+      required: [anio, equipos]
+      properties:
+        anio: { type: integer }
+        equipos:
+          type: array
+          description: Nombres de los equipos activos que dirige, por nombre; vacía si es de la categoría en general
+          items: { type: string }
+
+    EnlaceFichaDto:
+      type: object
+      description: A dónde lleva un nombre. Ausente o null si quien mira no puede abrir esa ficha o la persona ya no está en el club.
+      required: [usuarioRolId, tipo]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        tipo:
+          type: string
+          enum: [JUGADOR, BASICA]
+
+    EntrenadorParaFamiliaDto:
+      type: object
+      description: CAMBIA. Añade usuarioRolId y versionFoto (deja sin efecto la parte de RF-035 de la 003)
+      required: [usuarioRolId, nombres, apellidos, equipos, versionFoto]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        equipos: { type: array, items: { type: string } }
+        versionFoto: { type: integer }
+
+    UltimoCambioDto:
+      type: object
+      description: CAMBIA. Añade autorFicha
+      required: [fecha, autor, porLaCuentaDelJugador, autorFicha]
+      properties:
+        fecha: { type: string, format: date-time }
+        autor: { type: string, description: Nombre copiado en ese momento (§13) }
+        porLaCuentaDelJugador: { type: boolean }
+        autorFicha:
+          oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+
+    JugadorRetiradoDto.CamposNuevos:
+      description: CAMBIA. Solo los campos que se añaden; el resto sigue como en su spec
+      type: object
+      properties:
+        retiradoPorFicha:
+          oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+
+    IngresoAprobadoDto.CamposNuevos:
+      description: CAMBIA. Solo los campos que se añaden; el resto sigue como en su spec
+      type: object
+      properties:
+        ficha:
+          description: Ficha actual de la persona aprobada
+          oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+        aprobadoPorFicha:
+          oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+
+    IngresoEnEsperaDto.CamposNuevos:
+      description: CAMBIA. Solo los campos que se añaden; el resto sigue como en su spec
+      type: object
+      properties:
+        hermanoDeFicha:
+          description: Ficha del jugador desde cuya ficha se agregó
+          oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+
+    DatosPropiosDto:
+      type: object
+      additionalProperties: false
+      required: [nombres, apellidos, tipoDocumento, numeroDocumento, fechaNacimiento, correo, celular]
+      properties:
+        nombres: { type: string }
+        apellidos: { type: string }
+        tipoDocumento: { $ref: '#/components/schemas/TipoDocumento' }
+        numeroDocumento: { type: string, description: De solo lectura }
+        fechaNacimiento: { type: string, format: date }
+        correo: { type: string, description: De solo lectura }
+        celular: { type: string }
+
+    CambiarDatosPropiosDto:
+      type: object
+      required: [nombres, apellidos, fechaNacimiento, celular]
+      properties:
+        nombres: { type: string, maxLength: 80 }
+        apellidos: { type: string, maxLength: 80 }
+        fechaNacimiento: { type: string, format: date, description: No futura }
+        celular: { type: string, maxLength: 20 }
