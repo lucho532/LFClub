@@ -1,0 +1,60 @@
+/* Edición de fotos y escudos con un lápiz dentro del círculo (`LapizDeImagen`). */
+
+.lapiz-imagen {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.lapiz-imagen-boton {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 50%;
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.lapiz-imagen-boton:disabled {
+  cursor: progress;
+}
+
+.lapiz-imagen-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  padding: 4px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
+  transform: translateX(-50%);
+}
+
+.lapiz-imagen-menu button {
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lapiz-imagen-menu button:hover,
+.lapiz-imagen-menu button:focus-visible {
+  background: var(--superficie-suave);
+}

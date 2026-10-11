@@ -1,0 +1,30 @@
+/* Campo de contraseña con el botón del ojo dentro del cuadro, a la derecha. */
+.campo-contrasena {
+  position: relative;
+}
+
+.campo .campo-contrasena input {
+  padding-right: 52px;
+}
+
+.boton-ver-contrasena {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.boton-ver-contrasena:hover,
+.boton-ver-contrasena[aria-pressed='true'] {
+  color: var(--texto);
+}

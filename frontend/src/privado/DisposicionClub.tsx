@@ -8,15 +8,6 @@ import { useCarga } from '../compartido/api/useCarga';
 import { Aviso } from '../compartido/componentes/Aviso';
 import { inicialesDe } from '../compartido/componentes/Avatar';
 import { BarraSuperior } from '../compartido/componentes/BarraSuperior';
-import { EnlaceMenu } from '../compartido/componentes/EnlaceMenu';
-import {
-  IconoCategorias,
-  IconoDatosClub,
-  IconoFicha,
-  IconoIngresos,
-  IconoInicio,
-  IconoJugadores,
-} from '../compartido/componentes/Iconos';
 import { MenuPerfil } from '../compartido/componentes/MenuPerfil';
 import { nombreDeRol } from '../compartido/formato';
 import { jugadorDe, olvidarJugadorElegido, useJugadorElegido } from '../compartido/sesion/jugadorElegido';
@@ -26,11 +17,10 @@ import { Escudo, IdentidadClub } from '../compartido/tema/IdentidadClub';
 import { AvisoClubNoDisponible, esClubNoDisponible } from './AvisoClubNoDisponible';
 import { AvisoRetirado } from './AvisoRetirado';
 import { BotonCambiarJugador } from './BotonCambiarJugador';
-import { puedeVerCategorias, rutaDeFicha } from './categorias/textos';
 import type { ContextoDelClub } from './contextoClub';
 import { DesplegableClubes } from './DesplegableClubes';
 import { ElegirJugador } from './ElegirJugador';
-import { puedeVerJugadores } from './jugadores/textos';
+import { MenuDelClub } from './MenuDelClub';
 import { SalaDeEspera } from './SalaDeEspera';
 
 /** Códigos con los que la API dice que la sesión guardada ya no refleja la relación con el club. */
@@ -135,37 +125,7 @@ function AplicacionDelClub({ clubId, deSesion }: Props) {
         <div className="solo-escritorio">
           <DesplegableClubes clubId={clubId} />
         </div>
-        <nav className="lateral-menu" aria-label={`Menú de ${nombre}`}>
-          <EnlaceMenu a={`/club/${clubId}`} icono={<IconoInicio />} exacto>
-            Inicio
-          </EnlaceMenu>
-          {/* Solo la cuenta de un jugador tiene ficha propia (RF-033); los demás roles no ven el enlace. */}
-          {club?.miRol === 'JUGADOR' && (
-            <EnlaceMenu a={rutaDeFicha(clubId, club.miUsuarioRolId)} icono={<IconoFicha />}>
-              Mi ficha
-            </EnlaceMenu>
-          )}
-          {rol === 'PRESIDENTE' && (
-            <EnlaceMenu a={`/club/${clubId}/ingresos`} icono={<IconoIngresos />}>
-              Ingresos
-            </EnlaceMenu>
-          )}
-          {rol && puedeVerJugadores(rol) && (
-            <EnlaceMenu a={`/club/${clubId}/jugadores`} icono={<IconoJugadores />}>
-              Jugadores
-            </EnlaceMenu>
-          )}
-          {rol && puedeVerCategorias(rol) && (
-            <EnlaceMenu a={`/club/${clubId}/categorias`} icono={<IconoCategorias />}>
-              Categorías
-            </EnlaceMenu>
-          )}
-          {rol === 'PRESIDENTE' && (
-            <EnlaceMenu a={`/club/${clubId}/configuracion`} icono={<IconoDatosClub />}>
-              Datos del club
-            </EnlaceMenu>
-          )}
-        </nav>
+        <MenuDelClub clubId={clubId} nombre={nombre} club={club} rol={rol} />
       </aside>
       <div className="contenido">
         <BarraSuperior

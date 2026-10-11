@@ -53,6 +53,11 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioResumenClub, RepositorioResumenClub>();
         servicios.AddScoped<IRepositorioFichaBasica, RepositorioFichaBasica>();
         servicios.AddScoped<IRepositorioEnlaces, RepositorioEnlaces>();
+        servicios.AddScoped<IRepositorioEntrenamientos, RepositorioEntrenamientos>();
+        servicios.AddScoped<IRepositorioPartidos, RepositorioPartidos>();
+        servicios.AddScoped<IRepositorioConvocatoria, RepositorioConvocatoria>();
+        servicios.AddScoped<IRepositorioAsistencias, RepositorioAsistencias>();
+        servicios.AddScoped<IRepositorioEstadisticas, RepositorioEstadisticas>();
 
         servicios.Configure<OpcionesCorreo>(opciones =>
         {

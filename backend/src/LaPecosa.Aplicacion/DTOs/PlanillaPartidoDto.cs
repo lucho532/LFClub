@@ -1,0 +1,60 @@
+using LaPecosa.Dominio.Enumeraciones;
+
+namespace LaPecosa.Aplicacion.DTOs;
+
+/// <summary>
+/// Representa la planilla de un partido: sus convocados con su respuesta, si jugaron y sus goles,
+/// los conteos de respuestas y, mientras está próximo, los jugadores que se pueden convocar (spec
+/// 009, RF-010, RF-024).
+/// Su responsabilidad es darle a quien entrena alguna de sus categorías y al PRESIDENTE lo que
+/// necesita para convocar y registrar el resultado.
+/// No llega nunca a la cuenta de un jugador (RF-012).
+/// </summary>
+/// <param name="PartidoId">Identificador del partido.</param>
+/// <param name="Asistiran">Convocados cuya familia respondió que asistirá.</param>
+/// <param name="NoAsistiran">Convocados cuya familia respondió que no asistirá.</param>
+/// <param name="SinResponder">Convocados sin respuesta.</param>
+/// <param name="Convocados">Los convocados, por la categoría copiada y apellidos.</param>
+/// <param name="Convocables">Jugadores activos de sus categorías sin convocar; vacía si no está próximo.</param>
+public record PlanillaPartidoDto(
+    Guid PartidoId,
+    int Asistiran,
+    int NoAsistiran,
+    int SinResponder,
+    IReadOnlyList<ConvocadoDto> Convocados,
+    IReadOnlyList<ConvocableDto> Convocables);
+
+/// <summary>
+/// Representa a un convocado en la planilla de un partido.
+/// Su responsabilidad es llevar su nombre, el enlace a su ficha si quien mira puede abrirla, la
+/// categoría con la que se le convocó, la respuesta de su familia, si jugó y sus goles.
+/// No lleva datos personales del jugador.
+/// </summary>
+/// <param name="UsuarioRolId">Jugador.</param>
+/// <param name="Nombres">Nombres.</param>
+/// <param name="Apellidos">Apellidos.</param>
+/// <param name="Enlace">Su ficha, si quien mira puede abrirla.</param>
+/// <param name="Categoria">La copiada al convocarlo.</param>
+/// <param name="Respuesta">Respuesta de su familia, o nula.</param>
+/// <param name="Jugo">Si jugó.</param>
+/// <param name="Goles">Goles que marcó.</param>
+public record ConvocadoDto(
+    Guid UsuarioRolId,
+    string Nombres,
+    string Apellidos,
+    EnlaceFichaDto? Enlace,
+    CategoriaDeActividadDto Categoria,
+    RespuestaFamilia? Respuesta,
+    bool Jugo,
+    int Goles);
+
+/// <summary>
+/// Representa a un jugador que se puede convocar a un partido próximo.
+/// Su responsabilidad es llevar su nombre y su categoría actual.
+/// No lleva datos personales del jugador.
+/// </summary>
+/// <param name="UsuarioRolId">Jugador.</param>
+/// <param name="Nombres">Nombres.</param>
+/// <param name="Apellidos">Apellidos.</param>
+/// <param name="Categoria">Su categoría actual.</param>
+public record ConvocableDto(Guid UsuarioRolId, string Nombres, string Apellidos, CategoriaDeActividadDto Categoria);

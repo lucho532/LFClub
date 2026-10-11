@@ -66,6 +66,18 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<ResolutorDeEnlaces>();
         servicios.AddScoped<IServicioDatosPropios, ServicioDatosPropios>();
 
+        servicios.AddScoped<AccesoAActividad>();
+        servicios.AddScoped<IServicioEntrenamientos, ServicioEntrenamientos>();
+        servicios.AddScoped<IServicioConsultaEntrenamientos, ServicioConsultaEntrenamientos>();
+        servicios.AddScoped<IServicioCalendario, ServicioCalendario>();
+        servicios.AddScoped<IServicioPartidos, ServicioPartidos>();
+        servicios.AddScoped<IServicioConsultaPartidos, ServicioConsultaPartidos>();
+        servicios.AddScoped<IServicioConvocatoria, ServicioConvocatoria>();
+        servicios.AddScoped<IServicioResultado, ServicioResultado>();
+        servicios.AddScoped<IServicioAsistencia, ServicioAsistencia>();
+        servicios.AddScoped<IServicioRespuestas, ServicioRespuestas>();
+        servicios.AddScoped<IServicioEstadisticas, ServicioEstadisticas>();
+
         return servicios;
     }
 }

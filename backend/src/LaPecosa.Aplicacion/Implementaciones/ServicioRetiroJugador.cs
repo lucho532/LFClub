@@ -13,8 +13,10 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// Su responsabilidad es decidir con <see cref="ReglaQuienRetira"/> si quien pide el retiro puede
 /// hacerlo (el PRESIDENTE a cualquiera, la familia solo a su jugador; research §18 de la 006),
 /// expresar el retiro con <c>Activo</c> (constitución §14.1), copiando en ese momento el nombre de
-/// quien retira (§13), sacar al jugador de su categoría y de sus equipos y borrar definitivamente
-/// su foto propia (§14.2, spec 007), sea quien sea el que lo retira. Al reincorporar, niega
+/// quien retira (§13), sacar al jugador de su categoría y de sus equipos, de sus convocatorias a
+/// partidos que no están jugados y de sus respuestas a entrenamientos que no han empezado (RF-033 de
+/// la 009; su asistencia y lo que jugó se conservan), y borrar definitivamente su foto propia
+/// (§14.2, spec 007), sea quien sea el que lo retira. Al reincorporar, niega
 /// la reincorporación mientras el documento esté activo con otra cuenta en otro club (RF-041 de la
 /// 006), vacía los datos del retiro (solo se guarda el estado actual, §18) y lo ubica con la misma
 /// regla que a un ingreso recién aprobado; vuelve sin foto, porque no queda nada que recuperar.
@@ -84,6 +86,10 @@ public class ServicioRetiroJugador : IServicioRetiroJugador
                 }
 
                 await _jugadores.SacarDeSusEquiposAsync(usuarioRolId, cancelacion);
+
+                // Sale de las convocatorias pendientes y sin respuestas futuras; su historial se queda (RF-033 de la 009).
+                var (hoy, ahora) = HoraDeColombia.Ahora(_reloj);
+                await _jugadores.BorrarPendientesDeActividadesAsync(usuarioRolId, hoy, ahora, cancelacion);
                 await _jugadores.RetirarAsync(
                     usuarioRolId,
                     _reloj.AhoraUtc,

@@ -72,6 +72,27 @@ public class ContextoLaPecosa : DbContext
     /// <summary>Fotos propias de los jugadores.</summary>
     public DbSet<FotoJugador> FotosJugador => Set<FotoJugador>();
 
+    /// <summary>Entrenamientos de los clubes.</summary>
+    public DbSet<Entrenamiento> Entrenamientos => Set<Entrenamiento>();
+
+    /// <summary>Categorías a las que va dirigido cada entrenamiento.</summary>
+    public DbSet<EntrenamientoCategoria> EntrenamientosCategoria => Set<EntrenamientoCategoria>();
+
+    /// <summary>Asistencia registrada a cada entrenamiento.</summary>
+    public DbSet<AsistenciaEntrenamiento> AsistenciasEntrenamiento => Set<AsistenciaEntrenamiento>();
+
+    /// <summary>Respuestas de las familias a cada entrenamiento.</summary>
+    public DbSet<RespuestaEntrenamiento> RespuestasEntrenamiento => Set<RespuestaEntrenamiento>();
+
+    /// <summary>Partidos de los clubes.</summary>
+    public DbSet<Partido> Partidos => Set<Partido>();
+
+    /// <summary>Categorías de cada partido.</summary>
+    public DbSet<PartidoCategoria> PartidosCategoria => Set<PartidoCategoria>();
+
+    /// <summary>Convocados de cada partido, con lo que jugaron y la respuesta de su familia.</summary>
+    public DbSet<PartidoJugador> PartidosJugador => Set<PartidoJugador>();
+
     /// <summary>Club de la petición; lo lee el filtro global en cada consulta.</summary>
     private Guid? ClubDeLaPeticion => _contextoClub.ClubId;
 

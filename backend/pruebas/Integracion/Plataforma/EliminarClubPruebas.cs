@@ -132,6 +132,12 @@ public class EliminarClubPruebas
         await _fabrica.Fichas.CrearDocumentoAsync(
             jugador, DocumentoPedido.CERTIFICADO_SALUD, SembradorFichas.Pdf(), "application/pdf");
         await _fabrica.Jugadores.PonerFotoAsync(jugador, Imagenes.Png());
+
+        // Spec 009: un entrenamiento con asistencia y respuesta, y un partido con el jugador convocado.
+        var entrenamiento = await _fabrica.Actividades.CrearEntrenamientoAsync([categoria], new DateOnly(2026, 10, 13));
+        await _fabrica.Actividades.RegistrarAsistenciaAsync(entrenamiento, jugador, presente: true);
+        await _fabrica.Actividades.ResponderAsync(entrenamiento, jugador, RespuestaFamilia.ASISTIRA);
+        await _fabrica.Actividades.CrearPartidoAsync([categoria], new DateOnly(2026, 10, 17), convocados: [jugador]);
     }
 
     private Task<bool> ExisteClubAsync(Guid clubId) =>

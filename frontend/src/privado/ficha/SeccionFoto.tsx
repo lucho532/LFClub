@@ -1,10 +1,10 @@
-import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { api } from '../../compartido/api/cliente';
 import { mensajeDe } from '../../compartido/api/errores';
 import type { FichaJugadorDto } from '../../compartido/api/tiposFicha';
 import { Aviso } from '../../compartido/componentes/Aviso';
-import { Boton } from '../../compartido/componentes/Boton';
 import { DialogoConfirmacion } from '../../compartido/componentes/DialogoConfirmacion';
+import { LapizDeImagen } from '../../compartido/componentes/LapizDeImagen';
 import { FotoJugador } from '../jugadores/FotoJugador';
 
 interface Props {
@@ -20,13 +20,13 @@ interface Props {
 /**
  * Cabecera de la ficha: la foto propia del jugador, o sus iniciales (spec 007), y a su lado lo que
  * reciba como hijos (el nombre, la categoría y los equipos), para que todo se vea de un vistazo
- * también en el teléfono. Debajo de la foto, discretos, cargarla o cambiarla y quitarla. Quien
+ * también en el teléfono. Un lápiz pequeño dentro del círculo de la foto la carga, la cambia o la
+ * quita (`LapizDeImagen`). Quien
  * puede cambiar la ficha (la familia y el presidente) la carga, la cambia y la quita, salvo si el
  * jugador está retirado: un retirado no tiene foto (§14.2). Si la API rechaza una imagen, se dice
  * por qué y la anterior sigue a la vista. No es la foto de perfil de la cuenta.
  */
 export function SeccionFoto({ clubId, ficha, rutaDeLaFicha, alCambiar, children }: Props) {
-  const selector = useRef<HTMLInputElement>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quitando, setQuitando] = useState(false);
@@ -47,43 +47,22 @@ export function SeccionFoto({ clubId, ficha, rutaDeLaFicha, alCambiar, children 
     }
   }
 
-  function cargar(evento: ChangeEvent<HTMLInputElement>) {
-    const archivo = evento.target.files?.[0];
-    evento.target.value = '';
-    if (archivo) {
-      void ejecutar(() => api.putArchivo<FichaJugadorDto>(ruta, archivo));
-    }
-  }
-
   return (
     <>
       <div className="cabecera-ficha">
         <div className="cabecera-ficha-foto">
-          <FotoJugador clubId={clubId} jugador={ficha} tamano="grande" />
-          {puedeCambiarla && (
-            <>
-              <Boton
-                variante="texto"
-                cargando={ocupado && !quitando}
-                textoCargando="Guardando…"
-                onClick={() => selector.current?.click()}
-              >
-                {tieneFoto ? 'Cambiar foto' : 'Cargar foto'}
-              </Boton>
-              <input
-                ref={selector}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={cargar}
-                hidden
-              />
-              {tieneFoto && (
-                <Boton variante="texto" onClick={() => setQuitando(true)} disabled={ocupado}>
-                  Quitar foto
-                </Boton>
-              )}
-              <span className="texto-suave texto-pequeno">PNG, JPEG o WebP de hasta 1 MB.</span>
-            </>
+          {puedeCambiarla ? (
+            <LapizDeImagen
+              que="la foto"
+              tieneImagen={tieneFoto}
+              ocupado={ocupado}
+              alElegir={(archivo) => void ejecutar(() => api.putArchivo<FichaJugadorDto>(ruta, archivo))}
+              alQuitar={() => setQuitando(true)}
+            >
+              <FotoJugador clubId={clubId} jugador={ficha} tamano="grande" />
+            </LapizDeImagen>
+          ) : (
+            <FotoJugador clubId={clubId} jugador={ficha} tamano="grande" />
           )}
         </div>
         <div className="cabecera-ficha-datos">{children}</div>
