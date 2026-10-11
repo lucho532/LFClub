@@ -2,6 +2,7 @@
 // Van aparte de tipos.ts para que ningún archivo pase de 250 líneas.
 
 import type { TipoDocumento } from './tipos';
+import type { EnlaceFichaDto } from './tiposPersonas';
 
 /** Documentos que pide la ficha: una lista fija, igual para todos los clubes. */
 export type DocumentoPedido = 'COPIA_DOCUMENTO_IDENTIDAD' | 'CERTIFICADO_SALUD';
@@ -60,6 +61,8 @@ export interface UltimoCambioDto {
   autor: string;
   /** Verdadero si lo hizo la cuenta del jugador (su familia) y no el presidente. */
   porLaCuentaDelJugador: boolean;
+  /** Ficha básica de quien lo hizo; `null` si fue la familia o si ya no está en el club (spec 008). */
+  autorFicha: EnlaceFichaDto | null;
 }
 
 /** Lo que quien pregunta puede hacer en esta ficha; la API lo comprueba igualmente. */

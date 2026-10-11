@@ -63,6 +63,7 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioResumenClub, ServicioResumenClub>();
 
         servicios.AddScoped<IServicioFichaBasica, ServicioFichaBasica>();
+        servicios.AddScoped<ResolutorDeEnlaces>();
 
         return servicios;
     }

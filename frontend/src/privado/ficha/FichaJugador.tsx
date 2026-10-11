@@ -70,7 +70,7 @@ export function FichaJugador() {
           <SeccionFoto clubId={club.clubId} ficha={ficha} rutaDeLaFicha={ruta} alCambiar={carga.fijar} />
           <div className="columna">
             <h1>{ficha.usuarioRolId === club.miUsuarioRolId ? 'Mi ficha' : `Ficha de ${nombreCompleto(ficha)}`}</h1>
-            <UltimoCambio cambio={ficha.ultimoCambio} />
+            <UltimoCambio cambio={ficha.ultimoCambio} clubId={club.clubId} textoVolver={nombreCompleto(ficha)} />
             {esLaPropia && (
               <div className="fila">
                 <Boton variante="secundario" onClick={() => setAgregando(true)}>
