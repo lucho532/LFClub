@@ -1,14 +1,14 @@
-import { Link } from 'react-router-dom';
 import type { JugadorDeCategoriaDto } from '../../compartido/api/tiposCategorias';
 import type { Carga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
+import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tabla, type Columna } from '../../compartido/componentes/Tabla';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { BotonRetirarJugador } from './BotonRetirarJugador';
 import { DialogoCambiarCategoria } from './DialogoCambiarCategoria';
 import { EstadoDeDocumentacion } from './EstadoDeDocumentacion';
-import { nombreCompleto, rutaDeFicha } from './textos';
+import { nombreCompleto } from './textos';
 import { useAccion } from './useAccion';
 import { useUbicarJugador } from './useUbicarJugador';
 
@@ -37,9 +37,14 @@ export function SeccionSinCategoria({ clubId, esPresidente, sinCategoria, alCamb
     {
       titulo: 'Jugador',
       celda: (jugador) => (
-        <Link to={rutaDeFicha(clubId, jugador.usuarioRolId)}>
-          <strong>{nombreCompleto(jugador)}</strong>
-        </Link>
+        <strong>
+          <NombrePersona
+            nombre={nombreCompleto(jugador)}
+            enlace={{ usuarioRolId: jugador.usuarioRolId, tipo: 'JUGADOR' }}
+            clubId={clubId}
+            textoVolver="Categorías"
+          />
+        </strong>
       ),
     },
     { titulo: 'Año de nacimiento', celda: (jugador) => jugador.anioNacimiento },

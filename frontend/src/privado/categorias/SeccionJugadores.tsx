@@ -1,15 +1,15 @@
-import { Link } from 'react-router-dom';
 import { api } from '../../compartido/api/cliente';
 import type { CategoriaDetalleDto, JugadorDeCategoriaDto } from '../../compartido/api/tiposCategorias';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { EtiquetaEstado } from '../../compartido/componentes/EtiquetaEstado';
+import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tabla, type Columna } from '../../compartido/componentes/Tabla';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { BotonRetirarJugador } from './BotonRetirarJugador';
 import { DialogoCambiarCategoria } from './DialogoCambiarCategoria';
 import { EstadoDeDocumentacion } from './EstadoDeDocumentacion';
-import { nombreCompleto, rutaDeFicha } from './textos';
+import { nombreCompleto } from './textos';
 import { useAccion } from './useAccion';
 import { useUbicarJugador } from './useUbicarJugador';
 
@@ -28,7 +28,8 @@ interface Props {
  * la ficha del jugador (RF-034), que es donde están sus demás datos y donde la API decide qué ve cada quien.
  * A quien está en una categoría que no es la de su año se le señala con texto, no solo con color
  * (RF-016). El presidente ve una casilla por equipo en cada fila, que guarda al instante,
- * y puede pasar a cada jugador a otra categoría.
+ * y puede pasar a cada jugador a otra categoría. El nombre abre la ficha del jugador, y desde ella
+ * se vuelve a esta categoría (spec 008).
  */
 export function SeccionJugadores({ clubId, categoria, esPresidente, alCambiar, alRecargar }: Props) {
   const { ocupado, mensaje, ejecutar, fijarMensaje } = useAccion();
@@ -57,9 +58,14 @@ export function SeccionJugadores({ clubId, categoria, esPresidente, alCambiar, a
     {
       titulo: 'Jugador',
       celda: (jugador) => (
-        <Link to={rutaDeFicha(clubId, jugador.usuarioRolId)}>
-          <strong>{nombreCompleto(jugador)}</strong>
-        </Link>
+        <strong>
+          <NombrePersona
+            nombre={nombreCompleto(jugador)}
+            enlace={{ usuarioRolId: jugador.usuarioRolId, tipo: 'JUGADOR' }}
+            clubId={clubId}
+            textoVolver={`Categoría ${categoria.anio}`}
+          />
+        </strong>
       ),
     },
     {

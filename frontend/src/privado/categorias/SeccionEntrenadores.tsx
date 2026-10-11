@@ -10,6 +10,7 @@ import type {
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { DialogoConfirmacion } from '../../compartido/componentes/DialogoConfirmacion';
+import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tabla, type Columna } from '../../compartido/componentes/Tabla';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { nombreDeRol } from '../../compartido/formato';
@@ -28,7 +29,8 @@ interface Props {
 /**
  * Entrenadores de una categoría: quiénes son, su rol en el club y qué equipos dirigen. El
  * presidente asigna, retira e indica los equipos de cada uno; los demás solo lo ven. Quien no
- * dirige ningún equipo es entrenador de la categoría en general.
+ * dirige ningún equipo es entrenador de la categoría en general. Su nombre abre su ficha básica,
+ * y desde ella se vuelve a esta categoría (spec 008).
  */
 export function SeccionEntrenadores({ clubId, categoria, esPresidente, alCambiar }: Props) {
   const base = `/api/clubes/${clubId}/categorias/${categoria.categoriaId}/entrenadores`;
@@ -76,7 +78,19 @@ export function SeccionEntrenadores({ clubId, categoria, esPresidente, alCambiar
     });
 
   const columnas: Columna<EntrenadorDeCategoriaDto>[] = [
-    { titulo: 'Entrenador', celda: (entrenador) => <strong>{nombreCompleto(entrenador)}</strong> },
+    {
+      titulo: 'Entrenador',
+      celda: (entrenador) => (
+        <strong>
+          <NombrePersona
+            nombre={nombreCompleto(entrenador)}
+            enlace={{ usuarioRolId: entrenador.usuarioRolId, tipo: 'BASICA' }}
+            clubId={clubId}
+            textoVolver={`Categoría ${categoria.anio}`}
+          />
+        </strong>
+      ),
+    },
     { titulo: 'Rol en el club', celda: (entrenador) => nombreDeRol(entrenador.rol) },
     {
       titulo: 'Equipos que dirige',

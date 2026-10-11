@@ -6,6 +6,7 @@ import type { CategoriaDto } from '../../compartido/api/tiposCategorias';
 import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { EtiquetaEstado } from '../../compartido/componentes/EtiquetaEstado';
+import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tabla, type Columna } from '../../compartido/componentes/Tabla';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { useClub } from '../contextoClub';
@@ -18,7 +19,8 @@ import type { Mensaje } from './useAccion';
 /**
  * Apartado "Categorías" del club. El presidente las gestiona, el directivo las consulta todas y
  * el entrenador ve solo las que tiene asignadas. La API rechaza a cualquier otro rol; aquí
- * simplemente no se le muestra la pantalla.
+ * simplemente no se le muestra la pantalla. El nombre de cada entrenador abre su ficha básica
+ * (spec 008).
  */
 export function Categorias() {
   const { club } = useClub();
@@ -75,7 +77,20 @@ function ApartadoCategorias({ clubId, miRol }: { clubId: string; miRol: Rol }) {
     },
     {
       titulo: 'Entrenadores',
-      celda: (categoria) => categoria.entrenadores.map(nombreCompleto).join(', ') || 'Sin entrenador',
+      celda: (categoria) =>
+        categoria.entrenadores.length === 0
+          ? 'Sin entrenador'
+          : categoria.entrenadores.map((entrenador, indice) => (
+              <span key={entrenador.usuarioRolId}>
+                {indice > 0 && ', '}
+                <NombrePersona
+                  nombre={nombreCompleto(entrenador)}
+                  enlace={{ usuarioRolId: entrenador.usuarioRolId, tipo: 'BASICA' }}
+                  clubId={clubId}
+                  textoVolver="Categorías"
+                />
+              </span>
+            )),
     },
   ];
 
