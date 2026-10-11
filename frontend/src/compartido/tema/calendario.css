@@ -1,0 +1,100 @@
+/* Calendario (spec 009): la semana en columnas o, en el teléfono, en una tira de días. */
+
+.semana {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tira-semana {
+  display: none;
+}
+
+.semana-dias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.dia-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dia-columna h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.dia-columna h3::first-letter {
+  text-transform: uppercase;
+}
+
+/* En una pantalla ancha, la semana entera en siete columnas. */
+@media (min-width: 1100px) {
+  .semana-dias {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+/* En el teléfono, la tira de días de `M-Calendario` y debajo solo el día elegido. */
+@media (max-width: 720px) {
+  .tira-semana {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .dia-de-tira {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    padding: 6px 0;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--superficie);
+    color: var(--texto);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .dia-de-tira.encendido {
+    border-color: var(--color-club-principal);
+    background: var(--color-club-principal);
+    color: var(--color-club-principal-texto);
+  }
+
+  .dia-columna:not(.dia-elegido) {
+    display: none;
+  }
+}
+
+/* La semana: el título y, en una sola fila, los dos botones para moverse (en el teléfono, a medias). */
+.navegacion-semana {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.navegacion-semana-botones {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 720px) {
+  .navegacion-semana-botones {
+    width: 100%;
+  }
+
+  .navegacion-semana-botones .boton {
+    flex: 1 1 0;
+  }
+}
