@@ -45,3 +45,24 @@
   align-items: baseline;
   gap: 2px 12px;
 }
+
+/* "Mi categoría" (spec 008): cada entrenador con su foto o sus iniciales y, al lado, su nombre. */
+.lista-de-entrenadores {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-de-entrenadores li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lista-de-entrenadores li > span:last-child {
+  min-width: 0;
+}

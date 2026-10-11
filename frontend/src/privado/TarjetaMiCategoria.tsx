@@ -2,12 +2,15 @@ import { api } from '../compartido/api/cliente';
 import type { MiCategoriaDto } from '../compartido/api/tiposCategorias';
 import { useCarga } from '../compartido/api/useCarga';
 import { Aviso } from '../compartido/componentes/Aviso';
+import { NombrePersona } from '../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../compartido/componentes/Tarjeta';
+import { FotoPersona } from './personas/FotoPersona';
 
 /**
  * Tarjeta "Mi categoría" del inicio del club, solo para la cuenta de un jugador: su categoría, los
- * equipos en los que está y quiénes lo entrenan, con el equipo que dirige cada uno (RF-035). De un
- * entrenador solo se muestra el nombre: la API no entrega nada más.
+ * equipos en los que está y quiénes lo entrenan, con el equipo que dirige cada uno (RF-035). Cada
+ * entrenador sale con su foto de perfil en miniatura o sus iniciales, y su nombre abre su ficha
+ * básica (spec 008, historia 3). Del entrenador no se muestra nada más: la API no lo entrega.
  */
 export function TarjetaMiCategoria({ clubId }: { clubId: string }) {
   const mia = useCarga(`${clubId}/mi-categoria`, () => api.get<MiCategoriaDto>(`/api/clubes/${clubId}/mi-categoria`));
@@ -37,13 +40,21 @@ export function TarjetaMiCategoria({ clubId }: { clubId: string }) {
           ) : (
             <>
               <p className="texto-suave">{categoria.entrenadores.length === 1 ? 'Entrenador' : 'Entrenadores'}</p>
-              <ul>
-                {categoria.entrenadores.map((entrenador, indice) => (
-                  <li key={`${entrenador.nombres}-${entrenador.apellidos}-${indice}`}>
-                    {entrenador.nombres} {entrenador.apellidos}
-                    {entrenador.equipos.length > 0 && (
-                      <span className="texto-suave"> · dirige {entrenador.equipos.join(', ')}</span>
-                    )}
+              <ul className="lista-de-entrenadores">
+                {categoria.entrenadores.map((entrenador) => (
+                  <li key={entrenador.usuarioRolId}>
+                    <FotoPersona clubId={clubId} persona={entrenador} tamano="miniatura" />
+                    <span>
+                      <NombrePersona
+                        nombre={`${entrenador.nombres} ${entrenador.apellidos}`}
+                        enlace={{ usuarioRolId: entrenador.usuarioRolId, tipo: 'BASICA' }}
+                        clubId={clubId}
+                        textoVolver="Inicio"
+                      />
+                      {entrenador.equipos.length > 0 && (
+                        <span className="texto-suave"> · dirige {entrenador.equipos.join(', ')}</span>
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>

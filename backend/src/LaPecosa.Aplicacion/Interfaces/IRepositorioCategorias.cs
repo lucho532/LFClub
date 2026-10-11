@@ -23,6 +23,12 @@ public interface IRepositorioCategorias
     /// <summary>Una categoría del club, cargada igual que en la lista, o nulo si no existe en él.</summary>
     Task<Categoria?> ObtenerAsync(Guid categoriaId, CancellationToken cancelacion = default);
 
+    /// <summary>
+    /// Una categoría del club cargada igual que en la lista y, además, con la cuenta de cada
+    /// entrenador asignado, para leer la versión de su foto (RF-014 de la 008); o nulo si no existe.
+    /// </summary>
+    Task<Categoria?> ObtenerConCuentasDeEntrenadoresAsync(Guid categoriaId, CancellationToken cancelacion = default);
+
     /// <summary>La categoría de ese año, activa o inactiva, sin sus equipos ni asignaciones.</summary>
     Task<Categoria?> BuscarPorAnioAsync(int anio, CancellationToken cancelacion = default);
 

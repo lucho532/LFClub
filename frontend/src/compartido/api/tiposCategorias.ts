@@ -106,12 +106,18 @@ export interface ReincorporacionDto {
   anio: number | null;
 }
 
-/** Lo único que una familia ve de un entrenador: sin identificador, rol ni contacto. */
+/**
+ * Lo que una familia ve de un entrenador: su identificador para abrir su ficha básica, su nombre,
+ * sus equipos y la versión de su foto (spec 008); sin rol ni contacto.
+ */
 export interface EntrenadorParaFamiliaDto {
+  usuarioRolId: string;
   nombres: string;
   apellidos: string;
   /** Nombres de los equipos que dirige; vacía si lo es de la categoría en general. */
   equipos: string[];
+  /** 0 si no tiene foto de perfil: se muestran sus iniciales. */
+  versionFoto: number;
 }
 
 export interface MiCategoriaDto {

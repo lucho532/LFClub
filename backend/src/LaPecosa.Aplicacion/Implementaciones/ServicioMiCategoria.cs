@@ -10,8 +10,9 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// <summary>
 /// Representa el servicio de la tarjeta "Mi categoría" de la familia.
 /// Su responsabilidad es leer el integrante de quien pregunta con sus equipos y la categoría que
-/// tiene, y convertirlos en el DTO de la familia, que es un tipo distinto del que ve el club y no
-/// lleva identificadores (constitución §23).
+/// tiene, con la cuenta de cada entrenador para la versión de su foto, y convertirlos en el DTO de
+/// la familia, que es un tipo distinto del que ve el club (constitución §23): de cada entrenador
+/// lleva solo su identificador, su nombre, sus equipos y la versión de su foto (RF-014 de la 008).
 /// No lee ninguna otra categoría ni ningún otro jugador, no modifica datos y no accede al contexto
 /// de Entity Framework.
 /// </summary>
@@ -34,7 +35,7 @@ public class ServicioMiCategoria : IServicioMiCategoria
             ?? throw ExcepcionDeAplicacion.NoEncontrado();
 
         var categoria = jugador.CategoriaId is { } categoriaId
-            ? await _categorias.ObtenerAsync(categoriaId, cancelacion)
+            ? await _categorias.ObtenerConCuentasDeEntrenadoresAsync(categoriaId, cancelacion)
             : null;
 
         return MapperCategorias.AMiCategoria(jugador, categoria);
