@@ -21,6 +21,7 @@ import { FichaJugador } from './privado/ficha/FichaJugador';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
 import { ListaJugadores } from './privado/jugadores/ListaJugadores';
+import { FichaBasica } from './privado/personas/FichaBasica';
 
 interface Props {
   /** Si se muestra la animación de arranque encima mientras la aplicación carga (solo en Android). */
@@ -64,6 +65,7 @@ export function App({ conArranque = false }: Props) {
                 <Route path="categorias/:categoriaId" element={<DetalleCategoria />} />
                 <Route path="jugadores" element={<ListaJugadores />} />
                 <Route path="jugadores/:usuarioRolId/ficha" element={<FichaJugador />} />
+                <Route path="personas/:usuarioRolId" element={<FichaBasica />} />
               </Route>
             </Route>
 

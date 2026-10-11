@@ -9,7 +9,9 @@ namespace LaPecosa.Api.Controladores.Cuenta;
 /// Representa los endpoints de la foto de perfil de la cuenta con sesión.
 /// Su responsabilidad es recibir la petición y delegar en <see cref="IServicioFotoPerfil"/>.
 /// No contiene reglas de negocio. Ninguna ruta lleva identificador de cuenta: la foto es siempre
-/// la de la sesión, así que no existe forma de pedir la de otra persona (RF-038).
+/// la de la sesión, y es la única vía para cargarla, cambiarla o quitarla (RF-009 de la 008). La de
+/// un PRESIDENTE, DIRECTIVO o ENTRENADOR la ven además los integrantes de su club, solo en su ficha
+/// básica y en la miniatura junto a su nombre, por <c>ControladorPersonas</c> (§14.2 4.5.0).
 /// </summary>
 [Route("api/cuenta/foto")]
 [Tags("Cuenta")]

@@ -35,53 +35,53 @@ tags:
 paths:
   # ------------------------------------------------------------------ Ficha básica
 
-#008-T008   /api/clubes/{clubId}/personas/{usuarioRolId}:
-#008-T008     parameters:
-#008-T008       - $ref: '#/components/parameters/clubId'
-#008-T008       - $ref: '#/components/parameters/usuarioRolId'
-#008-T008     get:
-#008-T008       tags: [Personas]
-#008-T008       summary: NUEVO. Ficha básica de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
-#008-T008       description: |
-#008-T008         Cualquier rol del club, también la cuenta de un jugador, sin límite de categoría (RF-003).
-#008-T008         Solo lo de este club: el rol, y las categorías activas con los equipos activos que dirige
-#008-T008         en cada una (RF-001, RF-005).
-#008-T008       responses:
-#008-T008         '200':
-#008-T008           description: La ficha básica
-#008-T008           content:
-#008-T008             application/json:
-#008-T008               schema: { $ref: '#/components/schemas/FichaBasicaDto' }
-#008-T008         '401': { $ref: '#/components/responses/SinSesion' }
-#008-T008         '403': { $ref: '#/components/responses/NoAutorizado' }
-#008-T008         '404': { $ref: '#/components/responses/NoEncontrado' }
+  /api/clubes/{clubId}/personas/{usuarioRolId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Personas]
+      summary: NUEVO. Ficha básica de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
+      description: |
+        Cualquier rol del club, también la cuenta de un jugador, sin límite de categoría (RF-003).
+        Solo lo de este club: el rol, y las categorías activas con los equipos activos que dirige
+        en cada una (RF-001, RF-005).
+      responses:
+        '200':
+          description: La ficha básica
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FichaBasicaDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
-#008-T009   /api/clubes/{clubId}/personas/{usuarioRolId}/foto:
-#008-T009     parameters:
-#008-T009       - $ref: '#/components/parameters/clubId'
-#008-T009       - $ref: '#/components/parameters/usuarioRolId'
-#008-T009     get:
-#008-T009       tags: [Personas]
-#008-T009       summary: NUEVO. Foto de perfil de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
-#008-T009       description: |
-#008-T009         Mismo acceso que la ficha básica (RF-007). Es la foto de perfil de la cuenta de ese
-#008-T009         integrante, la misma que carga en "Mi perfil". Se sirve con `Cache-Control: private,
-#008-T009         no-store` y `X-Content-Type-Options: nosniff`. La foto de perfil de una cuenta que en
-#008-T009         este club es JUGADOR no sale por aquí (404, RF-008).
-#008-T009       responses:
-#008-T009         '200':
-#008-T009           description: La imagen
-#008-T009           content:
-#008-T009             image/png: { schema: { type: string, format: binary } }
-#008-T009             image/jpeg: { schema: { type: string, format: binary } }
-#008-T009             image/webp: { schema: { type: string, format: binary } }
-#008-T009         '401': { $ref: '#/components/responses/SinSesion' }
-#008-T009         '403': { $ref: '#/components/responses/NoAutorizado' }
-#008-T009         '404':
-#008-T009           description: '`no_encontrado`: no tiene foto, no es de este club o no tiene ficha básica'
-#008-T009           content:
-#008-T009             application/problem+json:
-#008-T009               schema: { $ref: '#/components/schemas/Problema' }
+  /api/clubes/{clubId}/personas/{usuarioRolId}/foto:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Personas]
+      summary: NUEVO. Foto de perfil de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
+      description: |
+        Mismo acceso que la ficha básica (RF-007). Es la foto de perfil de la cuenta de ese
+        integrante, la misma que carga en "Mi perfil". Se sirve con `Cache-Control: private,
+        no-store` y `X-Content-Type-Options: nosniff`. La foto de perfil de una cuenta que en
+        este club es JUGADOR no sale por aquí (404, RF-008).
+      responses:
+        '200':
+          description: La imagen
+          content:
+            image/png: { schema: { type: string, format: binary } }
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404':
+          description: '`no_encontrado`: no tiene foto, no es de este club o no tiene ficha básica'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
 
   # ------------------------------------------------------------------ Datos propios
 

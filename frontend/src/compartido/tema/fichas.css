@@ -167,7 +167,8 @@
   max-width: 100%;
 }
 
-.foto-jugador-miniatura {
+.foto-jugador-miniatura,
+.foto-persona-miniatura {
   width: 40px;
   height: 40px;
   font-size: 14px;
@@ -180,7 +181,8 @@
   white-space: nowrap;
 }
 
-.foto-jugador-grande {
+.foto-jugador-grande,
+.foto-persona-grande {
   width: 120px;
   height: 120px;
   font-size: 40px;
@@ -192,4 +194,10 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 16px;
+}
+
+/* Ficha básica (spec 008): el nombre, aunque sea muy largo, se parte al lado o debajo de la foto. */
+.ficha-basica-nombre {
+  flex: 1 1 200px;
+  min-width: 0;
 }
