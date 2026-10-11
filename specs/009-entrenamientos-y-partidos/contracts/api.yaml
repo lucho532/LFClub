@@ -199,55 +199,55 @@ paths:
         '404': { $ref: '#/components/responses/NoEncontrado' }
         '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
-#009-T024   /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/jugadores:
-#009-T024     parameters:
-#009-T024       - $ref: '#/components/parameters/clubId'
-#009-T024       - $ref: '#/components/parameters/entrenamientoId'
-#009-T024     get:
-#009-T024       tags: [Entrenamientos]
-#009-T024       summary: NUEVO. Planilla del entrenamiento con respuestas y asistencia
-#009-T024       description: |
-#009-T024         PRESIDENTE y quien entrena alguna de sus categorías; los demás que lo ven, 403
-#009-T024         `no_gestiona_actividad`; la cuenta de un jugador, 403 `rol_no_autorizado`. Quien entrena
-#009-T024         solo algunas de sus categorías recibe solo los jugadores de esas (escenario 4.2).
-#009-T024       responses:
-#009-T024         '200':
-#009-T024           description: La planilla
-#009-T024           content:
-#009-T024             application/json:
-#009-T024               schema: { $ref: '#/components/schemas/PlanillaEntrenamientoDto' }
-#009-T024         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T024         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T024         '404': { $ref: '#/components/responses/NoEncontrado' }
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    get:
+      tags: [Entrenamientos]
+      summary: NUEVO. Planilla del entrenamiento con respuestas y asistencia
+      description: |
+        PRESIDENTE y quien entrena alguna de sus categorías; los demás que lo ven, 403
+        `no_gestiona_actividad`; la cuenta de un jugador, 403 `rol_no_autorizado`. Quien entrena
+        solo algunas de sus categorías recibe solo los jugadores de esas (escenario 4.2).
+      responses:
+        '200':
+          description: La planilla
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaEntrenamientoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
-#009-T024   /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/asistencia:
-#009-T024     parameters:
-#009-T024       - $ref: '#/components/parameters/clubId'
-#009-T024       - $ref: '#/components/parameters/entrenamientoId'
-#009-T024     put:
-#009-T024       tags: [Entrenamientos]
-#009-T024       summary: NUEVO. Registra o corrige la asistencia de los jugadores enviados
-#009-T024       description: |
-#009-T024         PRESIDENTE y quien entrena alguna de sus categorías, solo para los jugadores que puede
-#009-T024         marcar (RF-022). Entrenamiento programado cuya fecha ya llegó; si no, 409
-#009-T024         `entrenamiento_futuro` o `actividad_cancelada`. Un jugador fuera de su alcance, 409
-#009-T024         `jugador_fuera_de_la_actividad`. Las filas no enviadas no cambian.
-#009-T024       requestBody:
-#009-T024         required: true
-#009-T024         content:
-#009-T024           application/json:
-#009-T024             schema: { $ref: '#/components/schemas/RegistrarAsistenciaDto' }
-#009-T024       responses:
-#009-T024         '200':
-#009-T024           description: La planilla actualizada
-#009-T024           content:
-#009-T024             application/json:
-#009-T024               schema: { $ref: '#/components/schemas/PlanillaEntrenamientoDto' }
-#009-T024         '400': { $ref: '#/components/responses/Validacion' }
-#009-T024         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T024         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T024         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T024         '409': { $ref: '#/components/responses/EstadoNoPermite' }
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/asistencia:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    put:
+      tags: [Entrenamientos]
+      summary: NUEVO. Registra o corrige la asistencia de los jugadores enviados
+      description: |
+        PRESIDENTE y quien entrena alguna de sus categorías, solo para los jugadores que puede
+        marcar (RF-022). Entrenamiento programado cuya fecha ya llegó; si no, 409
+        `entrenamiento_futuro` o `actividad_cancelada`. Un jugador fuera de su alcance, 409
+        `jugador_fuera_de_la_actividad`. Las filas no enviadas no cambian.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistrarAsistenciaDto' }
+      responses:
+        '200':
+          description: La planilla actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaEntrenamientoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
 #009-T025   /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/mi-respuesta:
 #009-T025     parameters:

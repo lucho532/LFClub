@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../compartido/api/cliente';
 import { ErrorApi } from '../../compartido/api/errores';
-import type { EntrenamientoDto } from '../../compartido/api/tiposActividades';
+import type { EntrenamientoDto, PlanillaEntrenamientoDto } from '../../compartido/api/tiposActividades';
 import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
@@ -12,6 +12,7 @@ import { EtiquetaActividad } from '../actividades/EtiquetaActividad';
 import { FormularioEntrenamiento } from '../actividades/FormularioEntrenamiento';
 import { textoDeCategorias } from '../calendario/TarjetaActividad';
 import { useClub } from '../contextoClub';
+import { PlanillaAsistencia } from './PlanillaAsistencia';
 
 /**
  * Detalle de un entrenamiento: fecha, horas, lugar, nota, categorías y estado escrito. Quien lo
@@ -26,6 +27,10 @@ export function DetalleEntrenamiento() {
   const carga = useCarga(ruta, () => api.get<EntrenamientoDto>(ruta));
   const [cambiando, setCambiando] = useState(false);
   const entrenamiento = carga.datos;
+  const vePlanilla = entrenamiento?.permisos.vePlanilla ?? false;
+  const planilla = useCarga<PlanillaEntrenamientoDto | null>(`${ruta}/jugadores#${vePlanilla}#${entrenamiento?.estado}`, () =>
+    vePlanilla ? api.get<PlanillaEntrenamientoDto>(`${ruta}/jugadores`) : Promise.resolve(null),
+  );
   const noExiste = carga.fallo instanceof ErrorApi && carga.fallo.status === 404;
 
   return (
@@ -82,6 +87,11 @@ export function DetalleEntrenamiento() {
                   </div>
                 )}
               </dl>
+              {entrenamiento.miAsistencia !== undefined && (
+                <p>
+                  <strong>{entrenamiento.miAsistencia ? 'Asististe' : 'No asististe'}</strong>
+                </p>
+              )}
               {entrenamiento.permisos.gestiona && (
                 <AccionesDeEstado
                   nombre="entrenamiento"
@@ -95,6 +105,7 @@ export function DetalleEntrenamiento() {
               )}
             </Tarjeta>
           )}
+          {vePlanilla && <PlanillaAsistencia clubId={club.clubId} entrenamiento={entrenamiento} planilla={planilla} />}
         </>
       )}
     </>
