@@ -7,6 +7,7 @@ import type {
 } from '../../compartido/api/tiposActividades';
 import { horaCorta, rangoDeHoras } from '../../compartido/fechas';
 import { EtiquetaActividad } from '../actividades/EtiquetaActividad';
+import { nombreRival } from '../partidos/textos';
 
 /** "Categoría 2014", "Categorías 2014 y 2015" o "Categorías 2013, 2014 y 2015". */
 export function textoDeCategorias(categorias: CategoriaDeActividadDto[]): string {
@@ -23,7 +24,12 @@ export function textoDeCondicion(condicion: PartidoResumenDto['condicion']): str
   return condicion === 'LOCAL' ? 'Local' : 'Visitante';
 }
 
-type Props = { clubId: string; pie?: ReactNode } & (
+type Props = {
+  clubId: string;
+  pie?: ReactNode;
+  /** Si quien mira gestiona la actividad: entonces se ofrece "Editar". Solo comodidad; decide la API. */
+  editable?: boolean;
+} & (
   | { tipo: 'ENTRENAMIENTO'; entrenamiento: EntrenamientoResumenDto }
   | { tipo: 'PARTIDO'; partido: PartidoResumenDto }
 );
@@ -31,13 +37,17 @@ type Props = { clubId: string; pie?: ReactNode } & (
 /**
  * Una actividad en el calendario o en una lista, como las tarjetas del lienzo (`M-Calendario`): su
  * etiqueta con el tipo y el estado escritos, la hora, el lugar, las categorías y, en un partido, el
- * rival y si es local o visitante. Lleva a su detalle. No decide qué actividades se muestran.
+ * rival y si es local o visitante. Lleva a su detalle y, para quien la gestiona, mientras no esté
+ * cancelada ni jugada, a editarla. No decide qué actividades se muestran.
  */
 export function TarjetaActividad(props: Props) {
   const ruta =
     props.tipo === 'ENTRENAMIENTO'
       ? `/club/${props.clubId}/entrenamientos/${props.entrenamiento.entrenamientoId}`
       : `/club/${props.clubId}/partidos/${props.partido.partidoId}`;
+  const sePuedeEditar =
+    props.editable === true &&
+    (props.tipo === 'ENTRENAMIENTO' ? props.entrenamiento.estado === 'PROGRAMADO' : props.partido.estado === 'PROXIMO');
 
   return (
     <article className="tarjeta-actividad">
@@ -58,7 +68,7 @@ export function TarjetaActividad(props: Props) {
             faltaResultado={props.partido.faltaResultado}
           />
           <Link to={ruta} className="tarjeta-actividad-titulo dato-largo">
-            {`Contra ${props.partido.rival}`}
+            {`Contra ${nombreRival(props.partido)}`}
           </Link>
           <span>
             {horaCorta(props.partido.hora)} · {textoDeCondicion(props.partido.condicion)}
@@ -66,6 +76,11 @@ export function TarjetaActividad(props: Props) {
           <span className="dato-largo">{props.partido.lugar}</span>
           <span className="texto-suave">{textoDeCategorias(props.partido.categorias)}</span>
         </>
+      )}
+      {sePuedeEditar && (
+        <Link to={`${ruta}?editar=1`} className="tarjeta-actividad-editar">
+          Editar
+        </Link>
       )}
       {props.pie}
     </article>

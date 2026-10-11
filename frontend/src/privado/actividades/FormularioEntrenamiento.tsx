@@ -5,8 +5,9 @@ import type { EntrenamientoDto, GuardarEntrenamientoDto } from '../../compartido
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { Campo } from '../../compartido/componentes/Campo';
-import { hoyEnColombia } from '../../compartido/fechas';
+import { diaDeLaSemana, hoyEnColombia } from '../../compartido/fechas';
 import { SelectorCategorias } from './SelectorCategorias';
+import { SelectorFechas } from './SelectorFechas';
 import type { CategoriaGestionable } from './useCategoriasGestionables';
 
 interface Props {
@@ -15,56 +16,75 @@ interface Props {
   categorias: CategoriaGestionable[];
   /** Al cambiar, el entrenamiento tal como está; sin él, se programa uno nuevo. */
   entrenamiento?: EntrenamientoDto;
-  alGuardar: (entrenamiento: EntrenamientoDto) => void;
+  /** Con el entrenamiento guardado (el primero, si se programaron varios) y cuántos se guardaron. */
+  alGuardar: (entrenamiento: EntrenamientoDto, cuantos: number) => void;
   alCancelar?: () => void;
 }
 
 /**
  * Los campos de un entrenamiento (categorías, fecha, hora de inicio y de fin, lugar y nota) para
- * programarlo o cambiarlo. Muestra en cada campo el error que devuelve la API y, en un aviso, los
+ * programarlo o cambiarlo. Al programar se pueden elegir varios días: se crea un entrenamiento
+ * independiente por cada uno, de uno en uno, y si alguno falla quedan en la lista solo los días que
+ * faltan. Muestra en cada campo el error que devuelve la API y, en un aviso, los
  * demás (por ejemplo, que ya no lo gestiona o que está cancelado). No decide quién puede programar.
  */
 export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alGuardar, alCancelar }: Props) {
   const [elegidas, setElegidas] = useState<string[]>(
     entrenamiento?.categorias.map((categoria) => categoria.categoriaId) ?? [],
   );
-  const [fecha, setFecha] = useState(entrenamiento?.fecha ?? hoyEnColombia());
+  const [fechas, setFechas] = useState<string[]>([entrenamiento?.fecha ?? hoyEnColombia()]);
   const [horaInicio, setHoraInicio] = useState(entrenamiento?.horaInicio ?? '16:00');
   const [horaFin, setHoraFin] = useState(entrenamiento?.horaFin ?? '17:30');
   const [lugar, setLugar] = useState(entrenamiento?.lugar ?? '');
   const [nota, setNota] = useState(entrenamiento?.nota ?? '');
   const [fallo, setFallo] = useState<unknown>(null);
   const [enviando, setEnviando] = useState(false);
+  const [programados, setProgramados] = useState(0);
   const errorDe = (campo: string) => (fallo instanceof ErrorApi ? fallo.errorDe(campo) : undefined);
   const conErroresPorCampo = fallo instanceof ErrorApi && Object.keys(fallo.errores).length > 0;
 
   async function guardar(evento: FormEvent) {
     evento.preventDefault();
     setFallo(null);
+    setProgramados(0);
     setEnviando(true);
-    const datos: GuardarEntrenamientoDto = {
+    const datosDe = (fecha: string): GuardarEntrenamientoDto => ({
       fecha,
       horaInicio,
       horaFin,
       lugar,
       nota: nota.trim() === '' ? null : nota,
       categoriaIds: elegidas,
-    };
+    });
 
-    try {
-      alGuardar(
-        entrenamiento
-          ? await api.put<EntrenamientoDto>(
-              `/api/clubes/${clubId}/entrenamientos/${entrenamiento.entrenamientoId}`,
-              datos,
-            )
-          : await api.post<EntrenamientoDto>(`/api/clubes/${clubId}/entrenamientos`, datos),
-      );
-    } catch (error) {
-      setFallo(error);
-    } finally {
-      setEnviando(false);
+    if (entrenamiento) {
+      try {
+        const ruta = `/api/clubes/${clubId}/entrenamientos/${entrenamiento.entrenamientoId}`;
+        alGuardar(await api.put<EntrenamientoDto>(ruta, datosDe(fechas[0])), 1);
+      } catch (error) {
+        setFallo(error);
+      } finally {
+        setEnviando(false);
+      }
+      return;
     }
+
+    const dias = [...new Set(fechas)];
+    const creados: EntrenamientoDto[] = [];
+    for (const fecha of dias) {
+      try {
+        creados.push(await api.post<EntrenamientoDto>(`/api/clubes/${clubId}/entrenamientos`, datosDe(fecha)));
+      } catch (error) {
+        setFallo(error);
+        setProgramados(creados.length);
+        setFechas(dias.slice(creados.length));
+        setEnviando(false);
+        return;
+      }
+    }
+
+    setEnviando(false);
+    alGuardar(creados[0], creados.length);
   }
 
   const ofrecidas = entrenamiento
@@ -80,8 +100,18 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
         error={errorDe('categoriaIds')}
         fijas={entrenamiento !== undefined}
       />
+      {!entrenamiento && <SelectorFechas fechas={fechas} alCambiar={setFechas} error={errorDe('fecha')} />}
       <div className="rejilla">
-        <Campo etiqueta="Fecha" type="date" valor={fecha} alCambiar={setFecha} error={errorDe('fecha')} required />
+        {entrenamiento && (
+          <Campo
+            etiqueta="Fecha"
+            type="date"
+            valor={fechas[0]}
+            alCambiar={(valor) => setFechas([valor])}
+            error={errorDe('fecha')}
+            required
+          />
+        )}
         <Campo
           etiqueta="Hora de inicio"
           type="time"
@@ -116,10 +146,20 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
         maxLength={500}
         lineas={3}
       />
+      {programados > 0 && (
+        <Aviso tono="aviso">
+          {`Se ${programados === 1 ? 'programó 1 entrenamiento' : `programaron ${programados} entrenamientos`}. `}
+          {`Faltan ${fechas.map(diaDeLaSemana).join(', ')}: revisa y vuelve a intentarlo.`}
+        </Aviso>
+      )}
       {fallo !== null && !conErroresPorCampo && <Aviso tono="error">{mensajeDe(fallo)}</Aviso>}
       <div className="fila">
         <Boton type="submit" cargando={enviando} textoCargando="Guardando…">
-          {entrenamiento ? 'Guardar cambios' : 'Programar entrenamiento'}
+          {entrenamiento
+            ? 'Guardar cambios'
+            : fechas.length > 1
+              ? `Programar ${new Set(fechas).size} entrenamientos`
+              : 'Programar entrenamiento'}
         </Boton>
         {alCancelar && (
           <Boton variante="secundario" onClick={alCancelar} disabled={enviando}>

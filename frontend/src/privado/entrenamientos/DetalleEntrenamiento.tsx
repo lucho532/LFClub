@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../../compartido/api/cliente';
 import { ErrorApi } from '../../compartido/api/errores';
 import type { EntrenamientoDto, PlanillaEntrenamientoDto } from '../../compartido/api/tiposActividades';
@@ -18,7 +18,7 @@ import { ResumenRespuestas } from './ResumenRespuestas';
 
 /**
  * Detalle de un entrenamiento: fecha, horas, lugar, nota, categorías y estado escrito. Quien lo
- * gestiona lo cambia (con las categorías fijas), lo cancela o, si está cancelado y no ha empezado,
+ * gestiona lo edita (con las categorías fijas; con `?editar=1` el formulario ya viene abierto), lo cancela o, si está cancelado y no ha empezado,
  * lo reactiva; los demás no ven esos botones. Si no existe o quien pregunta no lo ve, dice lo mismo
  * que si no existiera, sin más datos (RF-011).
  */
@@ -27,7 +27,8 @@ export function DetalleEntrenamiento() {
   const { entrenamientoId = '' } = useParams();
   const ruta = `/api/clubes/${club.clubId}/entrenamientos/${entrenamientoId}`;
   const carga = useCarga(ruta, () => api.get<EntrenamientoDto>(ruta));
-  const [cambiando, setCambiando] = useState(false);
+  const [parametros] = useSearchParams();
+  const [cambiando, setCambiando] = useState(parametros.get('editar') === '1');
   const entrenamiento = carga.datos;
   const vePlanilla = entrenamiento?.permisos.vePlanilla ?? false;
   const planilla = useCarga<PlanillaEntrenamientoDto | null>(`${ruta}/jugadores#${vePlanilla}#${entrenamiento?.estado}`, () =>
@@ -50,8 +51,8 @@ export function DetalleEntrenamiento() {
             <h1>Entrenamiento</h1>
             <EtiquetaActividad tipo="ENTRENAMIENTO" estado={entrenamiento.estado} />
           </div>
-          {cambiando ? (
-            <Tarjeta titulo="Cambiar el entrenamiento">
+          {cambiando && entrenamiento.permisos.gestiona && entrenamiento.estado === 'PROGRAMADO' ? (
+            <Tarjeta titulo="Editar el entrenamiento">
               <FormularioEntrenamiento
                 clubId={club.clubId}
                 categorias={[]}

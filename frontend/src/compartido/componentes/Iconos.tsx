@@ -4,12 +4,12 @@ import type { ReactNode } from 'react';
  * Iconos de línea de los menús, dibujados con el color del texto que los rodea. Son decorativos:
  * el texto del enlace es el que dice adónde lleva, así que se ocultan a los lectores de pantalla.
  */
-function Icono({ children }: { children: ReactNode }) {
+function Icono({ children, tamano = 22 }: { children: ReactNode; tamano?: number }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="22"
-      height="22"
+      width={tamano}
+      height={tamano}
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -133,6 +133,16 @@ export function IconoOjoTachado() {
     <Icono>
       <path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.6 3.6M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6" />
       <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18" />
+    </Icono>
+  );
+}
+
+/** El lápiz de editar una foto o un escudo, pequeño para ir dentro del círculo. */
+export function IconoLapiz() {
+  return (
+    <Icono tamano={14}>
+      <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" />
+      <path d="m13.5 6.5 4 4" />
     </Icono>
   );
 }

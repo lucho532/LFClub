@@ -3,6 +3,7 @@ import { useClub } from './contextoClub';
 import { InicioEntrenador } from './inicio/InicioEntrenador';
 import { ResumenDelClub } from './inicio/ResumenDelClub';
 import { TarjetaMiJugador } from './inicio/TarjetaMiJugador';
+import { TarjetaPartidos } from './inicio/TarjetaPartidos';
 import { TarjetaProximosEntrenamientos } from './inicio/TarjetaProximosEntrenamientos';
 import { TarjetaTuClub } from './inicio/TarjetaTuClub';
 import { TarjetaMiCategoria } from './TarjetaMiCategoria';
@@ -28,8 +29,8 @@ function DelRol({ club }: { club: ClubDto }) {
 
 /**
  * Pantalla de inicio de la aplicación del club: su nombre, lo propio del rol de la persona en ese
- * club (el resumen, sus categorías o su jugador), los próximos entrenamientos que puede ver (spec
- * 009) y la tarjeta del club. Cambia al cambiar de club, porque el rol es el del club
+ * club (el resumen, sus categorías o su jugador), los próximos entrenamientos y los partidos
+ * (próximos y últimos resultados) que puede ver (spec 009) y la tarjeta del club. Cambia al cambiar de club, porque el rol es el del club
  * elegido.
  */
 export function InicioClub() {
@@ -42,6 +43,7 @@ export function InicioClub() {
       </div>
       <DelRol club={club} />
       <TarjetaProximosEntrenamientos clubId={club.clubId} />
+      <TarjetaPartidos clubId={club.clubId} nombreClub={club.nombre} />
       <TarjetaTuClub club={club} />
     </>
   );

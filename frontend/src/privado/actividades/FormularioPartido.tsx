@@ -27,7 +27,7 @@ interface Props {
 }
 
 /**
- * Los campos de un partido (categorías, rival, fecha, hora, lugar, local o visitante, amistoso o
+ * Los campos de un partido (categorías, rival —vacío queda "Por definir"—, fecha, hora, lugar, local o visitante, amistoso o
  * torneo y nombre del torneo, que solo se pide en un torneo). Al crearlo muestra además la lista de
  * jugadores de las categorías elegidas para convocar: primero se crea el partido y después se
  * guarda la convocatoria. Muestra los errores de la API en cada campo. No decide quién puede crear.
@@ -53,7 +53,7 @@ export function FormularioPartido({ clubId, categorias, partido, alGuardar, alCa
     setFallo(null);
     setEnviando(true);
     const datos: GuardarPartidoDto = {
-      rival,
+      rival: rival.trim() === '' ? null : rival,
       fecha,
       hora,
       lugar,
@@ -96,7 +96,14 @@ export function FormularioPartido({ clubId, categorias, partido, alGuardar, alCa
         error={errorDe('categoriaIds')}
         fijas={partido !== undefined}
       />
-      <Campo etiqueta="Rival" valor={rival} alCambiar={setRival} error={errorDe('rival')} maxLength={120} required />
+      <Campo
+        etiqueta="Rival (opcional)"
+        valor={rival}
+        alCambiar={setRival}
+        error={errorDe('rival')}
+        maxLength={120}
+        placeholder="Por definir"
+      />
       <div className="rejilla">
         <Campo etiqueta="Fecha" type="date" valor={fecha} alCambiar={setFecha} error={errorDe('fecha')} required />
         <Campo etiqueta="Hora" type="time" valor={hora} alCambiar={setHora} error={errorDe('hora')} required />

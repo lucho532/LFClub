@@ -64,10 +64,29 @@
     cursor: pointer;
   }
 
+  /* Un día con actividad: tinte del color del club, además del número escrito. */
+  .dia-de-tira.con-actividad {
+    border-color: var(--color-club-principal);
+    background: color-mix(in srgb, var(--color-club-principal) 22%, var(--superficie));
+    font-weight: 600;
+  }
+
   .dia-de-tira.encendido {
     border-color: var(--color-club-principal);
     background: var(--color-club-principal);
     color: var(--color-club-principal-texto);
+  }
+
+  /* El día que acompaña al elegido: también se ve abajo, así que se marca con un borde. */
+  .dia-de-tira.acompanado {
+    border-width: 2px;
+    border-color: var(--color-club-principal);
+  }
+
+  /* Dos días, uno al lado del otro: el elegido y el siguiente. */
+  .semana-dias {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
   .dia-columna:not(.dia-elegido) {
@@ -97,4 +116,27 @@
   .navegacion-semana-botones .boton {
     flex: 1 1 0;
   }
+}
+
+/* "Editar" en la tarjeta de una actividad, para quien la gestiona. */
+.tarjeta-actividad-editar {
+  align-self: flex-start;
+  font-size: 13px;
+}
+
+/* Los días de un entrenamiento nuevo: cada fecha con su botón "Quitar" al lado. */
+.selector-fechas {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.selector-fechas legend {
+  padding: 0;
+  font-weight: 600;
+}
+
+.selector-fechas-dia {
+  align-items: flex-end;
 }

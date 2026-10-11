@@ -11,7 +11,8 @@ type Tipo = 'PARTIDO' | 'ENTRENAMIENTO';
 /**
  * "Nueva actividad", según el lienzo (`Convocatoria`): el selector "Partido / Entrenamiento", las
  * categorías que la persona gestiona como botones y los campos de cada tipo; cada uno se guarda en
- * su propio endpoint y al terminar lleva al detalle. Sin costo de arbitraje, mensaje para los
+ * su propio endpoint y al terminar lleva al detalle (o al calendario, si se programaron varios
+ * entrenamientos). Sin costo de arbitraje, mensaje para los
  * convocados ni borradores, que están fuera de alcance (plan, nota 1). Quien decide si se puede
  * crear es la API.
  */
@@ -56,7 +57,9 @@ export function FormularioActividad() {
             key="entrenamiento"
             clubId={club.clubId}
             categorias={categorias}
-            alGuardar={(entrenamiento) => navegar(`${base}/entrenamientos/${entrenamiento.entrenamientoId}`)}
+            alGuardar={(entrenamiento, cuantos) =>
+              navegar(cuantos > 1 ? `${base}/calendario` : `${base}/entrenamientos/${entrenamiento.entrenamientoId}`)
+            }
           />
         )}
       </Tarjeta>

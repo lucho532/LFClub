@@ -28,6 +28,9 @@ export function Calendario() {
   const carga = useCarga(ruta, () => api.get<CalendarioDto>(ruta));
   const { categorias } = useCategoriasGestionables(club);
   const puedeCrear = club.miRol === 'PRESIDENTE' || categorias.length > 0;
+  const queGestiona = new Set(categorias.map((categoria) => categoria.categoriaId));
+  const gestiona = (de: { categoriaId: string }[]) =>
+    club.miRol === 'PRESIDENTE' || (de.length > 0 && de.every((categoria) => queGestiona.has(categoria.categoriaId)));
   const esJugador = club.miRol === 'JUGADOR';
   const base = `/api/clubes/${club.clubId}`;
 
@@ -48,6 +51,7 @@ export function Calendario() {
         clubId={club.clubId}
         tipo="ENTRENAMIENTO"
         entrenamiento={entrenamiento}
+        editable={gestiona(entrenamiento.categorias)}
         pie={
           esJugador && (
             <BotonesRespuesta
@@ -69,6 +73,7 @@ export function Calendario() {
         clubId={club.clubId}
         tipo="PARTIDO"
         partido={partido}
+        editable={gestiona(partido.categorias)}
         pie={
           esJugador &&
           partido.estado !== 'JUGADO' && (

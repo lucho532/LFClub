@@ -18,7 +18,7 @@ interface Props {
 }
 
 /**
- * Los botones de quien gestiona una actividad: "Cambiar", "Cancelar …" con confirmación y, si está
+ * Los botones de quien gestiona una actividad: "Editar", "Cancelar …" con confirmación y, si está
  * cancelada y no ha empezado, "Reactivar" (RF-038). Muestra con texto claro el motivo si la API lo
  * rechaza. Solo se pinta con `permisos.gestiona`; la API lo vuelve a comprobar.
  */
@@ -46,7 +46,7 @@ export function AccionesDeEstado({ nombre, cancelada, empezo, sePuedeCambiar, al
         {!cancelada && sePuedeCambiar && (
           <>
             <Boton variante="secundario" onClick={alCambiar}>
-              Cambiar
+              Editar
             </Boton>
             <Boton variante="peligro" onClick={() => setConfirmando(true)}>
               {`Cancelar ${nombre}`}

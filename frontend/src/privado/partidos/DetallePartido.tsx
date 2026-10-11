@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../../compartido/api/cliente';
 import { ErrorApi } from '../../compartido/api/errores';
 import type { PartidoDto } from '../../compartido/api/tiposActividades';
@@ -15,12 +15,12 @@ import { textoDeCategorias, textoDeCondicion } from '../calendario/TarjetaActivi
 import { useClub } from '../contextoClub';
 import { SeccionConvocatoria } from './SeccionConvocatoria';
 import { SeccionResultado } from './SeccionResultado';
-import { textoDeTipo } from './textos';
+import { nombreRival, textoDeTipo } from './textos';
 
 /**
  * Detalle de un partido: rival, fecha, hora, lugar, condición, tipo y torneo, categorías y estado
  * escrito; si está jugado, el marcador y los goleadores. Quien gestiona un partido próximo lo
- * cambia o lo cancela, y uno cancelado que no ha empezado lo reactiva. Quien ve la planilla ve la
+ * edita (con `?editar=1` el formulario ya viene abierto) o lo cancela, y uno cancelado que no ha empezado lo reactiva. Quien ve la planilla ve la
  * convocatoria. Si no existe o quien pregunta no lo ve, dice lo mismo que si no existiera (RF-011).
  */
 export function DetallePartido() {
@@ -28,7 +28,8 @@ export function DetallePartido() {
   const { partidoId = '' } = useParams();
   const ruta = `/api/clubes/${club.clubId}/partidos/${partidoId}`;
   const carga = useCarga(ruta, () => api.get<PartidoDto>(ruta));
-  const [cambiando, setCambiando] = useState(false);
+  const [parametros] = useSearchParams();
+  const [cambiando, setCambiando] = useState(parametros.get('editar') === '1');
   const partido = carga.datos;
   const noExiste = carga.fallo instanceof ErrorApi && carga.fallo.status === 404;
 
@@ -44,12 +45,12 @@ export function DetallePartido() {
       {partido && (
         <>
           <div className="cabecera">
-            <h1 className="dato-largo">Contra {partido.rival}</h1>
+            <h1 className="dato-largo">Contra {nombreRival(partido)}</h1>
             <EtiquetaActividad tipo="PARTIDO" estado={partido.estado} faltaResultado={partido.faltaResultado} />
           </div>
           <SeccionResultado clubId={club.clubId} nombreClub={club.nombre} partido={partido} alCambiar={carga.fijar} />
-          {cambiando ? (
-            <Tarjeta titulo="Cambiar el partido">
+          {cambiando && partido.permisos.gestiona && partido.estado === 'PROXIMO' ? (
+            <Tarjeta titulo="Editar el partido">
               <FormularioPartido
                 clubId={club.clubId}
                 categorias={[]}

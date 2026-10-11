@@ -1,4 +1,4 @@
-import { useId, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { mensajeDe } from '../api/errores';
 import type { ActualizarColoresDto, IdentidadClubDto } from '../api/tipos';
 import { temasDondeSePierde, type Tema } from '../tema/contraste';
@@ -6,6 +6,7 @@ import { Escudo, IdentidadClub } from '../tema/IdentidadClub';
 import { Aviso } from './Aviso';
 import { Boton } from './Boton';
 import { Campo } from './Campo';
+import { LapizDeImagen } from './LapizDeImagen';
 
 const NOMBRE_DEL_TEMA: Record<Tema, string> = { claro: 'claro', oscuro: 'oscuro' };
 
@@ -39,7 +40,6 @@ interface Props {
 export function EditorIdentidad({ identidad, nombre, guardarColores, guardarEscudo }: Props) {
   const [principal, setPrincipal] = useState(identidad.colorPrincipal ?? '#231F1E');
   const [acento, setAcento] = useState(identidad.colorAcento ?? '#5E5650');
-  const idEscudo = useId();
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hecho, setHecho] = useState<string | null>(null);
@@ -68,32 +68,21 @@ export function EditorIdentidad({ identidad, nombre, guardarColores, guardarEscu
     void ejecutar(() => guardarColores({ colorPrincipal: principal, colorAcento: acento }), 'Colores guardados.');
   }
 
-  function cargarEscudo(evento: ChangeEvent<HTMLInputElement>) {
-    const archivo = evento.target.files?.[0];
-    evento.target.value = '';
-    if (archivo) {
-      void ejecutar(() => guardarEscudo(archivo), 'Escudo guardado.');
-    }
-  }
-
   return (
     <>
       {error && <Aviso tono="error">{error}</Aviso>}
       {hecho && <Aviso tono="exito">{hecho}</Aviso>}
 
       <div className="fila">
-        <Escudo identidad={identidad} nombre={nombre} />
-        <div className="campo">
-          <label htmlFor={idEscudo}>{identidad.urlEscudo ? 'Cambiar el escudo' : 'Cargar el escudo'}</label>
-          <input
-            id={idEscudo}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            onChange={cargarEscudo}
-            disabled={ocupado}
-          />
-          <span className="texto-suave">PNG, JPEG o WebP de hasta 1 MB.</span>
-        </div>
+        <LapizDeImagen
+          que="el escudo"
+          tieneImagen={Boolean(identidad.urlEscudo)}
+          ocupado={ocupado}
+          alElegir={(archivo) => void ejecutar(() => guardarEscudo(archivo), 'Escudo guardado.')}
+        >
+          <Escudo identidad={identidad} nombre={nombre} />
+        </LapizDeImagen>
+        <span className="texto-suave">Escudo</span>
       </div>
 
       <form className="columna" onSubmit={enviarColores}>

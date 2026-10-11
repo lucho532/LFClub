@@ -173,3 +173,66 @@
   gap: 8px;
   overflow-wrap: anywhere;
 }
+
+/* "Confirma asistencia": casilla verde con chulo y casilla roja con X, en una línea. */
+.botones-respuesta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.botones-respuesta-linea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.respuesta-casilla {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.respuesta-si {
+  background: var(--exito-fondo);
+  color: var(--exito-texto);
+}
+
+.respuesta-no {
+  background: var(--error-fondo);
+  color: var(--error-texto);
+}
+
+/* La opción elegida, rellena de su color. */
+.respuesta-si.encendido {
+  border-color: var(--exito-texto);
+  background: var(--exito-texto);
+  color: var(--exito-fondo);
+}
+
+.respuesta-no.encendido {
+  border-color: var(--error-texto);
+  background: var(--error-texto);
+  color: var(--error-fondo);
+}
+
+.respuesta-casilla:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.respuesta-casilla.encendido:disabled {
+  opacity: 1;
+}

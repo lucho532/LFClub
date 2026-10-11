@@ -94,7 +94,8 @@ export interface RegistrarAsistenciaDto {
 
 /** Lo que se envía al crear o cambiar un partido. */
 export interface GuardarPartidoDto {
-  rival: string;
+  /** Vacío o nulo si el rival está por definir. */
+  rival: string | null;
   fecha: string;
   hora: string;
   lugar: string;
@@ -116,7 +117,8 @@ export interface GoleadorDePartidoDto {
 /** Un partido en una lista o en el calendario. */
 export interface PartidoResumenDto {
   partidoId: string;
-  rival: string;
+  /** Ausente si el rival está por definir. */
+  rival?: string;
   fecha: string;
   hora: string;
   lugar: string;
