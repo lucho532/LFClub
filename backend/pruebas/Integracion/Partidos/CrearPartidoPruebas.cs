@@ -5,7 +5,8 @@ namespace LaPecosa.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// Crear un partido: lo crea el PRESIDENTE o quien entrena todas sus categorías, nace próximo y
-/// sin convocados, y el torneo exige su nombre (historia 2, escenario 2.10; RF-007, RF-008).
+/// sin convocados, el torneo exige su nombre y el rival puede quedar por definir (historia 2,
+/// escenario 2.10; RF-007, RF-008).
 /// </summary>
 [Collection(ColeccionApi.Nombre)]
 public class CrearPartidoPruebas : IDisposable
@@ -58,6 +59,27 @@ public class CrearPartidoPruebas : IDisposable
             await e.E2.Cliente.PostAsync(ruta, Actividades.Partido(Sabado, [e.C2014], nombreTorneo: "Copa Ciudad")),
             HttpStatusCode.Created);
         Assert.False(amistoso.TryGetProperty("nombreTorneo", out _));
+    }
+
+    [Fact]
+    public async Task El_rival_se_puede_dejar_por_definir_y_escribir_despues()
+    {
+        var e = await _fabrica.Actividades.CrearClubAsync();
+
+        var sinRival = await Actividades.LeerAsync(
+            await e.E1.Cliente.PostAsync(e.Ruta("/partidos"), Actividades.Partido(Sabado, [e.C2014], rival: null)),
+            HttpStatusCode.Created);
+        Assert.False(sinRival.TryGetProperty("rival", out _));
+        var ruta = e.Ruta($"/partidos/{sinRival.GetProperty("partidoId").GetGuid()}");
+        var enBlanco = await Actividades.LeerAsync(
+            await e.E1.Cliente.PutAsync(ruta, Actividades.Partido(Sabado, [e.C2014], rival: "   ")));
+        Assert.False(enBlanco.TryGetProperty("rival", out _));
+
+        var conRival = await Actividades.LeerAsync(
+            await e.E1.Cliente.PutAsync(ruta, Actividades.Partido(Sabado, [e.C2014], rival: "Equipo D")));
+        Assert.Equal("Equipo D", conRival.GetProperty("rival").GetString());
+        var largo = await e.E1.Cliente.PutAsync(ruta, Actividades.Partido(Sabado, [e.C2014], rival: new string('x', 121)));
+        await Actividades.ErrorAsync(largo, HttpStatusCode.BadRequest, "datos_invalidos");
     }
 
     [Fact]

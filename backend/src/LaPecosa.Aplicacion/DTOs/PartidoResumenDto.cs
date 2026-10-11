@@ -11,7 +11,7 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// No lleva convocados ni quiénes jugaron (RF-012): lo que no aplica se omite del JSON.
 /// </summary>
 /// <param name="PartidoId">Identificador del partido.</param>
-/// <param name="Rival">Equipo rival.</param>
+/// <param name="Rival">Equipo rival; ausente si está por definir.</param>
 /// <param name="Fecha">Fecha.</param>
 /// <param name="Hora">Hora, <c>HH:mm</c>.</param>
 /// <param name="Lugar">Lugar.</param>
@@ -26,7 +26,7 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// <param name="MiRespuesta">La respuesta de la familia del convocado de la petición; ausente si no respondió.</param>
 public record PartidoResumenDto(
     Guid PartidoId,
-    string Rival,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Rival,
     DateOnly Fecha,
     string Hora,
     string Lugar,

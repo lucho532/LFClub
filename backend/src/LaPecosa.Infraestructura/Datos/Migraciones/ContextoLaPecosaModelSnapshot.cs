@@ -606,7 +606,6 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                         .HasColumnType("uuid");
 
                     b.Property<string>("Rival")
-                        .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");
 

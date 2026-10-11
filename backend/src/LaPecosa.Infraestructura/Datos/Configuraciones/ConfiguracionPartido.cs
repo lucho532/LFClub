@@ -31,7 +31,7 @@ public class ConfiguracionPartido : IEntityTypeConfiguration<Partido>
         builder.HasKey(partido => partido.Id);
         builder.Property(partido => partido.Id).ValueGeneratedNever();
 
-        builder.Property(partido => partido.Rival).HasMaxLength(Partido.LongitudMaximaDeTexto).IsRequired();
+        builder.Property(partido => partido.Rival).HasMaxLength(Partido.LongitudMaximaDeTexto);
         builder.Property(partido => partido.Lugar).HasMaxLength(Partido.LongitudMaximaDeTexto).IsRequired();
         builder.Property(partido => partido.NombreTorneo).HasMaxLength(Partido.LongitudMaximaDeTexto);
         builder.Property(partido => partido.Condicion).HasConversion<string>().HasMaxLength(20).IsRequired();

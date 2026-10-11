@@ -782,9 +782,12 @@ components:
     GuardarPartidoDto:
       type: object
       additionalProperties: false
-      required: [rival, fecha, hora, lugar, condicion, tipo, categoriaIds]
+      required: [fecha, hora, lugar, condicion, tipo, categoriaIds]
       properties:
-        rival: { type: string, minLength: 1, maxLength: 120 }
+        rival:
+          type: [string, 'null']
+          maxLength: 120
+          description: Opcional; vacío o ausente si el rival está por definir
         fecha: { type: string, format: date }
         hora: { $ref: '#/components/schemas/Hora' }
         lugar: { type: string, minLength: 1, maxLength: 120 }
@@ -814,10 +817,12 @@ components:
     PartidoResumenDto:
       type: object
       additionalProperties: false
-      required: [partidoId, rival, fecha, hora, lugar, condicion, tipo, estado, faltaResultado, categorias]
+      required: [partidoId, fecha, hora, lugar, condicion, tipo, estado, faltaResultado, categorias]
       properties:
         partidoId: { type: string, format: uuid }
-        rival: { type: string }
+        rival:
+          type: string
+          description: Ausente si está por definir; la pantalla muestra "Por definir"
         fecha: { type: string, format: date }
         hora: { $ref: '#/components/schemas/Hora' }
         lugar: { type: string }

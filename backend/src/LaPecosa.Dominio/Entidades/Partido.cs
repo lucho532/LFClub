@@ -28,8 +28,11 @@ public class Partido : IPerteneceAClub
     /// <summary>Club al que pertenece.</summary>
     public Club? Club { get; set; }
 
-    /// <summary>Equipo rival. Obligatorio, de 120 caracteres como máximo.</summary>
-    public string Rival { get; set; } = string.Empty;
+    /// <summary>
+    /// Equipo rival, de 120 caracteres como máximo. Nulo mientras no se sabe: las pantallas lo
+    /// muestran como "Por definir" y se escribe después al cambiar el partido.
+    /// </summary>
+    public string? Rival { get; set; }
 
     /// <summary>Fecha del partido, en hora de Colombia. Obligatoria.</summary>
     public DateOnly Fecha { get; set; }

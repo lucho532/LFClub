@@ -36,7 +36,7 @@ public static class Actividades
         DateOnly fecha,
         IEnumerable<Categoria> categorias,
         string hora = "09:00",
-        string rival = "Equipo C",
+        string? rival = "Equipo C",
         string tipo = "AMISTOSO",
         string? nombreTorneo = null,
         string condicion = "LOCAL") => new

@@ -9,7 +9,7 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// No valida nada: eso lo hace <c>ValidadorPartido</c>. Al cambiar, sus categorías deben ser las que
 /// ya tiene.
 /// </summary>
-/// <param name="Rival">Equipo rival, de 120 caracteres como máximo.</param>
+/// <param name="Rival">Equipo rival, de 120 caracteres como máximo; vacío o ausente si está por definir.</param>
 /// <param name="Fecha">Fecha del partido.</param>
 /// <param name="Hora">Hora de inicio.</param>
 /// <param name="Lugar">Lugar, de 120 caracteres como máximo.</param>
