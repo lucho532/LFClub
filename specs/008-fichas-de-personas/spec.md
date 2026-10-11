@@ -4,7 +4,7 @@
 
 **Creada**: 2026-10-10
 
-**Estado**: Borrador
+**Estado**: Implementada
 
 **Entrada**: Descripción del propietario del proyecto: "Todos los nombres de personas de la
 aplicación son clicables y abren la ficha de esa persona. Para un jugador, su ficha actual
@@ -119,9 +119,9 @@ cuáles no son enlace.
    ver (spec 007).
 3. **Dado** cualquier rol en el detalle de una categoría o en un resumen que muestra entrenadores,
    **cuando** pulsa el nombre de un entrenador, **entonces** se abre su ficha básica.
-4. **Dado** el nombre de un jugador que quien mira no puede abrir (por ejemplo, el ENTRENADOR que
-   ve en algún lugar a un jugador de otra categoría), **cuando** se muestra, **entonces** aparece
-   como texto normal y no lleva a ninguna parte.
+4. **Dado** el nombre de un jugador que quien mira no puede abrir (por ejemplo, el PRESIDENTE en
+   la sala de espera, ante el "hermano de" cuyo ingreso fue rechazado), **cuando** se muestra,
+   **entonces** aparece como texto normal y no lleva a ninguna parte.
 5. **Dado** el nombre de una persona que ya no pertenece al club (por ejemplo, quien hizo el último
    cambio de una ficha y luego salió del club), **cuando** se muestra, **entonces** aparece como
    texto normal.
@@ -193,8 +193,8 @@ permitidos no se pueden cambiar.
    valor no válido, **entonces** el sistema lo rechaza, explica el motivo y conserva el valor
    anterior.
 4. **Dado** un PRESIDENTE, DIRECTIVO o ENTRENADOR en "Mi perfil", **cuando** mira su tipo y
-   número de documento, **entonces** los ve sin poder editarlos, y si intenta cambiarlos por otro
-   camino el sistema se lo niega.
+   número de documento, **entonces** los ve sin poder editarlos, y si los envía por otro camino el
+   sistema no los cambia.
 5. **Dado** una cuenta de jugador, **cuando** abre "Mi perfil", **entonces** ve su foto de perfil y
    un acceso a "Mi ficha" del jugador elegido, y no ve un segundo formulario con los mismos datos.
 6. **Dado** el correo de la cuenta, **cuando** la persona abre "Mi perfil", **entonces** lo ve sin
@@ -218,6 +218,9 @@ permitidos no se pueden cambiar.
 - Una persona que es ENTRENADOR en un club y tiene en otro club una cuenta de jugador con la misma
   cuenta: en el club donde es jugador nadie ve su foto de perfil por esta funcionalidad, porque
   allí no tiene ficha básica.
+- Una persona que es ENTRENADOR en un club y tiene una cuenta de jugador en otro cambia su celular
+  en "Mi perfil": el contacto de la ficha de su jugador muestra el celular nuevo, y los datos del
+  jugador no cambian.
 - Un club suspendido: solo entra su PRESIDENTE, que puede abrir las fichas como siempre.
 - Un nombre muy largo no debe romper la ficha básica ni los enlaces, en teléfono ni en escritorio.
 
@@ -276,13 +279,17 @@ permitidos no se pueden cambiar.
   personales: nombres, apellidos, tipo y número de documento, fecha de nacimiento, correo y
   celular.
 - **RF-016**: La persona DEBE poder cambiar por sí misma su celular, sus nombres, sus apellidos y
-  su fecha de nacimiento. NO DEBE poder cambiar el tipo ni el número de documento. Los cambios DEBEN validarse con las mismas
-  reglas del registro (§10 y §12.1) y aplicarse en todos los clubes de la persona.
+  su fecha de nacimiento. NO DEBE poder cambiar el tipo ni el número de documento. Los cambios
+  DEBEN validarse con las mismas reglas del registro (§10 y §12.1) y aplicarse en todos los
+  clubes de la persona. El celular es de la cuenta: el cambio también se ve en la ficha de los
+  jugadores de esa cuenta, si los tiene. Los nombres, apellidos y fecha de nacimiento de esos
+  jugadores no cambian.
 - **RF-017**: "Mi perfil" de una cuenta de jugador DEBE llevar a "Mi ficha" del jugador elegido en
   lugar de repetir sus datos; lo que la familia puede cambiar sigue siendo lo de la spec 005.
 - **RF-018**: El correo DEBE mostrarse en "Mi perfil" sin poder cambiarse desde ahí.
 - **RF-019**: El tipo y el número de documento DEBEN mostrarse de solo lectura en "Mi perfil", y el
-  sistema DEBE negar su cambio por cualquier camino.
+  sistema NO DEBE cambiarlos por ningún camino: si llegan en un pedido de cambio, se ignoran y el
+  resto del cambio se aplica.
 
 **Aislamiento**
 
