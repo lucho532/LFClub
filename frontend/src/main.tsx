@@ -7,6 +7,7 @@ import './compartido/tema/variables.css';
 import './compartido/tema/base.css';
 import './compartido/tema/disposicion.css';
 import './compartido/tema/componentes.css';
+import './compartido/tema/formularios.css';
 import './compartido/tema/fichas.css';
 import './compartido/tema/inicio.css';
 import './compartido/tema/actividades.css';

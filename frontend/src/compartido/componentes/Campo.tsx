@@ -1,4 +1,5 @@
-import { useId, type InputHTMLAttributes } from 'react';
+import { useId, useState, type InputHTMLAttributes } from 'react';
+import { IconoOjo, IconoOjoTachado } from './Iconos';
 
 interface Opcion {
   valor: string;
@@ -18,9 +19,14 @@ interface Props extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' |
   lineas?: number;
 }
 
-/** Etiqueta, entrada y error de un campo de formulario. */
+/**
+ * Etiqueta, entrada y error de un campo de formulario. Una contraseña lleva al lado un botón con un
+ * ojo para verla mientras se escribe y volver a ocultarla.
+ */
 export function Campo({ etiqueta, valor, alCambiar, error, ayuda, opciones, lineas, ...resto }: Props) {
   const id = useId();
+  const [visible, setVisible] = useState(false);
+  const esContrasena = resto.type === 'password';
   const idMensaje = `${id}-mensaje`;
   const comunes = {
     id,
@@ -54,6 +60,25 @@ export function Campo({ etiqueta, valor, alCambiar, error, ayuda, opciones, line
           disabled={resto.disabled}
           onChange={(evento) => alCambiar?.(evento.target.value)}
         />
+      ) : esContrasena ? (
+        <div className="campo-contrasena">
+          <input
+            {...resto}
+            {...comunes}
+            type={visible ? 'text' : 'password'}
+            onChange={(evento) => alCambiar?.(evento.target.value)}
+          />
+          <button
+            type="button"
+            className="boton-ver-contrasena"
+            aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            aria-pressed={visible}
+            aria-controls={id}
+            onClick={() => setVisible((antes) => !antes)}
+          >
+            {visible ? <IconoOjoTachado /> : <IconoOjo />}
+          </button>
+        </div>
       ) : (
         <input {...resto} {...comunes} onChange={(evento) => alCambiar?.(evento.target.value)} />
       )}
