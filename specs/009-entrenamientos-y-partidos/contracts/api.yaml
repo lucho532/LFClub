@@ -457,34 +457,34 @@ paths:
         '404': { $ref: '#/components/responses/NoEncontrado' }
         '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
-#009-T023   /api/clubes/{clubId}/partidos/{partidoId}/resultado:
-#009-T023     parameters:
-#009-T023       - $ref: '#/components/parameters/clubId'
-#009-T023       - $ref: '#/components/parameters/partidoId'
-#009-T023     put:
-#009-T023       tags: [Partidos]
-#009-T023       summary: NUEVO. Registra o corrige el resultado
-#009-T023       description: |
-#009-T023         Quien lo gestiona (RF-016). Partido PROXIMO que ya empezó, o JUGADO; si no, 409
-#009-T023         `partido_sin_empezar` o `actividad_cancelada`. Deja el partido JUGADO y guarda quién y
-#009-T023         cuándo (RF-020). Rechazos de RF-017 con 400: `goles_de_quien_no_jugo`,
-#009-T023         `goles_superan_marcador`, `jugador_no_convocado`.
-#009-T023       requestBody:
-#009-T023         required: true
-#009-T023         content:
-#009-T023           application/json:
-#009-T023             schema: { $ref: '#/components/schemas/RegistrarResultadoDto' }
-#009-T023       responses:
-#009-T023         '200':
-#009-T023           description: El partido jugado
-#009-T023           content:
-#009-T023             application/json:
-#009-T023               schema: { $ref: '#/components/schemas/PartidoDto' }
-#009-T023         '400': { $ref: '#/components/responses/Validacion' }
-#009-T023         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T023         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T023         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T023         '409': { $ref: '#/components/responses/EstadoNoPermite' }
+  /api/clubes/{clubId}/partidos/{partidoId}/resultado:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Registra o corrige el resultado
+      description: |
+        Quien lo gestiona (RF-016). Partido PROXIMO que ya empezó, o JUGADO; si no, 409
+        `partido_sin_empezar` o `actividad_cancelada`. Deja el partido JUGADO y guarda quién y
+        cuándo (RF-020). Rechazos de RF-017 con 400: `goles_de_quien_no_jugo`,
+        `goles_superan_marcador`, `jugador_no_convocado`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistrarResultadoDto' }
+      responses:
+        '200':
+          description: El partido jugado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
 #009-T025   /api/clubes/{clubId}/partidos/{partidoId}/mi-respuesta:
 #009-T025     parameters:

@@ -5,7 +5,6 @@ import { ErrorApi } from '../../compartido/api/errores';
 import type { PartidoDto } from '../../compartido/api/tiposActividades';
 import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
-import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { diaDeLaSemana, horaCorta, yaEmpezo } from '../../compartido/fechas';
 import { AccionesDeEstado } from '../actividades/AccionesDeEstado';
@@ -14,7 +13,8 @@ import { FormularioPartido } from '../actividades/FormularioPartido';
 import { textoDeCategorias, textoDeCondicion } from '../calendario/TarjetaActividad';
 import { useClub } from '../contextoClub';
 import { SeccionConvocatoria } from './SeccionConvocatoria';
-import { textoDeMarcador, textoDeTipo } from './textos';
+import { SeccionResultado } from './SeccionResultado';
+import { textoDeTipo } from './textos';
 
 /**
  * Detalle de un partido: rival, fecha, hora, lugar, condición, tipo y torneo, categorías y estado
@@ -46,28 +46,7 @@ export function DetallePartido() {
             <h1 className="dato-largo">Contra {partido.rival}</h1>
             <EtiquetaActividad tipo="PARTIDO" estado={partido.estado} faltaResultado={partido.faltaResultado} />
           </div>
-          {partido.estado === 'JUGADO' && (
-            <Tarjeta titulo="Resultado">
-              <p className="marcador dato-largo">{textoDeMarcador(partido, club.nombre)}</p>
-              {(partido.goleadores?.length ?? 0) > 0 ? (
-                <ul className="lista-de-inicio">
-                  {partido.goleadores?.map((goleador) => (
-                    <li key={`${goleador.nombres} ${goleador.apellidos}`}>
-                      <NombrePersona
-                        nombre={`${goleador.nombres} ${goleador.apellidos}`}
-                        enlace={goleador.enlace ?? null}
-                        clubId={club.clubId}
-                        textoVolver="Partido"
-                      />
-                      <span>{goleador.goles === 1 ? '1 gol' : `${goleador.goles} goles`}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="texto-suave">Sin goleadores registrados.</p>
-              )}
-            </Tarjeta>
-          )}
+          <SeccionResultado clubId={club.clubId} nombreClub={club.nombre} partido={partido} alCambiar={carga.fijar} />
           {cambiando ? (
             <Tarjeta titulo="Cambiar el partido">
               <FormularioPartido

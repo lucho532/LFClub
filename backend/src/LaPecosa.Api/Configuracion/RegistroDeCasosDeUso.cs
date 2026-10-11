@@ -73,6 +73,7 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioPartidos, ServicioPartidos>();
         servicios.AddScoped<IServicioConsultaPartidos, ServicioConsultaPartidos>();
         servicios.AddScoped<IServicioConvocatoria, ServicioConvocatoria>();
+        servicios.AddScoped<IServicioResultado, ServicioResultado>();
 
         return servicios;
     }

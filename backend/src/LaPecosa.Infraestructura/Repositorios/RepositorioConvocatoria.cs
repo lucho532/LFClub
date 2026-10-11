@@ -1,6 +1,7 @@
 using LaPecosa.Aplicacion.Interfaces;
 using LaPecosa.Dominio.Entidades;
 using LaPecosa.Dominio.Enumeraciones;
+using LaPecosa.Dominio.Reglas;
 using LaPecosa.Infraestructura.Datos;
 using Microsoft.EntityFrameworkCore;
 
@@ -85,5 +86,43 @@ public class RepositorioConvocatoria : IRepositorioConvocatoria
         _contexto.PartidosJugador.AddRange(nuevas);
         await _contexto.SaveChangesAsync(cancelacion);
         nuevas.ForEach(fila => _contexto.Entry(fila).State = EntityState.Detached);
+    }
+
+    /// <inheritdoc />
+    public async Task GuardarResultadoAsync(
+        Guid partidoId,
+        int golesClub,
+        int golesRival,
+        IReadOnlyCollection<FilaDeResultado> filas,
+        DateTime ahoraUtc,
+        Guid autorUsuarioId,
+        string autorNombre,
+        CancellationToken cancelacion = default)
+    {
+        await _contexto.Partidos
+            .Where(partido => partido.Id == partidoId)
+            .ExecuteUpdateAsync(
+                cambios => cambios
+                    .SetProperty(partido => partido.Estado, EstadoPartido.JUGADO)
+                    .SetProperty(partido => partido.GolesClub, golesClub)
+                    .SetProperty(partido => partido.GolesRival, golesRival)
+                    .SetProperty(partido => partido.ResultadoCambiadoEn, ahoraUtc)
+                    .SetProperty(partido => partido.ResultadoCambiadoPorUsuarioId, autorUsuarioId)
+                    .SetProperty(partido => partido.ResultadoCambiadoPorNombre, autorNombre),
+                cancelacion);
+
+        // Corregir corrige: primero nadie jugó y después cada fila enviada (RF-027).
+        await _contexto.PartidosJugador
+            .Where(fila => fila.PartidoId == partidoId)
+            .ExecuteUpdateAsync(cambios => cambios.SetProperty(fila => fila.Jugo, false).SetProperty(fila => fila.Goles, 0), cancelacion);
+
+        foreach (var enviada in filas.Where(fila => fila.Jugo))
+        {
+            await _contexto.PartidosJugador
+                .Where(fila => fila.PartidoId == partidoId && fila.UsuarioRolId == enviada.UsuarioRolId)
+                .ExecuteUpdateAsync(
+                    cambios => cambios.SetProperty(fila => fila.Jugo, true).SetProperty(fila => fila.Goles, enviada.Goles),
+                    cancelacion);
+        }
     }
 }

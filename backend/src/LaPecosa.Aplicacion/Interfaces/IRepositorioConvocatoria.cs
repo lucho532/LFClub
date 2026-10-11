@@ -1,4 +1,5 @@
 using LaPecosa.Dominio.Entidades;
+using LaPecosa.Dominio.Reglas;
 
 namespace LaPecosa.Aplicacion.Interfaces;
 
@@ -35,5 +36,19 @@ public interface IRepositorioConvocatoria
         IReadOnlyCollection<UsuarioRol> altas,
         IReadOnlyCollection<Guid> bajas,
         DateTime ahoraUtc,
+        CancellationToken cancelacion = default);
+
+    /// <summary>
+    /// Deja el partido jugado con ese marcador y quién lo cambió (con su nombre copiado), y a cada
+    /// convocado con lo enviado: los que no aparecen quedan como que no jugaron y sin goles.
+    /// </summary>
+    Task GuardarResultadoAsync(
+        Guid partidoId,
+        int golesClub,
+        int golesRival,
+        IReadOnlyCollection<FilaDeResultado> filas,
+        DateTime ahoraUtc,
+        Guid autorUsuarioId,
+        string autorNombre,
         CancellationToken cancelacion = default);
 }
