@@ -278,184 +278,184 @@ paths:
 
   # ------------------------------------------------------------------ Partidos
 
-#009-T019   /api/clubes/{clubId}/partidos:
-#009-T019     parameters:
-#009-T019       - $ref: '#/components/parameters/clubId'
-#009-T019     get:
-#009-T019       tags: [Partidos]
-#009-T019       summary: NUEVO. Partidos que quien pregunta puede ver
-#009-T019       description: |
-#009-T019         Cualquier rol. Los jugados, de todo el club; los próximos y cancelados, solo los visibles
-#009-T019         (RF-010, RF-019). Próximos por fecha ascendente; jugados y cancelados, descendente.
-#009-T019       parameters:
-#009-T019         - { name: estado, in: query, required: false, schema: { $ref: '#/components/schemas/EstadoPartido' } }
-#009-T019         - { name: categoriaId, in: query, required: false, schema: { type: string, format: uuid } }
-#009-T019       responses:
-#009-T019         '200':
-#009-T019           description: Partidos visibles
-#009-T019           content:
-#009-T019             application/json:
-#009-T019               schema:
-#009-T019                 type: array
-#009-T019                 items: { $ref: '#/components/schemas/PartidoResumenDto' }
-#009-T019         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T019         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T019         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T019     post:
-#009-T019       tags: [Partidos]
-#009-T019       summary: NUEVO. Crea un partido próximo, sin convocados
-#009-T019       description: |
-#009-T019         PRESIDENTE, DIRECTIVO o ENTRENADOR; quien no es PRESIDENTE debe entrenar todas sus
-#009-T019         categorías (RF-008). Torneo sin nombre: 400 (escenario 2.10).
-#009-T019       requestBody:
-#009-T019         required: true
-#009-T019         content:
-#009-T019           application/json:
-#009-T019             schema: { $ref: '#/components/schemas/GuardarPartidoDto' }
-#009-T019       responses:
-#009-T019         '201':
-#009-T019           description: Creado
-#009-T019           content:
-#009-T019             application/json:
-#009-T019               schema: { $ref: '#/components/schemas/PartidoDto' }
-#009-T019         '400': { $ref: '#/components/responses/Validacion' }
-#009-T019         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T019         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T019         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T019         '409':
-#009-T019           description: '`categoria_inactiva`'
-#009-T019           content:
-#009-T019             application/problem+json:
-#009-T019               schema: { $ref: '#/components/schemas/Problema' }
+  /api/clubes/{clubId}/partidos:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Partidos]
+      summary: NUEVO. Partidos que quien pregunta puede ver
+      description: |
+        Cualquier rol. Los jugados, de todo el club; los próximos y cancelados, solo los visibles
+        (RF-010, RF-019). Próximos por fecha ascendente; jugados y cancelados, descendente.
+      parameters:
+        - { name: estado, in: query, required: false, schema: { $ref: '#/components/schemas/EstadoPartido' } }
+        - { name: categoriaId, in: query, required: false, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Partidos visibles
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PartidoResumenDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    post:
+      tags: [Partidos]
+      summary: NUEVO. Crea un partido próximo, sin convocados
+      description: |
+        PRESIDENTE, DIRECTIVO o ENTRENADOR; quien no es PRESIDENTE debe entrenar todas sus
+        categorías (RF-008). Torneo sin nombre: 400 (escenario 2.10).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarPartidoDto' }
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409':
+          description: '`categoria_inactiva`'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
 
-#009-T019   /api/clubes/{clubId}/partidos/{partidoId}:
-#009-T019     parameters:
-#009-T019       - $ref: '#/components/parameters/clubId'
-#009-T019       - $ref: '#/components/parameters/partidoId'
-#009-T019     get:
-#009-T019       tags: [Partidos]
-#009-T019       summary: NUEVO. Detalle de un partido
-#009-T019       description: |
-#009-T019         Quien lo ve. Jugado: rival, fecha, condición, tipo, torneo, marcador y goleadores del club
-#009-T019         para todos (RF-019). La cuenta de un jugador recibe además su propia respuesta.
-#009-T019       responses:
-#009-T019         '200':
-#009-T019           description: El partido
-#009-T019           content:
-#009-T019             application/json:
-#009-T019               schema: { $ref: '#/components/schemas/PartidoDto' }
-#009-T019         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T019         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T019         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T021     put:
-#009-T021       tags: [Partidos]
-#009-T021       summary: NUEVO. Cambia los datos de un partido próximo
-#009-T021       description: |
-#009-T021         Quien lo gestiona. Solo en PROXIMO (research §16.2); las categorías no cambian (§16.1).
-#009-T021       requestBody:
-#009-T021         required: true
-#009-T021         content:
-#009-T021           application/json:
-#009-T021             schema: { $ref: '#/components/schemas/GuardarPartidoDto' }
-#009-T021       responses:
-#009-T021         '200':
-#009-T021           description: Cambiado
-#009-T021           content:
-#009-T021             application/json:
-#009-T021               schema: { $ref: '#/components/schemas/PartidoDto' }
-#009-T021         '400': { $ref: '#/components/responses/Validacion' }
-#009-T021         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T021         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T021         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T021         '409': { $ref: '#/components/responses/EstadoNoPermite' }
+  /api/clubes/{clubId}/partidos/{partidoId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    get:
+      tags: [Partidos]
+      summary: NUEVO. Detalle de un partido
+      description: |
+        Quien lo ve. Jugado: rival, fecha, condición, tipo, torneo, marcador y goleadores del club
+        para todos (RF-019). La cuenta de un jugador recibe además su propia respuesta.
+      responses:
+        '200':
+          description: El partido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Cambia los datos de un partido próximo
+      description: |
+        Quien lo gestiona. Solo en PROXIMO (research §16.2); las categorías no cambian (§16.1).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarPartidoDto' }
+      responses:
+        '200':
+          description: Cambiado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
-#009-T021   /api/clubes/{clubId}/partidos/{partidoId}/cancelacion:
-#009-T021     parameters:
-#009-T021       - $ref: '#/components/parameters/clubId'
-#009-T021       - $ref: '#/components/parameters/partidoId'
-#009-T021     post:
-#009-T021       tags: [Partidos]
-#009-T021       summary: NUEVO. Cancela un partido próximo
-#009-T021       description: |
-#009-T021         Quien lo gestiona. Un partido jugado no se cancela (RF-021): 409 `partido_jugado`. Se puede
-#009-T021         deshacer con `DELETE` mientras no haya empezado (RF-038).
-#009-T021       responses:
-#009-T021         '200':
-#009-T021           description: Cancelado
-#009-T021           content:
-#009-T021             application/json:
-#009-T021               schema: { $ref: '#/components/schemas/PartidoDto' }
-#009-T021         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T021         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T021         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T021         '409': { $ref: '#/components/responses/EstadoNoPermite' }
-#009-T021     delete:
-#009-T021       tags: [Partidos]
-#009-T021       summary: NUEVO. Reactiva un partido cancelado
-#009-T021       description: |
-#009-T021         Quien lo gestiona, mientras no haya empezado y sus categorías sigan activas (RF-038).
-#009-T021         Vuelve a PROXIMO con sus categorías, su convocatoria y las respuestas como estaban. Si no
-#009-T021         está cancelado, 409 `actividad_no_cancelada`; si ya empezó, `actividad_empezada`; con una
-#009-T021         categoría desactivada, `categoria_inactiva`.
-#009-T021       responses:
-#009-T021         '200':
-#009-T021           description: Reactivado
-#009-T021           content:
-#009-T021             application/json:
-#009-T021               schema: { $ref: '#/components/schemas/PartidoDto' }
-#009-T021         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T021         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T021         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T021         '409': { $ref: '#/components/responses/EstadoNoPermite' }
+  /api/clubes/{clubId}/partidos/{partidoId}/cancelacion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    post:
+      tags: [Partidos]
+      summary: NUEVO. Cancela un partido próximo
+      description: |
+        Quien lo gestiona. Un partido jugado no se cancela (RF-021): 409 `partido_jugado`. Se puede
+        deshacer con `DELETE` mientras no haya empezado (RF-038).
+      responses:
+        '200':
+          description: Cancelado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+    delete:
+      tags: [Partidos]
+      summary: NUEVO. Reactiva un partido cancelado
+      description: |
+        Quien lo gestiona, mientras no haya empezado y sus categorías sigan activas (RF-038).
+        Vuelve a PROXIMO con sus categorías, su convocatoria y las respuestas como estaban. Si no
+        está cancelado, 409 `actividad_no_cancelada`; si ya empezó, `actividad_empezada`; con una
+        categoría desactivada, `categoria_inactiva`.
+      responses:
+        '200':
+          description: Reactivado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
-#009-T020   /api/clubes/{clubId}/partidos/{partidoId}/jugadores:
-#009-T020     parameters:
-#009-T020       - $ref: '#/components/parameters/clubId'
-#009-T020       - $ref: '#/components/parameters/partidoId'
-#009-T020     get:
-#009-T020       tags: [Partidos]
-#009-T020       summary: NUEVO. Planilla del partido con convocados, respuestas y quiénes jugaron
-#009-T020       description: |
-#009-T020         PRESIDENTE y quien entrena alguna de sus categorías (RF-010). La cuenta de un jugador, 403
-#009-T020         `rol_no_autorizado` (RF-012); un DIRECTIVO que no entrena ninguna, el 404 del partido
-#009-T020         próximo o 403 `no_gestiona_actividad` si está jugado.
-#009-T020       responses:
-#009-T020         '200':
-#009-T020           description: La planilla
-#009-T020           content:
-#009-T020             application/json:
-#009-T020               schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
-#009-T020         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T020         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T020         '404': { $ref: '#/components/responses/NoEncontrado' }
+  /api/clubes/{clubId}/partidos/{partidoId}/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    get:
+      tags: [Partidos]
+      summary: NUEVO. Planilla del partido con convocados, respuestas y quiénes jugaron
+      description: |
+        PRESIDENTE y quien entrena alguna de sus categorías (RF-010). La cuenta de un jugador, 403
+        `rol_no_autorizado` (RF-012); un DIRECTIVO que no entrena ninguna, el 404 del partido
+        próximo o 403 `no_gestiona_actividad` si está jugado.
+      responses:
+        '200':
+          description: La planilla
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
-#009-T020   /api/clubes/{clubId}/partidos/{partidoId}/convocatoria:
-#009-T020     parameters:
-#009-T020       - $ref: '#/components/parameters/clubId'
-#009-T020       - $ref: '#/components/parameters/partidoId'
-#009-T020     put:
-#009-T020       tags: [Partidos]
-#009-T020       summary: NUEVO. Deja la convocatoria exactamente con esos jugadores
-#009-T020       description: |
-#009-T020         Quien lo gestiona, en un partido PROXIMO. Cada jugador debe ser activo y de una de sus
-#009-T020         categorías (RF-009): si no, 409 `jugador_fuera_de_la_actividad`. Los que salen pierden su
-#009-T020         fila y su respuesta, sin rastro (RF-013).
-#009-T020       requestBody:
-#009-T020         required: true
-#009-T020         content:
-#009-T020           application/json:
-#009-T020             schema: { $ref: '#/components/schemas/GuardarConvocatoriaDto' }
-#009-T020       responses:
-#009-T020         '200':
-#009-T020           description: La planilla actualizada
-#009-T020           content:
-#009-T020             application/json:
-#009-T020               schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
-#009-T020         '400': { $ref: '#/components/responses/Validacion' }
-#009-T020         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T020         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T020         '404': { $ref: '#/components/responses/NoEncontrado' }
-#009-T020         '409': { $ref: '#/components/responses/EstadoNoPermite' }
+  /api/clubes/{clubId}/partidos/{partidoId}/convocatoria:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Deja la convocatoria exactamente con esos jugadores
+      description: |
+        Quien lo gestiona, en un partido PROXIMO. Cada jugador debe ser activo y de una de sus
+        categorías (RF-009): si no, 409 `jugador_fuera_de_la_actividad`. Los que salen pierden su
+        fila y su respuesta, sin rastro (RF-013).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarConvocatoriaDto' }
+      responses:
+        '200':
+          description: La planilla actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
 #009-T023   /api/clubes/{clubId}/partidos/{partidoId}/resultado:
 #009-T023     parameters:

@@ -48,6 +48,25 @@ public class ResolutorDeEnlaces
     }
 
     /// <summary>
+    /// Enlace a la ficha de un jugador ya cargado en una planilla o en los goleadores (spec 009): solo
+    /// si quien mira puede abrir esa ficha según <see cref="ReglaAccesoAFicha"/>. Para la cuenta de
+    /// un jugador es siempre nulo: no abre fichas ajenas. No consulta nada.
+    /// </summary>
+    public static EnlaceFichaDto? DeJugador(UsuarioRol jugador, QuienPregunta quien)
+    {
+        if (quien.EsJugador)
+        {
+            return null;
+        }
+
+        var entrenaSuCategoria = quien.Rol == Rol.ENTRENADOR
+            && jugador.CategoriaId is { } categoria
+            && quien.CategoriasQueEntrena.Contains(categoria);
+        var alcance = ReglaAccesoAFicha.Evaluar(quien.Rol, false, jugador.Activo, entrenaSuCategoria);
+        return alcance.Ve ? new EnlaceFichaDto(jugador.Id, TipoFicha.JUGADOR) : null;
+    }
+
+    /// <summary>
     /// Enlace de un integrante ya cargado según la regla indicada (persona aprobada o hermano), sin
     /// consultar nada: si es nulo, porque ya no existe, no lleva a ninguna ficha.
     /// </summary>

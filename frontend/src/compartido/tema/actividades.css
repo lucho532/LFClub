@@ -130,3 +130,26 @@
     display: none;
   }
 }
+
+.lista-actividades {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
+}
+
+.marcador {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.casillas-convocatoria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 6px 14px;
+}
+
+.casillas-convocatoria .casilla {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

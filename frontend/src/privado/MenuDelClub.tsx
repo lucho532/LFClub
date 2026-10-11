@@ -8,6 +8,7 @@ import {
   IconoIngresos,
   IconoInicio,
   IconoJugadores,
+  IconoPartido,
 } from '../compartido/componentes/Iconos';
 import { puedeVerCategorias, rutaDeFicha } from './categorias/textos';
 import { puedeVerJugadores } from './jugadores/textos';
@@ -39,6 +40,9 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
       )}
       <EnlaceMenu a={`/club/${clubId}/calendario`} icono={<IconoCalendario />}>
         Calendario
+      </EnlaceMenu>
+      <EnlaceMenu a={`/club/${clubId}/partidos`} icono={<IconoPartido />}>
+        Partidos
       </EnlaceMenu>
       {rol === 'PRESIDENTE' && (
         <EnlaceMenu a={`/club/${clubId}/ingresos`} icono={<IconoIngresos />}>

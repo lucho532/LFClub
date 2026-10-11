@@ -24,6 +24,8 @@ import { FichaJugador } from './privado/ficha/FichaJugador';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
 import { ListaJugadores } from './privado/jugadores/ListaJugadores';
+import { DetallePartido } from './privado/partidos/DetallePartido';
+import { Partidos } from './privado/partidos/Partidos';
 import { FichaBasica } from './privado/personas/FichaBasica';
 
 interface Props {
@@ -72,6 +74,8 @@ export function App({ conArranque = false }: Props) {
                 <Route path="calendario" element={<Calendario />} />
                 <Route path="actividades/nueva" element={<FormularioActividad />} />
                 <Route path="entrenamientos/:entrenamientoId" element={<DetalleEntrenamiento />} />
+                <Route path="partidos" element={<Partidos />} />
+                <Route path="partidos/:partidoId" element={<DetallePartido />} />
               </Route>
             </Route>
 

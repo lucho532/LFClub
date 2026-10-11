@@ -20,14 +20,19 @@ namespace LaPecosa.Aplicacion.Utilidades;
 public class AccesoAActividad
 {
     private readonly IRepositorioEntrenamientos _entrenamientos;
+    private readonly IRepositorioPartidos _partidos;
     private readonly IRepositorioAsignaciones _asignaciones;
     private readonly IReloj _reloj;
 
     /// <summary>Crea el colaborador con sus dependencias.</summary>
     public AccesoAActividad(
-        IRepositorioEntrenamientos entrenamientos, IRepositorioAsignaciones asignaciones, IReloj reloj)
+        IRepositorioEntrenamientos entrenamientos,
+        IRepositorioPartidos partidos,
+        IRepositorioAsignaciones asignaciones,
+        IReloj reloj)
     {
         _entrenamientos = entrenamientos;
+        _partidos = partidos;
         _asignaciones = asignaciones;
         _reloj = reloj;
     }
@@ -84,6 +89,32 @@ public class AccesoAActividad
         return new EntrenamientoVisible(entrenamiento, quien, permisos, miRespuesta, miAsistencia);
     }
 
+    /// <summary>
+    /// El partido, lo que quien pregunta puede hacer con él y, para la cuenta de un jugador
+    /// convocado, su fila. Lanza <c>404 no_encontrado</c> si no existe en el club o quien pregunta no
+    /// lo ve: para una cuenta no convocada, un partido próximo no existe (§17.2).
+    /// </summary>
+    public async Task<PartidoVisible> PartidoAsync(Guid partidoId, UsuarioRol integrante, CancellationToken cancelacion = default)
+    {
+        var partido = await _partidos.ObtenerAsync(partidoId, cancelacion) ?? throw ExcepcionDeAplicacion.NoEncontrado();
+        var quien = await QuienPreguntaAsync(integrante, cancelacion);
+        var categorias = partido.Categorias.Select(fila => fila.CategoriaId).ToList();
+        var entrenaAlguna = categorias.Any(quien.CategoriasQueEntrena.Contains);
+        var miFila = quien.EsJugador ? await _partidos.FilaDeAsync(partidoId, quien.UsuarioRolId, cancelacion) : null;
+        if (!ReglaVisibilidadDePartido.LoVe(quien.Rol, partido.Estado, entrenaAlguna, miFila is not null))
+        {
+            throw ExcepcionDeAplicacion.NoEncontrado();
+        }
+
+        var (hoy, ahora) = HoraDeColombia.Ahora(_reloj);
+        var empezo = ReglaMomentoDeActividad.YaEmpezo(partido.Fecha, partido.Hora, hoy, ahora);
+        var permisos = new PermisosDeActividadDto(
+            ReglaGestionDeActividad.PuedeGestionar(quien.Rol, categorias, quien.CategoriasQueEntrena),
+            quien.Rol == Rol.PRESIDENTE || (!quien.EsJugador && entrenaAlguna),
+            miFila is not null && partido.Estado == EstadoPartido.PROXIMO && !empezo);
+        return new PartidoVisible(partido, quien, permisos, miFila, empezo);
+    }
+
     /// <summary>Lanza <c>403 no_gestiona_actividad</c> si quien pregunta ve la actividad pero no la gestiona.</summary>
     public static void ExigirGestion(PermisosDeActividadDto permisos)
     {
@@ -111,3 +142,25 @@ public record EntrenamientoVisible(
     PermisosDeActividadDto Permisos,
     RespuestaFamilia? MiRespuesta,
     bool? MiAsistencia);
+
+/// <summary>
+/// Representa un partido que quien pregunta puede ver, con lo que puede hacer con él.
+/// Su responsabilidad es llevarlo junto a quien pregunta, sus permisos, si ya empezó y, solo para
+/// la cuenta de un jugador convocado, su fila.
+/// No lleva los demás convocados.
+/// </summary>
+/// <param name="Partido">El partido con sus categorías.</param>
+/// <param name="Quien">Quien pregunta.</param>
+/// <param name="Permisos">Lo que puede hacer con él.</param>
+/// <param name="MiFila">La fila del convocado de la petición, si es la cuenta de un jugador convocado.</param>
+/// <param name="Empezo">Si ya empezó, en hora de Colombia.</param>
+public record PartidoVisible(
+    Partido Partido,
+    QuienPregunta Quien,
+    PermisosDeActividadDto Permisos,
+    PartidoJugador? MiFila,
+    bool Empezo)
+{
+    /// <summary>Un partido próximo que ya empezó y no tiene resultado.</summary>
+    public bool FaltaResultado => Partido.Estado == EstadoPartido.PROXIMO && Empezo;
+}

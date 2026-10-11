@@ -1,0 +1,130 @@
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { api } from '../../compartido/api/cliente';
+import { ErrorApi } from '../../compartido/api/errores';
+import type { PartidoDto } from '../../compartido/api/tiposActividades';
+import { useCarga } from '../../compartido/api/useCarga';
+import { Aviso } from '../../compartido/componentes/Aviso';
+import { NombrePersona } from '../../compartido/componentes/NombrePersona';
+import { Tarjeta } from '../../compartido/componentes/Tarjeta';
+import { diaDeLaSemana, horaCorta, yaEmpezo } from '../../compartido/fechas';
+import { AccionesDeEstado } from '../actividades/AccionesDeEstado';
+import { EtiquetaActividad } from '../actividades/EtiquetaActividad';
+import { FormularioPartido } from '../actividades/FormularioPartido';
+import { textoDeCategorias, textoDeCondicion } from '../calendario/TarjetaActividad';
+import { useClub } from '../contextoClub';
+import { SeccionConvocatoria } from './SeccionConvocatoria';
+import { textoDeMarcador, textoDeTipo } from './textos';
+
+/**
+ * Detalle de un partido: rival, fecha, hora, lugar, condición, tipo y torneo, categorías y estado
+ * escrito; si está jugado, el marcador y los goleadores. Quien gestiona un partido próximo lo
+ * cambia o lo cancela, y uno cancelado que no ha empezado lo reactiva. Quien ve la planilla ve la
+ * convocatoria. Si no existe o quien pregunta no lo ve, dice lo mismo que si no existiera (RF-011).
+ */
+export function DetallePartido() {
+  const { club } = useClub();
+  const { partidoId = '' } = useParams();
+  const ruta = `/api/clubes/${club.clubId}/partidos/${partidoId}`;
+  const carga = useCarga(ruta, () => api.get<PartidoDto>(ruta));
+  const [cambiando, setCambiando] = useState(false);
+  const partido = carga.datos;
+  const noExiste = carga.fallo instanceof ErrorApi && carga.fallo.status === 404;
+
+  return (
+    <>
+      <Link to={`/club/${club.clubId}/partidos`}>← Partidos</Link>
+      {noExiste ? (
+        <Aviso tono="aviso">No encontramos este partido.</Aviso>
+      ) : (
+        carga.error && <Aviso tono="error">{carga.error}</Aviso>
+      )}
+      {!partido && carga.cargando && <p className="texto-suave">Cargando…</p>}
+      {partido && (
+        <>
+          <div className="cabecera">
+            <h1 className="dato-largo">Contra {partido.rival}</h1>
+            <EtiquetaActividad tipo="PARTIDO" estado={partido.estado} faltaResultado={partido.faltaResultado} />
+          </div>
+          {partido.estado === 'JUGADO' && (
+            <Tarjeta titulo="Resultado">
+              <p className="marcador dato-largo">{textoDeMarcador(partido, club.nombre)}</p>
+              {(partido.goleadores?.length ?? 0) > 0 ? (
+                <ul className="lista-de-inicio">
+                  {partido.goleadores?.map((goleador) => (
+                    <li key={`${goleador.nombres} ${goleador.apellidos}`}>
+                      <NombrePersona
+                        nombre={`${goleador.nombres} ${goleador.apellidos}`}
+                        enlace={goleador.enlace ?? null}
+                        clubId={club.clubId}
+                        textoVolver="Partido"
+                      />
+                      <span>{goleador.goles === 1 ? '1 gol' : `${goleador.goles} goles`}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="texto-suave">Sin goleadores registrados.</p>
+              )}
+            </Tarjeta>
+          )}
+          {cambiando ? (
+            <Tarjeta titulo="Cambiar el partido">
+              <FormularioPartido
+                clubId={club.clubId}
+                categorias={[]}
+                partido={partido}
+                alGuardar={(cambiado) => {
+                  carga.fijar(cambiado);
+                  setCambiando(false);
+                }}
+                alCancelar={() => setCambiando(false)}
+              />
+            </Tarjeta>
+          ) : (
+            <Tarjeta>
+              <dl className="ficha-datos">
+                <div>
+                  <dt>Fecha</dt>
+                  <dd>{diaDeLaSemana(partido.fecha)}</dd>
+                </div>
+                <div>
+                  <dt>Hora</dt>
+                  <dd>{horaCorta(partido.hora)}</dd>
+                </div>
+                <div>
+                  <dt>Lugar</dt>
+                  <dd className="dato-largo">{partido.lugar}</dd>
+                </div>
+                <div>
+                  <dt>Condición</dt>
+                  <dd>{textoDeCondicion(partido.condicion)}</dd>
+                </div>
+                <div>
+                  <dt>Tipo</dt>
+                  <dd className="dato-largo">{textoDeTipo(partido)}</dd>
+                </div>
+                <div>
+                  <dt>Categorías</dt>
+                  <dd>{textoDeCategorias(partido.categorias)}</dd>
+                </div>
+              </dl>
+              {partido.permisos.gestiona && partido.estado !== 'JUGADO' && (
+                <AccionesDeEstado
+                  nombre="partido"
+                  cancelada={partido.estado === 'CANCELADO'}
+                  empezo={yaEmpezo(partido.fecha, partido.hora)}
+                  sePuedeCambiar={partido.estado === 'PROXIMO'}
+                  alCambiar={() => setCambiando(true)}
+                  cancelar={async () => carga.fijar(await api.post<PartidoDto>(`${ruta}/cancelacion`))}
+                  reactivar={async () => carga.fijar(await api.delete<PartidoDto>(`${ruta}/cancelacion`))}
+                />
+              )}
+            </Tarjeta>
+          )}
+          {partido.permisos.vePlanilla && <SeccionConvocatoria clubId={club.clubId} partido={partido} />}
+        </>
+      )}
+    </>
+  );
+}

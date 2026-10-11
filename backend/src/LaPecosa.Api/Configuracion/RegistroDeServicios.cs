@@ -54,6 +54,8 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioFichaBasica, RepositorioFichaBasica>();
         servicios.AddScoped<IRepositorioEnlaces, RepositorioEnlaces>();
         servicios.AddScoped<IRepositorioEntrenamientos, RepositorioEntrenamientos>();
+        servicios.AddScoped<IRepositorioPartidos, RepositorioPartidos>();
+        servicios.AddScoped<IRepositorioConvocatoria, RepositorioConvocatoria>();
 
         servicios.Configure<OpcionesCorreo>(opciones =>
         {
