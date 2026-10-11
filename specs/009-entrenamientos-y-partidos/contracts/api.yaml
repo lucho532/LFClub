@@ -36,9 +36,6 @@ tags:
   - name: Partidos
   - name: Estadisticas
 
-# Mientras se construye la 009, cada operación nueva lleva delante la marca `#009-T0NN` de la
-# tarea que la descomenta (tasks.md, T001). Al terminar no queda ninguna (T029).
-
 paths:
   # ------------------------------------------------------------------ Calendario
 

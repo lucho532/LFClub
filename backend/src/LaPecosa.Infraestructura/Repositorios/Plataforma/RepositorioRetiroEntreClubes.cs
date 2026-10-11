@@ -1,4 +1,5 @@
 using LaPecosa.Aplicacion.Interfaces;
+using LaPecosa.Aplicacion.Utilidades;
 using LaPecosa.Dominio.Enumeraciones;
 using LaPecosa.Infraestructura.Datos;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,9 @@ namespace LaPecosa.Infraestructura.Repositorios.Plataforma;
 /// Representa, con Entity Framework, la única escritura en un club desde otro club (constitución
 /// §7.1, cuarta excepción): el retiro por número de documento del jugador de otra cuenta.
 /// Su responsabilidad es bloquear varios clubes en orden y retirar con sentencias condicionadas,
-/// borrando también la foto propia de los que retira (§14.2, spec 007).
+/// borrando también la foto propia de los que retira (§14.2, spec 007), sus convocatorias a partidos
+/// que no están jugados y las respuestas de su familia a entrenamientos que no han empezado (RF-033
+/// de la 009). Su asistencia y lo que jugó se conservan.
 /// Por eso se salta el filtro de aislamiento, y cada sentencia va acotada a un número de documento
 /// o a los clubes que se le indican.
 /// No decide a quién retirar ni lee datos para devolverlos: solo cuenta cuántos retiró.
@@ -59,6 +62,19 @@ public class RepositorioRetiroEntreClubes : IRepositorioRetiroEntreClubes
         await _contexto.FotosJugador
             .IgnoreQueryFilters()
             .Where(foto => aRetirar.Any(integrante => integrante.Id == foto.UsuarioRolId))
+            .ExecuteDeleteAsync(cancelacion);
+
+        // Lo pendiente en las actividades: hoy y ahora en hora de Colombia, la de las actividades.
+        var (hoy, ahora) = HoraDeColombia.De(retiradoEn);
+        await _contexto.PartidosJugador
+            .IgnoreQueryFilters()
+            .Where(fila => aRetirar.Any(integrante => integrante.Id == fila.UsuarioRolId)
+                && fila.Partido!.Estado != EstadoPartido.JUGADO)
+            .ExecuteDeleteAsync(cancelacion);
+        await _contexto.RespuestasEntrenamiento
+            .IgnoreQueryFilters()
+            .Where(fila => aRetirar.Any(integrante => integrante.Id == fila.UsuarioRolId)
+                && (fila.Entrenamiento!.Fecha > hoy || (fila.Entrenamiento.Fecha == hoy && fila.Entrenamiento.HoraInicio > ahora)))
             .ExecuteDeleteAsync(cancelacion);
 
         return await aRetirar.ExecuteUpdateAsync(

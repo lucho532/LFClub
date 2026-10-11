@@ -65,6 +65,14 @@ public interface IRepositorioJugadores
     Task SacarDeSusEquiposAsync(Guid usuarioRolId, CancellationToken cancelacion = default);
 
     /// <summary>
+    /// Borra lo pendiente del jugador en las actividades (spec 009, RF-033): sus convocatorias a
+    /// partidos que no están jugados y las respuestas de su familia a entrenamientos que no han
+    /// empezado en hora de Colombia. Su asistencia y lo que jugó no se tocan.
+    /// </summary>
+    Task BorrarPendientesDeActividadesAsync(
+        Guid usuarioRolId, DateOnly hoy, TimeOnly ahora, CancellationToken cancelacion = default);
+
+    /// <summary>
     /// Retira al jugador solo si es jugador del club: lo deja inactivo, sin categoría y con quién
     /// lo retiró y cuándo, los tres datos a la vez. Devuelve si lo retiró.
     /// </summary>

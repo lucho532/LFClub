@@ -117,6 +117,20 @@ public class RepositorioJugadores : IRepositorioJugadores
         _contexto.JugadoresEquipo.Where(fila => fila.UsuarioRolId == usuarioRolId).ExecuteDeleteAsync(cancelacion);
 
     /// <inheritdoc />
+    public async Task BorrarPendientesDeActividadesAsync(
+        Guid usuarioRolId, DateOnly hoy, TimeOnly ahora, CancellationToken cancelacion = default)
+    {
+        await _contexto.PartidosJugador
+            .Where(fila => fila.UsuarioRolId == usuarioRolId && fila.Partido!.Estado != EstadoPartido.JUGADO)
+            .ExecuteDeleteAsync(cancelacion);
+
+        await _contexto.RespuestasEntrenamiento
+            .Where(fila => fila.UsuarioRolId == usuarioRolId
+                && (fila.Entrenamiento!.Fecha > hoy || (fila.Entrenamiento.Fecha == hoy && fila.Entrenamiento.HoraInicio > ahora)))
+            .ExecuteDeleteAsync(cancelacion);
+    }
+
+    /// <inheritdoc />
     public async Task<bool> RetirarAsync(
         Guid usuarioRolId,
         DateTime ahoraUtc,
