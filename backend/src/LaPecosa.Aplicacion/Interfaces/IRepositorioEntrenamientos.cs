@@ -53,4 +53,8 @@ public interface IRepositorioEntrenamientos
 
     /// <summary>Si ese jugador estuvo presente, o nulo si nadie registró su asistencia.</summary>
     Task<bool?> AsistenciaDeAsync(Guid entrenamientoId, Guid usuarioRolId, CancellationToken cancelacion = default);
+
+    /// <summary>Guarda o reemplaza la respuesta de la familia de ese jugador.</summary>
+    Task ResponderAsync(
+        Guid entrenamientoId, UsuarioRol jugador, RespuestaFamilia respuesta, DateTime ahoraUtc, CancellationToken cancelacion = default);
 }

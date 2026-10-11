@@ -26,12 +26,15 @@ public class ControladorEntrenamientos : ControladorBase
 {
     private readonly IServicioEntrenamientos _entrenamientos;
     private readonly IServicioConsultaEntrenamientos _consulta;
+    private readonly IServicioRespuestas _respuestas;
 
     /// <summary>Crea el controlador con sus servicios.</summary>
-    public ControladorEntrenamientos(IServicioEntrenamientos entrenamientos, IServicioConsultaEntrenamientos consulta)
+    public ControladorEntrenamientos(
+        IServicioEntrenamientos entrenamientos, IServicioConsultaEntrenamientos consulta, IServicioRespuestas respuestas)
     {
         _entrenamientos = entrenamientos;
         _consulta = consulta;
+        _respuestas = respuestas;
     }
 
     /// <summary>Programa un entrenamiento para una o varias categorías.</summary>
@@ -81,4 +84,13 @@ public class ControladorEntrenamientos : ControladorBase
     [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
     public Task<EntrenamientoDto> Reactivar(Guid entrenamientoId, CancellationToken cancelacion) =>
         _entrenamientos.ReactivarAsync(entrenamientoId, Integrante, cancelacion);
+
+    /// <summary>La familia del jugador de la petición dice si asistirá.</summary>
+    [HttpPut("{entrenamientoId:guid}/mi-respuesta")]
+    [IntegranteDelClub(Rol.JUGADOR)]
+    [ProducesResponseType<EntrenamientoDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]
+    [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
+    public Task<EntrenamientoDto> Responder(Guid entrenamientoId, ResponderDto datos, CancellationToken cancelacion) =>
+        _respuestas.ResponderEntrenamientoAsync(entrenamientoId, datos, Integrante, cancelacion);
 }

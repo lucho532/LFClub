@@ -1,4 +1,5 @@
 using LaPecosa.Dominio.Entidades;
+using LaPecosa.Dominio.Enumeraciones;
 using LaPecosa.Dominio.Reglas;
 
 namespace LaPecosa.Aplicacion.Interfaces;
@@ -51,4 +52,8 @@ public interface IRepositorioConvocatoria
         Guid autorUsuarioId,
         string autorNombre,
         CancellationToken cancelacion = default);
+
+    /// <summary>Guarda o reemplaza la respuesta de la familia en la fila del convocado.</summary>
+    Task ResponderAsync(
+        Guid partidoId, Guid usuarioRolId, RespuestaFamilia respuesta, DateTime ahoraUtc, CancellationToken cancelacion = default);
 }

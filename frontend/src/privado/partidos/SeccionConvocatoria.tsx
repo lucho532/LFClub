@@ -7,6 +7,7 @@ import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
+import { ResumenRespuestas } from '../entrenamientos/ResumenRespuestas';
 import { EditorConvocatoria, type JugadorConvocable } from './EditorConvocatoria';
 
 interface Props {
@@ -89,19 +90,24 @@ export function SeccionConvocatoria({ clubId, partido }: Props) {
         <p className="texto-suave">Todavía no hay jugadores convocados.</p>
       )}
       {planilla && !editando && planilla.convocados.length > 0 && (
-        <ul className="lista-de-inicio">
-          {planilla.convocados.map((fila) => (
-            <li key={fila.usuarioRolId}>
-              <NombrePersona
-                nombre={`${fila.nombres} ${fila.apellidos}`}
-                enlace={fila.enlace ?? null}
-                clubId={clubId}
-                textoVolver="Partido"
-              />
-              <span className="texto-suave">Categoría {fila.categoria.anio}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="lista-de-inicio">
+            {planilla.convocados.map((fila) => (
+              <li key={fila.usuarioRolId}>
+                <NombrePersona
+                  nombre={`${fila.nombres} ${fila.apellidos}`}
+                  enlace={fila.enlace ?? null}
+                  clubId={clubId}
+                  textoVolver="Partido"
+                />
+                <span className="texto-suave">Categoría {fila.categoria.anio}</span>
+              </li>
+            ))}
+          </ul>
+          {partido.estado !== 'JUGADO' && (
+            <ResumenRespuestas clubId={clubId} textoVolver="Partido" jugadores={planilla.convocados} />
+          )}
+        </>
       )}
     </Tarjeta>
   );

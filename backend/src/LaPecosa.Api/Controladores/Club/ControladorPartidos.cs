@@ -25,12 +25,14 @@ public class ControladorPartidos : ControladorBase
 {
     private readonly IServicioPartidos _partidos;
     private readonly IServicioConsultaPartidos _consulta;
+    private readonly IServicioRespuestas _respuestas;
 
     /// <summary>Crea el controlador con sus servicios.</summary>
-    public ControladorPartidos(IServicioPartidos partidos, IServicioConsultaPartidos consulta)
+    public ControladorPartidos(IServicioPartidos partidos, IServicioConsultaPartidos consulta, IServicioRespuestas respuestas)
     {
         _partidos = partidos;
         _consulta = consulta;
+        _respuestas = respuestas;
     }
 
     /// <summary>Los partidos que quien pregunta puede ver, opcionalmente de un estado o una categoría.</summary>
@@ -81,4 +83,13 @@ public class ControladorPartidos : ControladorBase
     [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
     public Task<PartidoDto> Reactivar(Guid partidoId, CancellationToken cancelacion) =>
         _partidos.ReactivarAsync(partidoId, Integrante, cancelacion);
+
+    /// <summary>La familia del jugador de la petición dice si asistirá.</summary>
+    [HttpPut("{partidoId:guid}/mi-respuesta")]
+    [IntegranteDelClub(Rol.JUGADOR)]
+    [ProducesResponseType<PartidoDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]
+    [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
+    public Task<PartidoDto> Responder(Guid partidoId, ResponderDto datos, CancellationToken cancelacion) =>
+        _respuestas.ResponderPartidoAsync(partidoId, datos, Integrante, cancelacion);
 }

@@ -10,9 +10,11 @@ import { diaDeLaSemana, rangoDeHoras, yaEmpezo } from '../../compartido/fechas';
 import { AccionesDeEstado } from '../actividades/AccionesDeEstado';
 import { EtiquetaActividad } from '../actividades/EtiquetaActividad';
 import { FormularioEntrenamiento } from '../actividades/FormularioEntrenamiento';
+import { BotonesRespuesta } from '../calendario/BotonesRespuesta';
 import { textoDeCategorias } from '../calendario/TarjetaActividad';
 import { useClub } from '../contextoClub';
 import { PlanillaAsistencia } from './PlanillaAsistencia';
+import { ResumenRespuestas } from './ResumenRespuestas';
 
 /**
  * Detalle de un entrenamiento: fecha, horas, lugar, nota, categorías y estado escrito. Quien lo
@@ -87,6 +89,14 @@ export function DetalleEntrenamiento() {
                   </div>
                 )}
               </dl>
+              {club.miRol === 'JUGADOR' && (
+                <BotonesRespuesta
+                  key={`${entrenamiento.estado}`}
+                  ruta={`${ruta}/mi-respuesta`}
+                  actual={entrenamiento.miRespuesta}
+                  habilitado={entrenamiento.permisos.responde}
+                />
+              )}
               {entrenamiento.miAsistencia !== undefined && (
                 <p>
                   <strong>{entrenamiento.miAsistencia ? 'Asististe' : 'No asististe'}</strong>
@@ -103,6 +113,11 @@ export function DetalleEntrenamiento() {
                   reactivar={async () => carga.fijar(await api.delete<EntrenamientoDto>(`${ruta}/cancelacion`))}
                 />
               )}
+            </Tarjeta>
+          )}
+          {vePlanilla && planilla.datos && (
+            <Tarjeta titulo="Respuestas de las familias">
+              <ResumenRespuestas clubId={club.clubId} textoVolver="Entrenamiento" jugadores={planilla.datos.jugadores} />
             </Tarjeta>
           )}
           {vePlanilla && <PlanillaAsistencia clubId={club.clubId} entrenamiento={entrenamiento} planilla={planilla} />}

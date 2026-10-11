@@ -10,6 +10,7 @@ import { diaDeLaSemana, horaCorta, yaEmpezo } from '../../compartido/fechas';
 import { AccionesDeEstado } from '../actividades/AccionesDeEstado';
 import { EtiquetaActividad } from '../actividades/EtiquetaActividad';
 import { FormularioPartido } from '../actividades/FormularioPartido';
+import { BotonesRespuesta } from '../calendario/BotonesRespuesta';
 import { textoDeCategorias, textoDeCondicion } from '../calendario/TarjetaActividad';
 import { useClub } from '../contextoClub';
 import { SeccionConvocatoria } from './SeccionConvocatoria';
@@ -88,6 +89,14 @@ export function DetallePartido() {
                   <dd>{textoDeCategorias(partido.categorias)}</dd>
                 </div>
               </dl>
+              {club.miRol === 'JUGADOR' && partido.estado !== 'JUGADO' && (
+                <BotonesRespuesta
+                  key={partido.estado}
+                  ruta={`${ruta}/mi-respuesta`}
+                  actual={partido.miRespuesta}
+                  habilitado={partido.permisos.responde}
+                />
+              )}
               {partido.permisos.gestiona && partido.estado !== 'JUGADO' && (
                 <AccionesDeEstado
                   nombre="partido"

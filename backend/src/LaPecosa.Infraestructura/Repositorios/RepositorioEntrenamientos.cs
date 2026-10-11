@@ -131,4 +131,31 @@ public class RepositorioEntrenamientos : IRepositorioEntrenamientos
         .AsNoTracking()
         .Include(entrenamiento => entrenamiento.Categorias)
         .ThenInclude(fila => fila.Categoria);
+
+    /// <inheritdoc />
+    public async Task ResponderAsync(
+        Guid entrenamientoId, UsuarioRol jugador, RespuestaFamilia respuesta, DateTime ahoraUtc, CancellationToken cancelacion = default)
+    {
+        var cambiadas = await _contexto.RespuestasEntrenamiento
+            .Where(fila => fila.EntrenamientoId == entrenamientoId && fila.UsuarioRolId == jugador.Id)
+            .ExecuteUpdateAsync(
+                cambios => cambios.SetProperty(fila => fila.Respuesta, respuesta).SetProperty(fila => fila.RespondidaEn, ahoraUtc),
+                cancelacion);
+        if (cambiadas > 0)
+        {
+            return;
+        }
+
+        var nueva = new RespuestaEntrenamiento
+        {
+            EntrenamientoId = entrenamientoId,
+            UsuarioRolId = jugador.Id,
+            ClubId = jugador.ClubId,
+            Respuesta = respuesta,
+            RespondidaEn = ahoraUtc,
+        };
+        _contexto.RespuestasEntrenamiento.Add(nueva);
+        await _contexto.SaveChangesAsync(cancelacion);
+        _contexto.Entry(nueva).State = EntityState.Detached;
+    }
 }

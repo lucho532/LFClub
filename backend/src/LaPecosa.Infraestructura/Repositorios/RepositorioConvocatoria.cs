@@ -125,4 +125,15 @@ public class RepositorioConvocatoria : IRepositorioConvocatoria
                     cancelacion);
         }
     }
+
+    /// <inheritdoc />
+    public Task ResponderAsync(
+        Guid partidoId, Guid usuarioRolId, RespuestaFamilia respuesta, DateTime ahoraUtc, CancellationToken cancelacion = default) =>
+        _contexto.PartidosJugador
+            .Where(fila => fila.PartidoId == partidoId && fila.UsuarioRolId == usuarioRolId)
+            .ExecuteUpdateAsync(
+                cambios => cambios
+                    .SetProperty(fila => fila.Respuesta, respuesta)
+                    .SetProperty(fila => fila.RespondidaEn, ahoraUtc),
+                cancelacion);
 }

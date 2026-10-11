@@ -5,9 +5,10 @@ import type { CalendarioDto } from '../../compartido/api/tiposActividades';
 import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
-import { diaDeLaSemana, diasDeLaSemana, hoyEnColombia, inicioDeSemana, sumarDias } from '../../compartido/fechas';
+import { diaDeLaSemana, diasDeLaSemana, hoyEnColombia, inicioDeSemana, sumarDias, yaEmpezo } from '../../compartido/fechas';
 import { useCategoriasGestionables } from '../actividades/useCategoriasGestionables';
 import { useClub } from '../contextoClub';
+import { BotonesRespuesta } from './BotonesRespuesta';
 import { TarjetaActividad } from './TarjetaActividad';
 import { TiraDeSemana } from './TiraDeSemana';
 
@@ -27,6 +28,8 @@ export function Calendario() {
   const carga = useCarga(ruta, () => api.get<CalendarioDto>(ruta));
   const { categorias } = useCategoriasGestionables(club);
   const puedeCrear = club.miRol === 'PRESIDENTE' || categorias.length > 0;
+  const esJugador = club.miRol === 'JUGADOR';
+  const base = `/api/clubes/${club.clubId}`;
 
   function irA(semana: number) {
     const nuevoLunes = sumarDias(lunes, semana * 7);
@@ -45,6 +48,15 @@ export function Calendario() {
         clubId={club.clubId}
         tipo="ENTRENAMIENTO"
         entrenamiento={entrenamiento}
+        pie={
+          esJugador && (
+            <BotonesRespuesta
+              ruta={`${base}/entrenamientos/${entrenamiento.entrenamientoId}/mi-respuesta`}
+              actual={entrenamiento.miRespuesta}
+              habilitado={entrenamiento.estado === 'PROGRAMADO' && !yaEmpezo(entrenamiento.fecha, entrenamiento.horaInicio)}
+            />
+          )
+        }
       />,
     );
   }
@@ -52,7 +64,22 @@ export function Calendario() {
     agregar(
       partido.fecha,
       partido.hora,
-      <TarjetaActividad key={partido.partidoId} clubId={club.clubId} tipo="PARTIDO" partido={partido} />,
+      <TarjetaActividad
+        key={partido.partidoId}
+        clubId={club.clubId}
+        tipo="PARTIDO"
+        partido={partido}
+        pie={
+          esJugador &&
+          partido.estado !== 'JUGADO' && (
+            <BotonesRespuesta
+              ruta={`${base}/partidos/${partido.partidoId}/mi-respuesta`}
+              actual={partido.miRespuesta}
+              habilitado={partido.estado === 'PROXIMO' && !yaEmpezo(partido.fecha, partido.hora)}
+            />
+          )
+        }
+      />,
     );
   }
 

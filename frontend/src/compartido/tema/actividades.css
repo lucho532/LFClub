@@ -196,3 +196,18 @@
   gap: 6px 12px;
   min-width: 0;
 }
+
+.resumen-respuestas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 12px;
+}
+
+.resumen-respuestas h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.botones-respuesta {
+  gap: 6px;
+}
