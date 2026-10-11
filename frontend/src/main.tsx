@@ -9,6 +9,7 @@ import './compartido/tema/disposicion.css';
 import './compartido/tema/componentes.css';
 import './compartido/tema/fichas.css';
 import './compartido/tema/inicio.css';
+import './compartido/tema/actividades.css';
 import './compartido/tema/identidad.css';
 import './compartido/tema/movil.css';
 

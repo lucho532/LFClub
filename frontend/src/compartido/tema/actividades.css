@@ -1,0 +1,132 @@
+/* Entrenamientos, partidos y calendario (spec 009). Todo estado se lee como texto; el color solo acompaña. */
+
+.etiquetas-actividad {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.etiqueta-tipo {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.tipo-entreno {
+  color: var(--info-texto);
+}
+
+.tipo-partido {
+  color: var(--texto);
+}
+
+/* Categorías y opciones como botones que se encienden: el estado también va en texto o en aria-pressed. */
+.boton-conmutable {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boton-conmutable.encendido {
+  border-color: var(--color-club-principal);
+  background: var(--color-club-principal);
+  color: var(--color-club-principal-texto);
+}
+
+.boton-conmutable:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.tarjeta-actividad {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie);
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-actividad-titulo {
+  font-weight: 700;
+}
+
+.semana {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tira-semana {
+  display: none;
+}
+
+.semana-dias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.dia-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dia-columna h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+/* En el teléfono, la tira de días de `M-Calendario` y debajo solo el día elegido. */
+@media (max-width: 720px) {
+  .tira-semana {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .dia-de-tira {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    padding: 6px 0;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    background: var(--superficie);
+    color: var(--texto);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .dia-de-tira.encendido {
+    border-color: var(--color-club-principal);
+    background: var(--color-club-principal);
+    color: var(--color-club-principal-texto);
+  }
+
+  .dia-columna:not(.dia-elegido) {
+    display: none;
+  }
+}

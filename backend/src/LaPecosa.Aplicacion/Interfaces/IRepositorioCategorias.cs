@@ -35,6 +35,12 @@ public interface IRepositorioCategorias
     /// <summary>Número de jugadores de cada categoría que tiene alguno; cada jugador cuenta una vez.</summary>
     Task<IReadOnlyDictionary<Guid, int>> ContarJugadoresAsync(CancellationToken cancelacion = default);
 
+    /// <summary>
+    /// Cuántas de esas categorías existen en el club y están activas, sin cargar sus equipos ni sus
+    /// asignaciones (spec 009).
+    /// </summary>
+    Task<int> ContarActivasAsync(IReadOnlyCollection<Guid> categoriaIds, CancellationToken cancelacion = default);
+
     /// <summary>Número de jugadores de una categoría.</summary>
     Task<int> ContarJugadoresAsync(Guid categoriaId, CancellationToken cancelacion = default);
 

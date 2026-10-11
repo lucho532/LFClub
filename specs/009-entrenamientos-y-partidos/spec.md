@@ -33,6 +33,9 @@ mostraba un espacio reservado. A partir de esta funcionalidad muestra los entren
   → R: Actúa como entrenador en las categorías que tiene asignadas: programa entrenamientos,
   registra asistencia, convoca, ve los partidos próximos de esas categorías y registra resultados,
   igual que un ENTRENADOR. Fuera de ellas sigue con su acceso de solo consulta.
+- P: ¿Se puede reactivar una actividad cancelada? → R: Sí. Quien la gestiona puede reactivar un
+  entrenamiento o un partido cancelado mientras no haya empezado. Vuelve a programado o a próximo
+  con sus categorías, su convocatoria y las respuestas de las familias tal como estaban.
 
 ## Impacto en la constitución
 
@@ -54,7 +57,8 @@ categorías lo que quien entrena hace en las suyas.
 Quien entrena una categoría programa un entrenamiento con fecha, hora de inicio, hora de fin,
 lugar y una nota opcional, dirigido a una o a varias de sus categorías. Todos los jugadores
 activos de esas categorías lo ven en su calendario y en "Próximos entrenamientos" del inicio. Se
-puede modificar o cancelar; un entrenamiento cancelado sigue a la vista, marcado como cancelado.
+puede modificar o cancelar; un entrenamiento cancelado sigue a la vista, marcado como cancelado, y
+se puede reactivar mientras no haya empezado.
 
 **Por qué esta prioridad**: es la actividad más frecuente del club y la que la familia más
 necesita saber. Llena el espacio que la spec 007 dejó reservado.
@@ -85,6 +89,9 @@ categorías, el PRESIDENTE y los DIRECTIVOS, y que no lo ve la familia de un jug
    por su identificador, **entonces** el sistema se lo niega sin revelar si existe.
 9. **Dado** "Próximos entrenamientos" en el inicio, **cuando** no hay entrenamientos programados,
    **entonces** se indica que no hay entrenamientos próximos, sin datos de ejemplo.
+10. **Dado** un entrenamiento cancelado que todavía no empieza, **cuando** quien lo gestiona lo
+    reactiva, **entonces** vuelve a estar programado y las familias lo ven como antes de cancelarse.
+    Si ya empezó, el sistema lo rechaza.
 
 ---
 
@@ -130,6 +137,9 @@ inicio, en los contadores y al pedir el partido por su identificador.
    como cancelado, y para los demás sigue sin existir.
 10. **Dado** un partido de torneo, **cuando** se guarda sin el nombre del torneo, **entonces** el
     sistema lo rechaza; un amistoso no lo pide.
+11. **Dado** un partido cancelado que todavía no empieza, **cuando** quien lo gestiona lo reactiva,
+    **entonces** vuelve a estar próximo con la misma convocatoria y las mismas respuestas, y sigue
+    sin existir para los no convocados.
 
 ---
 
@@ -382,6 +392,9 @@ un partido.
 - **RF-034**: Un cambio de categoría NO DEBE modificar convocatorias ya hechas ni registros
   pasados.
 - **RF-035**: El sistema NO DEBE eliminar físicamente entrenamientos ni partidos; se cancelan.
+- **RF-038**: Quien gestiona un entrenamiento o un partido cancelado DEBE poder reactivarlo mientras
+  no haya empezado y sus categorías sigan activas. Vuelve a programado o a próximo con sus
+  categorías, su convocatoria y las respuestas de las familias como estaban al cancelarse.
 
 **Interfaz**
 

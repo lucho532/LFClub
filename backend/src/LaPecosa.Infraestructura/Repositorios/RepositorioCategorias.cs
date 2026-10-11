@@ -81,6 +81,11 @@ public class RepositorioCategorias : IRepositorioCategorias
             .ExecuteUpdateAsync(cambios => cambios.SetProperty(categoria => categoria.Activa, activa), cancelacion);
 
     /// <inheritdoc />
+    public Task<int> ContarActivasAsync(IReadOnlyCollection<Guid> categoriaIds, CancellationToken cancelacion = default) =>
+        _contexto.Categorias.CountAsync(
+            categoria => categoriaIds.Contains(categoria.Id) && categoria.Activa, cancelacion);
+
+    /// <inheritdoc />
     public Task MarcarUsadaAsync(Guid categoriaId, CancellationToken cancelacion = default) =>
         _contexto.Categorias
             .Where(categoria => categoria.Id == categoriaId && !categoria.Usada)

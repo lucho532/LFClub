@@ -13,10 +13,13 @@ import { Inicio } from './Inicio';
 import { DetalleClub } from './plataforma/DetalleClub';
 import { DisposicionPlataforma } from './plataforma/DisposicionPlataforma';
 import { ListaClubes } from './plataforma/ListaClubes';
+import { FormularioActividad } from './privado/actividades/FormularioActividad';
+import { Calendario } from './privado/calendario/Calendario';
 import { Categorias } from './privado/categorias/Categorias';
 import { DetalleCategoria } from './privado/categorias/DetalleCategoria';
 import { ConfiguracionClub } from './privado/ConfiguracionClub';
 import { DisposicionClub } from './privado/DisposicionClub';
+import { DetalleEntrenamiento } from './privado/entrenamientos/DetalleEntrenamiento';
 import { FichaJugador } from './privado/ficha/FichaJugador';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
@@ -66,6 +69,9 @@ export function App({ conArranque = false }: Props) {
                 <Route path="jugadores" element={<ListaJugadores />} />
                 <Route path="jugadores/:usuarioRolId/ficha" element={<FichaJugador />} />
                 <Route path="personas/:usuarioRolId" element={<FichaBasica />} />
+                <Route path="calendario" element={<Calendario />} />
+                <Route path="actividades/nueva" element={<FormularioActividad />} />
+                <Route path="entrenamientos/:entrenamientoId" element={<DetalleEntrenamiento />} />
               </Route>
             </Route>
 
