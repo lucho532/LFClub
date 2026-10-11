@@ -71,12 +71,15 @@ export function PlanillaAsistencia({ clubId, entrenamiento, planilla }: Props) {
                 const presente = cambios[jugador.usuarioRolId] ?? jugador.presente ?? null;
                 return (
                   <li key={jugador.usuarioRolId}>
-                    <NombrePersona
-                      nombre={`${jugador.nombres} ${jugador.apellidos}`}
-                      enlace={jugador.enlace ?? null}
-                      clubId={clubId}
-                      textoVolver="Entrenamiento"
-                    />
+                    <span className="columna">
+                      <NombrePersona
+                        nombre={`${jugador.nombres} ${jugador.apellidos}`}
+                        enlace={jugador.enlace ?? null}
+                        clubId={clubId}
+                        textoVolver="Entrenamiento"
+                      />
+                      {jugador.marcable && presente === null && <span className="texto-suave texto-pequeno">Sin registrar</span>}
+                    </span>
                     {jugador.marcable ? (
                       <span className="fila">
                         {([true, false] as const).map((valor) => (
@@ -96,7 +99,6 @@ export function PlanillaAsistencia({ clubId, entrenamiento, planilla }: Props) {
                         {presente === null ? 'Sin registrar' : presente ? 'Presente' : 'Ausente'}
                       </span>
                     )}
-                    {jugador.marcable && presente === null && <span className="texto-suave texto-pequeno">Sin registrar</span>}
                   </li>
                 );
               })}

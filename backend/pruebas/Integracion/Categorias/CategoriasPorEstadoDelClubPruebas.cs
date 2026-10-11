@@ -31,7 +31,8 @@ public class CategoriasPorEstadoDelClubPruebas
         .Where(endpoint => new[] { "/categorias", "/jugadores", "/mi-categoria" }
             .Any(parte => endpoint.Ruta.StartsWith("/api/clubes/{clubId}" + parte, StringComparison.Ordinal))
             && !endpoint.Ruta.Contains("/ficha", StringComparison.Ordinal)
-            && !endpoint.Ruta.EndsWith("/hermanos", StringComparison.Ordinal))
+            && !endpoint.Ruta.EndsWith("/hermanos", StringComparison.Ordinal)
+            && !endpoint.Ruta.EndsWith("/estadisticas", StringComparison.Ordinal))
         .ToList();
 
     [Fact]

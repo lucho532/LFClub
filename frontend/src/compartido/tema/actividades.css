@@ -93,7 +93,17 @@
 .dia-columna h3 {
   margin: 0;
   font-size: 14px;
-  text-transform: capitalize;
+}
+
+.dia-columna h3::first-letter {
+  text-transform: uppercase;
+}
+
+/* En una pantalla ancha, la semana entera en siete columnas. */
+@media (min-width: 1100px) {
+  .semana-dias {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
 }
 
 /* En el teléfono, la tira de días de `M-Calendario` y debajo solo el día elegido. */
@@ -194,6 +204,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 6px 12px;
+  min-width: 0;
+}
+
+.lista-asistencia li > .columna {
+  gap: 2px;
   min-width: 0;
 }
 
