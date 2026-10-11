@@ -29,9 +29,6 @@ tags:
   - name: Personas
   - name: Cuenta
 
-# Mientras se construye la 008, cada operación nueva lleva delante la marca `#008-T0NN` de la
-# tarea que la descomenta (tasks.md, T001). Al terminar no queda ninguna (T018).
-
 paths:
   # ------------------------------------------------------------------ Ficha básica
 
