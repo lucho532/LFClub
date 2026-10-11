@@ -130,6 +130,16 @@ public class SembradorPersonas
         contexto.UsuariosRol.IgnoreQueryFilters().Where(fila => fila.Id == integrante.Id)
             .ExecuteUpdateAsync(cambios => cambios.SetProperty(fila => fila.Rol, rol)));
 
+    /// <summary>Deja al integrante como aprobado desde la sala de espera por quien se indique, con ese rol.</summary>
+    public Task MarcarAprobadoAsync(UsuarioRol integrante, UsuarioRol porQuien, Rol rolDeIngreso) =>
+        _fabrica.ConContextoAsync(contexto => contexto.UsuariosRol.IgnoreQueryFilters()
+            .Where(fila => fila.Id == integrante.Id)
+            .ExecuteUpdateAsync(cambios => cambios
+                .SetProperty(fila => fila.AprobadoEn, DateTime.UtcNow)
+                .SetProperty(fila => fila.AprobadoPorUsuarioId, porQuien.UsuarioId)
+                .SetProperty(fila => fila.AprobadoPorNombre, $"{porQuien.Nombres} {porQuien.Apellidos}")
+                .SetProperty(fila => fila.RolDeIngreso, rolDeIngreso)));
+
     public Task DesactivarEquipoAsync(Equipo equipo) => _fabrica.ConContextoAsync(contexto =>
         contexto.Equipos.IgnoreQueryFilters().Where(fila => fila.Id == equipo.Id)
             .ExecuteUpdateAsync(cambios => cambios.SetProperty(fila => fila.Activo, false)));

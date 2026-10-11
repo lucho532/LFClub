@@ -7,8 +7,8 @@ namespace LaPecosa.Infraestructura.Repositorios;
 /// <summary>
 /// Representa la lectura de integrantes para resolver enlaces a fichas, con Entity Framework.
 /// Su responsabilidad es proyectar el identificador, la cuenta, el rol y el estado de ingreso de los
-/// integrantes pedidos en una sola consulta. Trabaja siempre con el filtro de aislamiento activo:
-/// sin club en el contexto no devuelve nada.
+/// integrantes de las cuentas pedidas en una sola consulta. Trabaja siempre con el filtro de
+/// aislamiento activo: sin club en el contexto no devuelve nada.
 /// No se salta el filtro de aislamiento, no lee nombres ni datos personales y no contiene reglas.
 /// </summary>
 public class RepositorioEnlaces : IRepositorioEnlaces
@@ -32,22 +32,6 @@ public class RepositorioEnlaces : IRepositorioEnlaces
 
         return await _contexto.UsuariosRol
             .Where(integrante => usuarioIds.Contains(integrante.UsuarioId))
-            .Select(integrante => new IntegranteDeEnlace(
-                integrante.Id, integrante.UsuarioId, integrante.Rol, integrante.EstadoIngreso))
-            .ToListAsync(cancelacion);
-    }
-
-    /// <inheritdoc />
-    public async Task<IReadOnlyList<IntegranteDeEnlace>> IntegrantesAsync(
-        IReadOnlyCollection<Guid> usuarioRolIds, CancellationToken cancelacion = default)
-    {
-        if (usuarioRolIds.Count == 0)
-        {
-            return [];
-        }
-
-        return await _contexto.UsuariosRol
-            .Where(integrante => usuarioRolIds.Contains(integrante.Id))
             .Select(integrante => new IntegranteDeEnlace(
                 integrante.Id, integrante.UsuarioId, integrante.Rol, integrante.EstadoIngreso))
             .ToListAsync(cancelacion);

@@ -78,16 +78,19 @@ public static class MapperCategorias
         new(integrante.Id, integrante.Nombres, integrante.Apellidos, integrante.Rol);
 
     /// <summary>
-    /// Jugador retirado. Quién lo retiró sale de lo copiado al retirar, nunca del nombre actual (§13).
+    /// Jugador retirado. Quién lo retiró sale de lo copiado al retirar, nunca del nombre actual (§13);
+    /// <paramref name="retiradoPorFicha"/> es el enlace ya resuelto a su ficha básica de hoy, o nulo.
     /// </summary>
-    public static JugadorRetiradoDto ARetirado(UsuarioRol jugador, int documentosPendientes) => new(
+    public static JugadorRetiradoDto ARetirado(
+        UsuarioRol jugador, int documentosPendientes, EnlaceFichaDto? retiradoPorFicha) => new(
         jugador.Id,
         jugador.Nombres,
         jugador.Apellidos,
         jugador.FechaNacimiento.Year,
         jugador.RetiradoPorNombre ?? string.Empty,
         jugador.RetiradoEn ?? throw new InvalidOperationException("Un jugador retirado debe tener la fecha de su retiro."),
-        documentosPendientes);
+        documentosPendientes,
+        retiradoPorFicha);
 
     /// <summary>
     /// Lo que ve la familia: la categoría de su jugador, los nombres de sus equipos y, de cada

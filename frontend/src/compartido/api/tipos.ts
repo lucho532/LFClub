@@ -1,7 +1,8 @@
 // Tipos de los esquemas de specs/001-base-multiclub/contracts/api.yaml y de
 // specs/002-ingreso-club/contracts/api.yaml, con los cambios de
 // specs/004-invitacion-con-rol/contracts/api.yaml y con los mismos nombres. Los de
-// specs/003-categorias-club/contracts/api.yaml están en tiposCategorias.ts.
+// specs/003-categorias-club/contracts/api.yaml están en tiposCategorias.ts, y los de la sala de
+// espera y los ingresos aprobados, en tiposIngresos.ts.
 
 import type { ClubDeSesionDto } from './tiposSesion';
 
@@ -207,33 +208,7 @@ export interface InvitacionClubDto {
   venceEn: string;
 }
 
-export interface IngresoEnEsperaDto {
-  usuarioRolId: string;
-  nombres: string;
-  apellidos: string;
-  tipoDocumento: TipoDocumento;
-  numeroDocumento: string;
-  fechaNacimiento: string;
-  correo: string;
-  celular: string;
-  nombreResponsable: string | null;
-  registradoEn: string;
-  /** Jugador desde cuya ficha se agregó; `null` si ya no existe o no viene de un hermano. */
-  hermanoDe: string | null;
-  /** Si aprobarlo retirará a un jugador de otra cuenta en otro club; no dice cuál. */
-  retiraDeOtroClub: boolean;
-}
-
 /** Cuerpo opcional de la aprobación: al aprobar no se elige rol y la API solo admite JUGADOR. */
 export interface AprobarIngresoDto {
   rol?: 'JUGADOR' | null;
-}
-
-export interface IngresoAprobadoDto {
-  usuarioRolId: string;
-  nombres: string;
-  apellidos: string;
-  rolDeIngreso: RolDeIngreso;
-  aprobadoPor: string;
-  aprobadoEn: string;
 }

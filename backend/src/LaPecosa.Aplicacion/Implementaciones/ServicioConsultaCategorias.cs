@@ -14,7 +14,8 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// <see cref="ReglaAlcanceDeCategorias"/> permite a quien pregunta: para un ENTRENADOR, las activas
 /// en las que tiene una asignación activa, que se consulta en cada petición. A las listas de
 /// jugadores les añade el estado de su documentación, que solo reciben el PRESIDENTE y los
-/// DIRECTIVOS (RF-032 de la 005).
+/// DIRECTIVOS (RF-032 de la 005), y a la de retirados, el enlace a la ficha básica de quien retiró
+/// a cada uno si sigue en el club (spec 008).
 /// No modifica datos, no accede al contexto de Entity Framework y no recibe un identificador de
 /// club: solo existe el que fijó la autorización.
 /// </summary>
@@ -24,18 +25,21 @@ public class ServicioConsultaCategorias : IServicioConsultaCategorias
     private readonly IRepositorioAsignaciones _asignaciones;
     private readonly IRepositorioJugadores _jugadores;
     private readonly LectorDeCategorias _lector;
+    private readonly ResolutorDeEnlaces _enlaces;
 
     /// <summary>Crea el servicio con sus dependencias.</summary>
     public ServicioConsultaCategorias(
         IRepositorioCategorias categorias,
         IRepositorioAsignaciones asignaciones,
         IRepositorioJugadores jugadores,
-        LectorDeCategorias lector)
+        LectorDeCategorias lector,
+        ResolutorDeEnlaces enlaces)
     {
         _categorias = categorias;
         _asignaciones = asignaciones;
         _jugadores = jugadores;
         _lector = lector;
+        _enlaces = enlaces;
     }
 
     /// <inheritdoc />
@@ -99,10 +103,13 @@ public class ServicioConsultaCategorias : IServicioConsultaCategorias
     {
         var jugadores = await _jugadores.ListarRetiradosAsync(cancelacion);
         var entregados = await _lector.EntregadosAsync(jugadores.Select(jugador => jugador.Id), cancelacion);
+        var autores = await _enlaces.AutoresAsync(jugadores.Select(jugador => jugador.RetiradoPorUsuarioId), cancelacion);
 
         return jugadores
             .Select(jugador => MapperCategorias.ARetirado(
-                jugador, MapperCategorias.DocumentosPendientes(entregados, jugador.Id)))
+                jugador,
+                MapperCategorias.DocumentosPendientes(entregados, jugador.Id),
+                jugador.RetiradoPorUsuarioId is { } autorId ? autores.GetValueOrDefault(autorId) : null))
             .ToList();
     }
 }

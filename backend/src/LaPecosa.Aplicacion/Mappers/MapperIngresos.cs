@@ -1,5 +1,7 @@
 using LaPecosa.Aplicacion.DTOs;
+using LaPecosa.Aplicacion.Utilidades;
 using LaPecosa.Dominio.Entidades;
+using LaPecosa.Dominio.Reglas;
 
 namespace LaPecosa.Aplicacion.Mappers;
 
@@ -27,7 +29,8 @@ public static class MapperIngresos
     /// agregó desde la ficha de un hermano que sigue en el club, con ese jugador de origen. El
     /// nombre del hermano se lee en el momento: no se copia en ninguna columna, porque solo se
     /// muestra mientras el ingreso está en espera y no es histórico (§13).
-    /// <paramref name="retiraDeOtroClub"/> llega ya calculado por el servicio.
+    /// <paramref name="retiraDeOtroClub"/> llega ya calculado por el servicio. El hermano lleva a su
+    /// ficha si hoy es un JUGADOR aprobado (spec 008).
     /// </summary>
     public static IngresoEnEsperaDto AIngresoEnEspera(UsuarioRol integrante, bool retiraDeOtroClub)
     {
@@ -46,14 +49,16 @@ public static class MapperIngresos
             cuenta.NombreResponsable,
             integrante.CreadoEn,
             integrante.AgregadoDesde is { } origen ? $"{origen.Nombres} {origen.Apellidos}" : null,
-            retiraDeOtroClub);
+            retiraDeOtroClub,
+            ResolutorDeEnlaces.DeIntegrante(integrante.AgregadoDesde, ReglaEnlaceDeFicha.ParaHermano));
     }
 
     /// <summary>
     /// Ingreso aprobado. Quién aprobó y con qué rol salen de lo copiado al aprobar, nunca del
-    /// nombre ni del rol actuales (§13).
+    /// nombre ni del rol actuales (§13). La persona lleva a su ficha según su rol de hoy, y
+    /// <paramref name="aprobadoPorFicha"/> es el enlace ya resuelto a la ficha básica de quien aprobó.
     /// </summary>
-    public static IngresoAprobadoDto AIngresoAprobado(UsuarioRol integrante) => new(
+    public static IngresoAprobadoDto AIngresoAprobado(UsuarioRol integrante, EnlaceFichaDto? aprobadoPorFicha) => new(
         integrante.Id,
         integrante.Nombres,
         integrante.Apellidos,
@@ -61,5 +66,7 @@ public static class MapperIngresos
             ?? throw new InvalidOperationException("Un ingreso aprobado debe tener su rol de ingreso."),
         integrante.AprobadoPorNombre ?? string.Empty,
         integrante.AprobadoEn
-            ?? throw new InvalidOperationException("Un ingreso aprobado debe tener su fecha de aprobación."));
+            ?? throw new InvalidOperationException("Un ingreso aprobado debe tener su fecha de aprobación."),
+        ResolutorDeEnlaces.DeIntegrante(integrante, ReglaEnlaceDeFicha.ParaPersonaAprobada),
+        aprobadoPorFicha);
 }

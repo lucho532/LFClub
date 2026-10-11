@@ -12,7 +12,7 @@ namespace LaPecosa.Pruebas.Integracion.Personas;
 /// (spec 008, historia 2; RF-010 a RF-012; CE-005; constitución §13).
 /// </summary>
 [Collection(ColeccionApi.Nombre)]
-public partial class EnlacesDeFichaPruebas
+public class EnlacesDeFichaPruebas
 {
     private readonly FabricaApi _fabrica;
 
@@ -38,7 +38,7 @@ public partial class EnlacesDeFichaPruebas
             var cambio = (await LeerAsync(cliente, FichaDe(c, c.Ana.Integrante))).GetProperty("ultimoCambio");
 
             Assert.Equal($"{c.P.Integrante.Nombres} {c.P.Integrante.Apellidos}", cambio.GetProperty("autor").GetString());
-            AssertEnlace(cambio.GetProperty("autorFicha"), c.P.Integrante.Id, "BASICA");
+            ComprobarEnlace(cambio.GetProperty("autorFicha"), c.P.Integrante.Id, "BASICA");
         }
     }
 
@@ -77,7 +77,7 @@ public partial class EnlacesDeFichaPruebas
         var cambio = (await LeerAsync(await ClienteAsync(c.D.Usuario), FichaDe(c, c.Ana.Integrante))).GetProperty("ultimoCambio");
 
         Assert.Equal($"{c.P.Integrante.Nombres} {c.P.Integrante.Apellidos}", cambio.GetProperty("autor").GetString());
-        AssertEnlace(cambio.GetProperty("autorFicha"), c.P.Integrante.Id, "BASICA");
+        ComprobarEnlace(cambio.GetProperty("autorFicha"), c.P.Integrante.Id, "BASICA");
     }
 
     [Fact]
@@ -89,14 +89,45 @@ public partial class EnlacesDeFichaPruebas
         await NoEncontradoAsync(await familia.GetAsync(FichaDe(c, c.Caro.Integrante)));
     }
 
-    private static string FichaDe(ClubDePersonas c, UsuarioRol jugador) => c.Ruta($"/jugadores/{jugador.Id}/ficha");
-
-    private static void AssertEnlace(JsonElement enlace, Guid usuarioRolId, string tipo)
+    [Fact]
+    public async Task Eva_retirada_por_P_lleva_a_su_ficha_basica()
     {
-        Assert.Equal(JsonValueKind.Object, enlace.ValueKind);
-        Assert.Equal(usuarioRolId, enlace.GetProperty("usuarioRolId").GetGuid());
-        Assert.Equal(tipo, enlace.GetProperty("tipo").GetString());
+        var c = await _fabrica.Personas.CrearAsync();
+
+        var eva = await RetiradaAsync(c, c.Eva.Integrante);
+
+        Assert.Equal($"{c.P.Integrante.Nombres} {c.P.Integrante.Apellidos}", eva.GetProperty("retiradoPor").GetString());
+        ComprobarEnlace(eva.GetProperty("retiradoPorFicha"), c.P.Integrante.Id, "BASICA");
     }
+
+    [Fact]
+    public async Task Un_retiro_hecho_por_la_familia_no_lleva_enlace()
+    {
+        var c = await _fabrica.Personas.CrearAsync();
+        await _fabrica.Categorias.RetirarAsync(c.Caro.Integrante, c.Caro.Integrante);
+
+        var caro = await RetiradaAsync(c, c.Caro.Integrante);
+
+        Assert.Equal(JsonValueKind.Null, caro.GetProperty("retiradoPorFicha").ValueKind);
+    }
+
+    [Fact]
+    public async Task Tras_quitar_a_P_del_club_el_retiro_queda_sin_enlace_y_con_el_nombre_copiado()
+    {
+        var c = await _fabrica.Personas.CrearAsync();
+        await _fabrica.Personas.QuitarDelClubAsync(c.P.Integrante);
+
+        var eva = await RetiradaAsync(c, c.Eva.Integrante);
+
+        Assert.Equal($"{c.P.Integrante.Nombres} {c.P.Integrante.Apellidos}", eva.GetProperty("retiradoPor").GetString());
+        Assert.Equal(JsonValueKind.Null, eva.GetProperty("retiradoPorFicha").ValueKind);
+    }
+
+    private async Task<JsonElement> RetiradaAsync(ClubDePersonas c, UsuarioRol jugador) =>
+        (await LeerAsync(await ClienteAsync(c.D.Usuario), c.Ruta("/jugadores/retirados"))).EnumerateArray()
+            .Single(fila => fila.GetProperty("usuarioRolId").GetGuid() == jugador.Id);
+
+    private static string FichaDe(ClubDePersonas c, UsuarioRol jugador) => c.Ruta($"/jugadores/{jugador.Id}/ficha");
 
     private Task<ClienteDePrueba> ClienteAsync(Usuario cuenta, UsuarioRol? elegido = null) =>
         _fabrica.CrearClienteDePrueba().ElegirJugador(elegido?.Id).ConSesionDeAsync(cuenta);

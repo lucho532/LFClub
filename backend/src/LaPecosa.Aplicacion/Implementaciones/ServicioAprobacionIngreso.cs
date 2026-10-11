@@ -106,7 +106,9 @@ public class ServicioAprobacionIngreso : IServicioAprobacionIngreso
                 await _retiroEntreClubes.RetirarDeOtrasCuentasAsync(
                     integrante.NumeroDocumento, integrante.UsuarioId, ahora, cancelacion);
 
-                return MapperIngresos.AIngresoAprobado(integrante);
+                // Quien aprueba es el PRESIDENTE de esta petición: su ficha básica, sin consultar nada.
+                return MapperIngresos.AIngresoAprobado(
+                    integrante, ResolutorDeEnlaces.DeIntegrante(quienAprueba, ReglaEnlaceDeFicha.ParaAutor));
             },
             cancelacion);
     }

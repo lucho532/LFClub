@@ -25,4 +25,12 @@ public static class LecturaDePersonas
         Assert.Equal(HttpStatusCode.NotFound, respuesta.StatusCode);
         Assert.Equal("no_encontrado", await ClienteDePrueba.CodigoAsync(respuesta));
     }
+
+    /// <summary>Comprueba que el enlace existe y lleva a esa ficha de ese tipo.</summary>
+    public static void ComprobarEnlace(JsonElement enlace, Guid usuarioRolId, string tipo)
+    {
+        Assert.Equal(JsonValueKind.Object, enlace.ValueKind);
+        Assert.Equal(usuarioRolId, enlace.GetProperty("usuarioRolId").GetGuid());
+        Assert.Equal(tipo, enlace.GetProperty("tipo").GetString());
+    }
 }
