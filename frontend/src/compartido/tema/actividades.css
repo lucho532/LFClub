@@ -248,3 +248,27 @@
   gap: 8px;
   overflow-wrap: anywhere;
 }
+
+/* La semana: el título y, en una sola fila, los dos botones para moverse (en el teléfono, a medias). */
+.navegacion-semana {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.navegacion-semana-botones {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 720px) {
+  .navegacion-semana-botones {
+    width: 100%;
+  }
+
+  .navegacion-semana-botones .boton {
+    flex: 1 1 0;
+  }
+}

@@ -101,14 +101,16 @@ export function Calendario() {
           </Link>
         )}
       </div>
-      <div className="cabecera">
-        <Boton variante="secundario" onClick={() => irA(-1)}>
-          ← Semana anterior
-        </Boton>
+      <div className="navegacion-semana">
         <strong>Semana del {diaDeLaSemana(dias[0])}</strong>
-        <Boton variante="secundario" onClick={() => irA(1)}>
-          Semana siguiente →
-        </Boton>
+        <div className="navegacion-semana-botones">
+          <Boton variante="secundario" aria-label="Semana anterior" onClick={() => irA(-1)}>
+            ← Anterior
+          </Boton>
+          <Boton variante="secundario" aria-label="Semana siguiente" onClick={() => irA(1)}>
+            Siguiente →
+          </Boton>
+        </div>
       </div>
       {carga.error && <Aviso tono="error">{carga.error}</Aviso>}
       {carga.cargando && !carga.datos && <p className="texto-suave">Cargando…</p>}
