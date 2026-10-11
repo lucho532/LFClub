@@ -12,7 +12,7 @@ entrenamientos y partidos.
 
 **Plataforma**: La Pecosa
 
-**Constitución aplicable**: versión 4.5.1, en especial §1, §7.1, §7.5, §8, §11.1, §11.2, §11.3,
+**Constitución aplicable**: versión 4.6.0, en especial §1, §7.1, §7.5, §8, §11.1, §11.2, §11.3,
 §13, §14, §14.1, §15, §17, §17.2, §20 y §24.
 
 **Depende de**: spec 001 (base multiclub), spec 003 (categorías, equipos, asignación de
@@ -37,6 +37,29 @@ mostraba un espacio reservado. A partir de esta funcionalidad muestra los entren
   entrenamiento o un partido cancelado mientras no haya empezado. Vuelve a programado o a próximo
   con sus categorías, su convocatoria y las respuestas de las familias tal como estaban.
 
+### Ajustes del propietario 2026-10-11 (después de implementar)
+
+- P: ¿Qué pasa cuando no se sabe todavía contra quién se juega? → R: El rival es opcional. Si no se
+  escribe, el partido se muestra "Contra Por definir" y el rival se pone después al editarlo.
+- P: ¿Cómo evita el entrenador escribir el mismo entreno día tras día? → R: Al programar un
+  entrenamiento puede elegir varios días. Se crea un entrenamiento independiente por cada día, que
+  después se edita, cancela o reactiva por separado. No hay series enlazadas.
+- P: ¿Cómo sabe la familia en el teléfono qué días de la semana tienen actividad? → R: En la tira de
+  días, los días con actividad se pintan de otro color, además del número de actividades escrito.
+- P: ¿Cómo se corrige un aviso del calendario si cambia la hora, la fecha u otro dato? → R: Ya se
+  podía desde el detalle. El botón pasa a llamarse "Editar" y también aparece en la tarjeta del
+  calendario para quien gestiona la actividad. Los permisos no cambian (RF-002, RF-008).
+- P: ¿Se puede ver más de un día en el calendario del teléfono? → R: Sí. Se ven dos días, uno al
+  lado del otro: el elegido y el siguiente (lunes y martes, luego martes y miércoles…). El domingo
+  se ve con el sábado.
+- P: ¿Cómo responde la familia con menos espacio? → R: Arriba un texto corto, "Confirma
+  asistencia", y en una línea una casilla verde con un chulo ("Asistirá") y una roja con una X ("No
+  asistirá"). La opción elegida se rellena de su color y se escribe al lado.
+- P: ¿Cómo se cargan las fotos sin tanto texto ni cuadros? → R: Con un lápiz pequeño dentro del
+  círculo de la foto del jugador, de la foto de perfil y del escudo del club. Sin foto abre el
+  selector de archivos; con foto ofrece cambiarla o quitarla. Es un cambio visual de las
+  pantallas de las specs 005, 007 y 008; las reglas de quién carga y quita no cambian (§14.2).
+
 ## Impacto en la constitución
 
 La §8 (rol Entrenador) dice que lo que puede hacer como entrenador un DIRECTIVO asignado "se
@@ -45,6 +68,8 @@ decisión: en sus categorías asignadas actúa como entrenador. Conviene enmenda
 registrarlo y precisar en la §17.2 que "los entrenadores de las categorías involucradas" incluye a
 los PRESIDENTES y DIRECTIVOS asignados a ellas. Es un cambio de alcance de un rol: debe quedar
 enmendado antes de implementar.
+
+**Aplicado**: la enmienda 4.5.1 → 4.6.0 (2026-10-11) incorpora esta decisión en la §8 y la §17.2.
 
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
@@ -92,6 +117,9 @@ categorías, el PRESIDENTE y los DIRECTIVOS, y que no lo ve la familia de un jug
 10. **Dado** un entrenamiento cancelado que todavía no empieza, **cuando** quien lo gestiona lo
     reactiva, **entonces** vuelve a estar programado y las familias lo ven como antes de cancelarse.
     Si ya empezó, el sistema lo rechaza.
+11. **Dado** quien entrena la 2014, **cuando** programa un entrenamiento eligiendo tres días,
+    **entonces** quedan tres entrenamientos independientes con los mismos datos; cancelar o editar
+    uno no cambia los otros.
 
 ---
 
@@ -140,6 +168,9 @@ inicio, en los contadores y al pedir el partido por su identificador.
 11. **Dado** un partido cancelado que todavía no empieza, **cuando** quien lo gestiona lo reactiva,
     **entonces** vuelve a estar próximo con la misma convocatoria y las mismas respuestas, y sigue
     sin existir para los no convocados.
+12. **Dado** un partido creado sin rival, **cuando** lo ve cualquiera que puede verlo, **entonces**
+    aparece "Contra Por definir"; **cuando** quien lo gestiona lo edita y escribe el rival,
+    **entonces** todos ven el rival nuevo.
 
 ---
 
@@ -159,9 +190,9 @@ corrige a 3-2 cambiando un goleador y se comprueba que las estadísticas cambian
 
 **Escenarios de aceptación**:
 
-1. **Dado** un partido cuya fecha ya llegó, **cuando** quien lo gestiona registra el marcador,
+1. **Dado** un partido cuya hora de inicio ya llegó, **cuando** quien lo gestiona registra el marcador,
    quiénes jugaron y los goles de cada jugador, **entonces** el partido queda como jugado.
-2. **Dado** un partido cuya fecha todavía no llega, **cuando** se intenta registrar su resultado,
+2. **Dado** un partido cuya hora de inicio todavía no llega, **cuando** se intenta registrar su resultado,
    **entonces** el sistema lo rechaza.
 3. **Dado** el registro de un resultado, **cuando** se marca a quién jugó, **entonces** la lista
    ofrece solo a los convocados, todos marcados de entrada.
@@ -228,8 +259,9 @@ se comprueba lo que ve quien entrena y que ninguna familia ve las respuestas de 
 1. **Dado** un entrenamiento próximo de su categoría o un partido próximo al que fue convocado,
    **cuando** la familia responde "asistirá" o "no asistirá", **entonces** queda guardado y puede
    cambiarlo hasta la hora de inicio.
-2. **Dado** quien gestiona la actividad, **cuando** la consulta, **entonces** ve cuántos y quiénes
-   respondieron cada opción y quiénes no han respondido.
+2. **Dado** quien entrena alguna de las categorías de la actividad, o el PRESIDENTE, **cuando** la
+   consulta, **entonces** ve cuántos y quiénes de los jugadores de su planilla respondieron cada
+   opción y quiénes no han respondido.
 3. **Dado** una actividad que ya empezó o fue cancelada, **cuando** la familia intenta responder,
    **entonces** el sistema lo rechaza.
 4. **Dado** una familia, **cuando** consulta la actividad, **entonces** no ve las respuestas de
@@ -280,6 +312,9 @@ un partido.
   se conservan.
 - Un jugador nuevo en una categoría ve los entrenamientos próximos de esa categoría desde que
   entra, pero no los partidos ya convocados, salvo que lo agreguen a la convocatoria.
+- Un jugador que cambia de categoría sigue viendo los entrenamientos pasados de su categoría
+  anterior en los que tiene asistencia registrada. Los próximos de esa categoría dejan de
+  aparecerle.
 - Un ENTRENADOR que pierde la asignación a una categoría deja de ver los partidos próximos de esa
   categoría y de poder gestionar sus entrenamientos. Lo que ya registró se conserva.
 - Una categoría desactivada no puede recibir actividades nuevas; sus actividades pasadas se
@@ -301,11 +336,14 @@ un partido.
 **Entrenamientos**
 
 - **RF-001**: El sistema DEBE permitir programar un entrenamiento con fecha, hora de inicio, hora
-  de fin, lugar, nota opcional y una o varias categorías activas del club como destino.
+  de fin, lugar, nota opcional y una o varias categorías activas del club como destino. Al
+  programarlo DEBE poder elegirse uno o varios días: cada día queda como un entrenamiento
+  independiente.
 - **RF-002**: Solo DEBEN poder programar, modificar y cancelar un entrenamiento los PRESIDENTES y
   quienes entrenan todas las categorías a las que va dirigido.
 - **RF-003**: Un entrenamiento DEBE ser visible para todos los jugadores activos de sus
-  categorías, para quienes entrenan alguna de ellas y para los PRESIDENTES y DIRECTIVOS del club.
+  categorías, para quienes entrenan alguna de ellas y para los PRESIDENTES y DIRECTIVOS del club,
+  y para el jugador que tiene asistencia registrada en él, aunque ya no esté en esas categorías.
 - **RF-004**: Un entrenamiento cancelado DEBE seguir visible para quienes lo veían, identificado
   como cancelado con texto, y NO DEBE admitir asistencia ni respuestas de la familia.
 - **RF-005**: El sistema DEBE rechazar un entrenamiento sin categorías, con hora de fin anterior a
@@ -316,7 +354,8 @@ un partido.
 
 **Partidos y convocatorias**
 
-- **RF-007**: El sistema DEBE permitir crear un partido con rival, fecha, hora, lugar, condición de
+- **RF-007**: El sistema DEBE permitir crear un partido con rival opcional (si falta, se muestra
+  "Por definir"), fecha, hora, lugar, condición de
   local o visitante, tipo (amistoso o de torneo), nombre del torneo cuando es de torneo, y una o
   varias categorías activas del club.
 - **RF-008**: Solo DEBEN poder crear, modificar, cancelar y convocar a un partido los PRESIDENTES y
@@ -359,8 +398,9 @@ un partido.
 - **RF-023**: La cuenta de un jugador DEBE poder responder "asistirá" o "no asistirá" a cada
   entrenamiento próximo de su categoría y a cada partido próximo al que está convocado, y cambiar
   su respuesta hasta la hora de inicio.
-- **RF-024**: Quien gestiona una actividad DEBE ver las respuestas de las familias y quiénes no han
-  respondido. Ninguna cuenta de jugador DEBE ver las respuestas ni la asistencia de otros
+- **RF-024**: Quien entrena alguna de las categorías de una actividad, y el PRESIDENTE, DEBEN ver
+  las respuestas de las familias y quiénes no han respondido, entre los jugadores de su planilla.
+  Ninguna cuenta de jugador DEBE ver las respuestas ni la asistencia de otros
   jugadores.
 - **RF-025**: La respuesta de la familia y la asistencia registrada por quien entrena DEBEN ser
   datos distintos; la una no reemplaza a la otra.
@@ -387,7 +427,8 @@ un partido.
 - **RF-032**: El backend DEBE aplicar todas las reglas de visibilidad y permisos de esta
   especificación; ocultar datos en la interfaz NO DEBE ser la única barrera (§15 y §17.2).
 - **RF-033**: Al retirarse un jugador, el sistema DEBE quitarlo de las convocatorias de los
-  partidos que no se han jugado. Sus registros de partidos jugados y asistencias pasadas DEBEN
+  partidos que no se han jugado y borrar sus respuestas a los entrenamientos que no han empezado.
+  Reactivar después un partido cancelado no lo vuelve a convocar. Sus registros de partidos jugados y asistencias pasadas DEBEN
   conservarse.
 - **RF-034**: Un cambio de categoría NO DEBE modificar convocatorias ya hechas ni registros
   pasados.
@@ -403,12 +444,20 @@ un partido.
   asistirá, no asistirá, presente, ausente) DEBEN distinguirse por texto además de por color.
 - **RF-037**: Los nombres de personas en estas pantallas DEBEN seguir la regla de la spec 008:
   llevan a su ficha cuando quien mira puede abrirla y, si no, se muestran como texto.
+- **RF-039**: En el teléfono, la tira de días del calendario DEBE distinguir con otro color los
+  días que tienen alguna actividad visible, además de escribir cuántas tienen, y debajo DEBEN
+  verse dos días: el elegido y el siguiente (el domingo, con el sábado).
+- **RF-041**: La respuesta de la familia DEBE darse con una casilla verde con un chulo
+  ("Asistirá") y una roja con una X ("No asistirá") bajo el texto "Confirma asistencia"; la
+  elegida DEBE escribirse además con texto (RF-036).
+- **RF-040**: Quien gestiona una actividad que no está cancelada ni jugada DEBE tener la opción
+  "Editar" en su detalle y en su tarjeta del calendario. Es comodidad: la API sigue decidiendo.
 
 ### Entidades clave
 
 - **Entrenamiento**: actividad de práctica de un club, con fecha, horas de inicio y fin, lugar,
   nota, estado (programado o cancelado) y una o varias categorías destino.
-- **Partido**: encuentro del club contra un rival, con fecha, hora, lugar, condición de local o
+- **Partido**: encuentro del club contra un rival (opcional mientras está por definir), con fecha, hora, lugar, condición de local o
   visitante, tipo (amistoso o de torneo), nombre del torneo, estado (próximo, cancelado o jugado),
   una o varias categorías, marcador y quién registró el último cambio del resultado y cuándo.
 - **Convocatoria** (jugador convocado a un partido): relación entre un partido y un jugador, con
@@ -448,9 +497,10 @@ un partido.
   entidades (§14) queda para otra funcionalidad.
 - Los entrenamientos y los partidos se dirigen a categorías completas, no a equipos (§11.1 habla
   de categorías). La convocatoria a un partido ya permite elegir a los jugadores de un equipo.
-- Cada entrenamiento se programa de uno en uno; no hay repetición automática semanal.
+- Al programar se pueden elegir varios días, y cada uno queda como un entrenamiento independiente.
+  No hay repetición automática ni series enlazadas.
 - Las fechas y horas son las de Colombia, como el resto de la plataforma.
-- Un partido pasa a "jugado" solo cuando se registra su resultado; si su fecha pasó sin resultado,
+- Un partido pasa a "jugado" solo cuando se registra su resultado; si su hora de inicio pasó sin resultado,
   sigue como próximo para quienes lo veían, con una indicación de que falta el resultado.
 - No se envían correos ni notificaciones por entrenamientos, convocatorias o cambios: cada quien
   los ve al entrar. Los "mensajes de convocatoria" de §1 quedan para la funcionalidad de
@@ -468,8 +518,12 @@ un partido.
 - Comunicados a las familias, mensajes de convocatoria y avisos por correo.
 - Sitio público con resultados y goleadores (§9).
 - Gestión de sedes o canchas.
-- Repetición automática de entrenamientos.
+- Repetición automática de entrenamientos y series enlazadas (editar varios a la vez).
 - Otros eventos del partido distintos de los goles (tarjetas, asistencias de gol, cambios,
   minutos).
 - Exportar o sincronizar el calendario con otras aplicaciones.
 - Actividades dirigidas a un equipo concreto en lugar de a categorías.
+- Qué pasa con las convocatorias, asistencias y respuestas de una cuenta que pasa de JUGADOR a
+  ENTRENADOR o DIRECTIVO (§12.2). Lo decide la funcionalidad del cambio de rol. Con el modelo
+  actual, la base de datos impide borrar la ficha de un jugador que ya tiene partidos o
+  asistencias registrados.

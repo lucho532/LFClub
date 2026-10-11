@@ -26,8 +26,8 @@ plan: historias 1, 2 y 3 (P1), 4 y 5 (P2), 6 (P3), y después el retiro (RF-033)
 
 Son las de los `tasks.md` de la 001 a la 008, que siguen vigentes. Resumen y lo que se añade:
 
-- **Esquema** (data-model.md): siete tablas y **una sola migración**, `EntrenamientosYPartidos`
-  (T004). Si una tarea posterior parece necesitar otra tabla, columna o índice, se detiene y se
+- **Esquema** (data-model.md): siete tablas y la migración `EntrenamientosYPartidos` (T004). La
+  única otra es `RivalOpcional` (T035), por un ajuste del propietario después de implementar. Si una tarea posterior parece necesitar otra tabla, columna o índice, se detiene y se
   informa (§25).
 - **Contrato**: `specs/009-entrenamientos-y-partidos/contracts/api.yaml` manda en rutas, cuerpos,
   códigos de estado y códigos de error. `AccesoClubPruebas` lee los contratos de todas las specs:
@@ -92,11 +92,11 @@ el modelo.
 
 | # | Supuesto (research §16) | Dónde | Estado |
 | --- | --- | --- | --- |
-| 1 | Las categorías de una actividad no cambian después de crearla: `409 categorias_no_cambian` | T016, T021 | Decidido en el plan |
-| 2 | Los datos de un partido jugado no cambian; solo su resultado | T021 (`ReglaTransicionPartido`, T008) | Decidido en el plan |
+| 1 | Las categorías de una actividad no cambian después de crearla: `409 categorias_no_cambian` | T016, T021 | Confirmado por el propietario |
+| 2 | Los datos de un partido jugado no cambian; solo su resultado | T021 (`ReglaTransicionPartido`, T008) | Confirmado por el propietario |
 | 3 | Cancelar se puede deshacer mientras no haya empezado (RF-038) | T016, T021 | Confirmado por el propietario |
-| 4 | Se puede programar una actividad con fecha pasada | T005, T015, T019 | Decidido en el plan |
-| 5 | La asistencia se registra desde el día del entrenamiento, no desde su hora | T008 (`ReglaMomentoDeActividad`), T024 | Decidido en el plan |
+| 4 | Se puede programar una actividad con fecha pasada | T005, T015, T019 | Confirmado por el propietario |
+| 5 | La asistencia se registra desde el día del entrenamiento, no desde su hora | T008 (`ReglaMomentoDeActividad`), T024 | Lo fija la spec (escenario 4.1, RF-022) |
 
 ---
 
@@ -231,6 +231,21 @@ el modelo.
 
 ---
 
+## Fase 11: Ajustes del propietario (2026-10-11, después de implementar)
+
+**Propósito**: cambios pedidos por el propietario al revisar las pantallas (spec, "Ajustes del
+propietario 2026-10-11", RF-001, RF-007, RF-039, RF-040 y RF-041).
+
+- [X] T034 [US1] Tira de días con actividad (RF-039, solo pantalla). En `frontend/src/privado/calendario/TiraDeSemana.tsx`, clase `con-actividad` en los días con alguna actividad; en `frontend/src/compartido/tema/calendario.css`, tinte del color del club con `color-mix` y borde, sin quitar el número escrito; el día elegido conserva su estilo
+- [X] T035 [US2] Rival opcional (RF-007, escenario 2.12). Backend: `Partido.Rival` nulable, sin `IsRequired` en `ConfiguracionPartido`, migración `RivalOpcional`; `ValidadorPartido` con `Maximo` en lugar de `Obligatorio` (vacío o en blanco queda nulo); `rival` omitido de `PartidoResumenDto` y `PartidoDto` cuando es nulo; contrato sin `rival` en `required`. Pantalla: "Rival (opcional)" con el texto de ayuda "Por definir"; `nombreRival` en `frontend/src/privado/partidos/textos.ts`, usado en la tarjeta, el detalle y el marcador. Pruebas: `CrearPartidoPruebas.El_rival_se_puede_dejar_por_definir_y_escribir_despues` (sin rival → 201 y sin `rival` en el texto; en blanco queda sin rival; escribirlo después; 121 caracteres → 400) y `frontend/pruebas/textosPartidos.test.ts`
+- [X] T036 [US1] Varios días al programar un entrenamiento (RF-001, escenario 1.11, solo pantalla). `frontend/src/privado/actividades/SelectorFechas.tsx` ("+ Agregar otro día" propone el mismo día de la semana siguiente; "Quitar"); `FormularioEntrenamiento.tsx` crea un entrenamiento por día distinto con el `POST` existente, de uno en uno; si uno falla, avisa cuántos se programaron y deja en la lista solo los días que faltan; con varios, al terminar lleva al calendario. Al editar sigue habiendo una sola fecha
+- [X] T037 [US1] "Editar" más visible (RF-040, solo pantalla). "Cambiar" pasa a "Editar" en `AccionesDeEstado.tsx` y en los títulos de los dos detalles; `TarjetaActividad.tsx` muestra "Editar" (enlace al detalle con `?editar=1`) si `Calendario.tsx` calcula que quien mira es PRESIDENTE o entrena todas las categorías de la actividad, y la actividad está programada o próxima; los detalles abren el formulario con `?editar=1` solo si `permisos.gestiona` y el estado lo permite
+- [X] T038 [US1] Dos días en el teléfono (RF-039, solo pantalla). `TiraDeSemana.tsx` muestra debajo el día elegido y el siguiente (el domingo con el sábado), en dos columnas; en la tira, el día que acompaña al elegido lleva borde (`acompanado`)
+- [X] T039 [US5] Casillas de respuesta (RF-041, solo pantalla). `BotonesRespuesta.tsx`: "Confirma asistencia" arriba y, en una línea, casilla verde con chulo y roja con X (`aria-label` "Asistirá" y "No asistirá", `aria-pressed`), la elegida rellena y escrita al lado; estilos en `actividades.css` con los colores de éxito y error del tema
+- [X] T040 Lápiz en las fotos (solo pantalla, specs 005, 007 y 008). `frontend/src/compartido/componentes/LapizDeImagen.tsx` (sin imagen abre el selector; con imagen que se puede quitar, menú "Cambiar…"/"Quitar…"; formatos en la descripción del lápiz) e `IconoLapiz`, usados en `SeccionFoto.tsx` (foto del jugador), `SeccionFotoPerfil.tsx` (foto de perfil) y `EditorIdentidad.tsx` (escudo, sin quitar); sin campo de archivo visible ni textos de formato; estilos en `frontend/src/compartido/tema/imagenes.css`. Los documentos de la ficha no cambian
+
+---
+
 ## Dependencias y orden de ejecución
 
 ### Entre fases
@@ -320,8 +335,8 @@ Cada paso deja la batería en verde y no rompe lo anterior.
 
 ## Notas
 
-- La migración `EntrenamientosYPartidos` es la única de esta funcionalidad. La aplicación está en
-  construcción: no hay datos que migrar.
+- Las migraciones de esta funcionalidad son `EntrenamientosYPartidos` y `RivalOpcional` (T035). La
+  aplicación está en construcción: no hay datos que migrar.
 - Ninguna tarea modifica la constitución: la decisión sobre el DIRECTIVO asignado ya está en la
   4.6.0.
 - Si una prueba de la 001 a la 008 falla al tocar `DisposicionClub.tsx`, `FichaJugador.tsx`,

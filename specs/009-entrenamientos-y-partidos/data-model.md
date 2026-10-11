@@ -2,7 +2,8 @@
 
 **Funcionalidad**: `009-entrenamientos-y-partidos` | **Fecha**: 2026-10-11
 
-Siete tablas nuevas y una migración, `EntrenamientosYPartidos`. Todas las entidades implementan
+Siete tablas nuevas y dos migraciones: `EntrenamientosYPartidos` y `RivalOpcional` (ajuste del
+propietario del 2026-10-11). Todas las entidades implementan
 `IPerteneceAClub`: el filtro global de club de la 001 las limita al club de la petición (§7.1).
 Las decisiones están en [research.md](research.md); el contrato, en
 [contracts/api.yaml](contracts/api.yaml).
@@ -93,7 +94,7 @@ asistencia (RF-025).
 | --- | --- | --- |
 | `Id` | uuid | Clave |
 | `ClubId` | uuid | Obligatorio |
-| `Rival` | texto ≤ 120 | Obligatorio |
+| `Rival` | texto ≤ 120 | Opcional: nulo mientras está por definir (migración `RivalOpcional`) |
 | `Fecha` | date | Obligatoria |
 | `Hora` | time | Obligatoria |
 | `Lugar` | texto ≤ 120 | Obligatorio |

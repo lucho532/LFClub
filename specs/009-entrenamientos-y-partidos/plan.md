@@ -61,8 +61,8 @@ quiénes jugaron, ni respuestas o asistencias de otros (RF-012, RF-024).
 *Puerta: debe pasar antes de la fase 0 y se revisa de nuevo tras el diseño de la fase 1.*
 
 Evaluada contra la versión **4.6.0**, que ya incorpora la decisión de esta funcionalidad sobre el
-PRESIDENTE o DIRECTIVO asignado (§8 "Entrenador" y §17.2). La spec cita la 4.5.1 porque se escribió
-antes de la enmienda; el impacto que pedía ya está aplicado.
+PRESIDENTE o DIRECTIVO asignado (§8 "Entrenador" y §17.2). La spec se escribió con la 4.5.1 y ya
+cita la 4.6.0; el impacto que pedía está aplicado.
 
 | Principio | Cómo lo cumple el plan | Resultado |
 | --- | --- | --- |
@@ -83,7 +83,7 @@ antes de la enmienda; el impacto que pedía ya está aplicado.
 | §17.2 Convocatorias | Tabla de visibilidad de research §4, con la misma respuesta 404 para "no existe" y "no convocado"; ningún contador ni lista lo deja pasar | Cumple |
 | §18 Estados | Solo estado actual; transiciones en `ReglaTransicionPartido` | Cumple |
 | §20 Pruebas | Las de §20 que tocan esta funcionalidad: no convocado no ve el partido y sí los entrenamientos; DIRECTIVO asignado actúa como entrenador solo en lo suyo; cálculo de estadísticas; transiciones; aislamiento | Cumple |
-| §22 Migraciones | Una migración controlada | Cumple |
+| §22 Migraciones | Dos migraciones controladas: la de las siete tablas y `RivalOpcional`, del ajuste del propietario | Cumple |
 | §23 API | DTOs propios; partes privadas omitidas, no vacías; `problem+json` con códigos estables; Swagger | Cumple |
 | §24 Diseño visual | Estructura de `Convocatoria` y `M-Calendario` del lienzo; teléfono y escritorio, dos temas, estados con texto | Cumple, con la nota 1 |
 | §25 Decisiones no tomadas | Los supuestos de research §16 se presentan al propietario antes de `/speckit-tasks` | Cumple, con la nota 2 |
@@ -116,7 +116,7 @@ specs/009-entrenamientos-y-partidos/
 ├── data-model.md        # Siete tablas, estados, vistas calculadas y visibilidad
 ├── quickstart.md        # Guía de validación de extremo a extremo
 ├── contracts/
-│   └── api.yaml         # Veinte endpoints nuevos
+│   └── api.yaml         # Veintidós endpoints nuevos
 └── tasks.md             # Lo genera /speckit-tasks
 ```
 
@@ -144,7 +144,8 @@ backend/src/
 │   │                        CalendarioDto, CategoriaDeActividadDto, PermisosDeActividadDto,
 │   │                        GoleadorDePartidoDto, GoleadoresDto, CifrasDto, EstadisticasJugadorDto
 │   ├── Interfaces/        + IRepositorioEntrenamientos, IRepositorioPartidos,
-│   │                        IRepositorioAsistencias, IRepositorioEstadisticas
+│   │                        IRepositorioAsistencias, IRepositorioEstadisticas,
+│   │                        IRepositorioConvocatoria
 │   │                      ~ IRepositorioJugadores (borrar convocatorias y respuestas pendientes)
 │   ├── Servicios/         + IServicioEntrenamientos, IServicioConsultaEntrenamientos,
 │   │                        IServicioAsistencia, IServicioPartidos, IServicioConsultaPartidos,
@@ -161,7 +162,9 @@ backend/src/
 │   │   ├── Configuraciones/ + una por entidad nueva
 │   │   └── Migraciones/   + EntrenamientosYPartidos
 │   └── Repositorios/      + RepositorioEntrenamientos, RepositorioPartidos,
-│                            RepositorioAsistencias, RepositorioEstadisticas
+│                            RepositorioAsistencias, RepositorioEstadisticas,
+│                            RepositorioConvocatoria (planilla, convocables y cambios de la
+│                            convocatoria, separados de RepositorioPartidos por tamaño, §2.3)
 │                          ~ RepositorioJugadores, Plataforma/RepositorioRetiroEntreClubes (RF-033)
 └── LaPecosa.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
