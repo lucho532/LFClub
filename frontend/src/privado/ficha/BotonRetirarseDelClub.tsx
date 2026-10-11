@@ -46,7 +46,7 @@ export function BotonRetirarseDelClub({ clubId, ficha }: Props) {
   return (
     <>
       <Boton
-        variante="secundario"
+        variante="texto"
         onClick={() => {
           setError(undefined);
           setAbierto(true);
