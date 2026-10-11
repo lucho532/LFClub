@@ -85,51 +85,51 @@ paths:
 
   # ------------------------------------------------------------------ Datos propios
 
-#008-T016   /api/cuenta/datos-propios:
-#008-T016     get:
-#008-T016       tags: [Cuenta]
-#008-T016       summary: NUEVO. Datos personales de la cuenta con sesión, para "Mi perfil"
-#008-T016       description: |
-#008-T016         Solo para una cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR en algún club (RF-015).
-#008-T016         Si la tiene en varios, se toman del integrante más antiguo; tras el primer cambio son
-#008-T016         iguales en todos. Una cuenta que solo tiene jugadores recibe 404: sus datos están en la
-#008-T016         ficha de cada jugador (RF-017).
-#008-T016       responses:
-#008-T016         '200':
-#008-T016           description: Los datos
-#008-T016           content:
-#008-T016             application/json:
-#008-T016               schema: { $ref: '#/components/schemas/DatosPropiosDto' }
-#008-T016         '401': { $ref: '#/components/responses/SinSesion' }
-#008-T016         '404': { $ref: '#/components/responses/NoEncontrado' }
-#008-T017     put:
-#008-T017       tags: [Cuenta]
-#008-T017       summary: NUEVO. Cambia nombres, apellidos, fecha de nacimiento y celular
-#008-T017       description: |
-#008-T017         Valida con las reglas del registro y aplica nombres, apellidos y fecha de nacimiento a
-#008-T017         todos los integrantes de la cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR, en todos sus
-#008-T017         clubes, y el celular a la cuenta, en una sola transacción (RF-016). No toca los
-#008-T017         integrantes JUGADOR de la cuenta ni los nombres ya copiados en aprobaciones, retiros o
-#008-T017         últimos cambios. El cuerpo no admite documento ni correo: si vienen, se ignoran (RF-018,
-#008-T017         RF-019).
-#008-T017       requestBody:
-#008-T017         required: true
-#008-T017         content:
-#008-T017           application/json:
-#008-T017             schema: { $ref: '#/components/schemas/CambiarDatosPropiosDto' }
-#008-T017       responses:
-#008-T017         '200':
-#008-T017           description: Los datos ya guardados
-#008-T017           content:
-#008-T017             application/json:
-#008-T017               schema: { $ref: '#/components/schemas/DatosPropiosDto' }
-#008-T017         '400':
-#008-T017           description: '`datos_invalidos`, con `errores` por campo; no cambia nada'
-#008-T017           content:
-#008-T017             application/problem+json:
-#008-T017               schema: { $ref: '#/components/schemas/Problema' }
-#008-T017         '401': { $ref: '#/components/responses/SinSesion' }
-#008-T017         '404': { $ref: '#/components/responses/NoEncontrado' }
+  /api/cuenta/datos-propios:
+    get:
+      tags: [Cuenta]
+      summary: NUEVO. Datos personales de la cuenta con sesión, para "Mi perfil"
+      description: |
+        Solo para una cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR en algún club (RF-015).
+        Si la tiene en varios, se toman del integrante más antiguo; tras el primer cambio son
+        iguales en todos. Una cuenta que solo tiene jugadores recibe 404: sus datos están en la
+        ficha de cada jugador (RF-017).
+      responses:
+        '200':
+          description: Los datos
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DatosPropiosDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Cuenta]
+      summary: NUEVO. Cambia nombres, apellidos, fecha de nacimiento y celular
+      description: |
+        Valida con las reglas del registro y aplica nombres, apellidos y fecha de nacimiento a
+        todos los integrantes de la cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR, en todos sus
+        clubes, y el celular a la cuenta, en una sola transacción (RF-016). No toca los
+        integrantes JUGADOR de la cuenta ni los nombres ya copiados en aprobaciones, retiros o
+        últimos cambios. El cuerpo no admite documento ni correo: si vienen, se ignoran (RF-018,
+        RF-019).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CambiarDatosPropiosDto' }
+      responses:
+        '200':
+          description: Los datos ya guardados
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DatosPropiosDto' }
+        '400':
+          description: '`datos_invalidos`, con `errores` por campo; no cambia nada'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
   # ------------------------------------------------------------------ Respuestas que cambian
   # Solo añaden campos; el resto de cada respuesta sigue como en su spec.

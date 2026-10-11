@@ -64,7 +64,7 @@ public class AccesoClubPruebas
         var delContrato = EndpointsDeLaApi.DelContrato().Select(par => par.Endpoint.ToString()).Order().ToList();
         var deLaApi = EndpointsDeLaApi.DeLaApi(_fabrica).Select(endpoint => endpoint.ToString()).Order().ToList();
 
-        Assert.Equal(70, delContrato.Count);
+        Assert.Equal(72, delContrato.Count);
         Assert.Equal(delContrato, deLaApi);
     }
 

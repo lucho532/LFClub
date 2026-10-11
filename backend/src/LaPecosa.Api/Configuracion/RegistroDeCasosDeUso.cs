@@ -64,6 +64,7 @@ public static class RegistroDeCasosDeUso
 
         servicios.AddScoped<IServicioFichaBasica, ServicioFichaBasica>();
         servicios.AddScoped<ResolutorDeEnlaces>();
+        servicios.AddScoped<IServicioDatosPropios, ServicioDatosPropios>();
 
         return servicios;
     }

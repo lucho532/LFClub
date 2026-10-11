@@ -1,5 +1,6 @@
 using LaPecosa.Aplicacion.Interfaces;
 using LaPecosa.Dominio.Entidades;
+using LaPecosa.Dominio.Enumeraciones;
 using LaPecosa.Infraestructura.Datos;
 using Microsoft.EntityFrameworkCore;
 
@@ -126,6 +127,32 @@ public class RepositorioPertenencias : IRepositorioPertenencias
         _contexto.UsuariosRol
             .IgnoreQueryFilters()
             .AnyAsync(integrante => integrante.UsuarioId == usuarioId, cancelacion);
+
+    /// <inheritdoc />
+    public async Task CambiarDatosPropiosAsync(
+        Guid usuarioId,
+        string nombres,
+        string apellidos,
+        DateOnly fechaNacimiento,
+        string celular,
+        CancellationToken cancelacion = default)
+    {
+        var integrantes = await _contexto.UsuariosRol
+            .IgnoreQueryFilters()
+            .Where(integrante => integrante.UsuarioId == usuarioId
+                && (integrante.Rol == Rol.PRESIDENTE || integrante.Rol == Rol.DIRECTIVO || integrante.Rol == Rol.ENTRENADOR))
+            .ToListAsync(cancelacion);
+
+        foreach (var integrante in integrantes)
+        {
+            integrante.Nombres = nombres;
+            integrante.Apellidos = apellidos;
+            integrante.FechaNacimiento = fechaNacimiento;
+        }
+
+        var cuenta = await _contexto.Usuarios.FirstAsync(usuario => usuario.Id == usuarioId, cancelacion);
+        cuenta.Celular = celular;
+    }
 
     /// <inheritdoc />
     public void Agregar(UsuarioRol integrante) => _contexto.UsuariosRol.Add(integrante);
