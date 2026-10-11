@@ -230,6 +230,19 @@ analizar la spec 008:
   §7.1 con §12.6
 - Principios modificados: ninguno renombrado. Secciones añadidas: ninguna. Eliminadas: ninguna
 - Pendientes: siguen abiertas las siete decisiones de la §28. La spec 008 implementa esta versión
+
+Enmienda 4.5.1 → 4.6.0 (2026-10-11), decidida por el propietario del proyecto en la spec 009:
+- §8 (Entrenador): se toma la decisión que estaba aplazada. Un PRESIDENTE o DIRECTIVO asignado a
+  una categoría actúa en ella como entrenador en lo deportivo (entrenamientos, asistencia,
+  convocatorias, partidos próximos, resultados y goles). Evaluaciones, comunicados y pagos en
+  efectivo del DIRECTIVO asignado se decidirán con esas funcionalidades
+- §8 (introducción y Directivo): se remite a esa regla
+- §17.2: la convocatoria la crea quien entrena las categorías del partido o el PRESIDENTE, y los
+  partidos próximos los ven también los PRESIDENTES y DIRECTIVOS asignados a sus categorías; un
+  DIRECTIVO no asignado no los ve
+- §20: prueba ajustada del DIRECTIVO asignado como entrenador
+- Principios modificados: ninguno renombrado. Secciones añadidas: ninguna. Eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 009 implementa esta versión
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -685,7 +698,8 @@ entrenador que además tiene un hijo en el club usa dos cuentas:
 la suya, con su documento, como ENTRENADOR, y la del niño, con el documento del niño, como JUGADOR.
 
 Un PRESIDENTE o un DIRECTIVO que además entrena no cambia de rol ni recibe un segundo rol: queda
-asignado a la categoría y conserva su único rol (ver "Entrenador" y §12.3).
+asignado a la categoría, conserva su único rol y en esa categoría actúa como entrenador en lo
+deportivo (ver "Entrenador" y §12.3).
 
 ### Desarrollador
 
@@ -761,6 +775,9 @@ Puede:
 - Consultar las categorías del club, con sus equipos, sus entrenadores y sus jugadores, y la lista
   de jugadores retirados.
 
+Si además entrena, en las categorías que tiene asignadas actúa como entrenador en lo deportivo
+(ver "Entrenador").
+
 Su acceso a finanzas y fichas es de consulta. No puede registrar ni anular pagos, modificar el
 valor de la mensualidad del club ni la de un jugador, enviar invitaciones, aprobar ni rechazar
 ingresos, asignar ni retirar roles, ni buscar usuarios por documento.
@@ -778,9 +795,13 @@ AsignacionEntrenadorCategoria
 ```
 
 También puede quedar asignado a una categoría un PRESIDENTE o un DIRECTIVO que además entrena.
-Conserva su rol como único rol en el club, con el mismo alcance: la asignación ni le da ni le
-quita nada, solo lo muestra como entrenador de esa categoría. Lo que un DIRECTIVO asignado pueda
-hacer como entrenador se decidirá con las funcionalidades de entrenamientos y convocatorias.
+Conserva su rol como único rol en el club. En las categorías que tiene asignadas actúa como
+entrenador en lo deportivo: programa entrenamientos, registra asistencia, crea convocatorias, ve
+los partidos próximos de esas categorías y registra resultados y goles, igual que un ENTRENADOR en
+las suyas (ver §17.2). Para un PRESIDENTE esto no añade nada, porque su rol ya lo cubre en todo el
+club. Un DIRECTIVO, fuera de sus categorías asignadas, sigue con su acceso de consulta. Lo demás
+que hace un ENTRENADOR (evaluaciones, comunicados, pagos en efectivo) se decidirá para el
+DIRECTIVO asignado con esas funcionalidades.
 
 Cuando la categoría tiene equipos, la asignación indica cuáles dirige (ver §11.3).
 
@@ -1485,14 +1506,19 @@ la comodidad de mostrar el calendario completo.
 
 #### Convocatoria a partidos
 
-El entrenador crea la convocatoria seleccionando, de la lista de jugadores, a quiénes se les
-envía.
+Quien entrena las categorías del partido, o el PRESIDENTE, crea la convocatoria seleccionando,
+de la lista de jugadores, a quiénes se les envía. Quien entrena una categoría es un ENTRENADOR
+asignado a ella, o un PRESIDENTE o DIRECTIVO asignado a ella (ver §8, "Entrenador").
 
 Un partido próximo y su convocatoria solamente son visibles para:
 
 - Los jugadores convocados a ese partido.
-- Los entrenadores de las categorías involucradas.
+- Quienes entrenan las categorías involucradas, incluidos los PRESIDENTES y DIRECTIVOS asignados
+  a ellas.
 - El presidente.
+
+Un DIRECTIVO que no entrena ninguna de las categorías del partido no lo ve mientras no se haya
+jugado.
 
 Para una cuenta no convocada, ese partido no existe: no aparece en su calendario, ni en listados,
 ni en contadores, ni en mensajes, ni puede consultarse por su identificador.
@@ -1618,7 +1644,9 @@ Las pruebas deben validar principalmente:
 - Que un jugador que entra al club queda en la categoría de su año, o sin categoría si no existe,
   y que entra en ella al crearse.
 - Que un jugador nunca está en dos categorías ni en un equipo de otra categoría.
-- Que un PRESIDENTE o un DIRECTIVO asignado como entrenador conserva su único rol y su alcance.
+- Que un PRESIDENTE o un DIRECTIVO asignado como entrenador conserva su único rol, y que un
+  DIRECTIVO asignado actúa como entrenador en lo deportivo solo en sus categorías asignadas y no
+  ve los partidos próximos de las demás.
 - Que un entrenador no accede a una categoría que no tiene asignada y sí ve todos los equipos de
   las suyas.
 - Que una cuenta de jugador solo ve su categoría, sus equipos, sus entrenadores y la ficha básica
@@ -1818,4 +1846,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.5.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-10
+**Versión**: 4.6.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-11
