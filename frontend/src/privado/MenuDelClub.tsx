@@ -5,6 +5,7 @@ import {
   IconoCategorias,
   IconoDatosClub,
   IconoFicha,
+  IconoGoleadores,
   IconoIngresos,
   IconoInicio,
   IconoJugadores,
@@ -43,6 +44,9 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
       </EnlaceMenu>
       <EnlaceMenu a={`/club/${clubId}/partidos`} icono={<IconoPartido />}>
         Partidos
+      </EnlaceMenu>
+      <EnlaceMenu a={`/club/${clubId}/goleadores`} icono={<IconoGoleadores />}>
+        Goleadores
       </EnlaceMenu>
       {rol === 'PRESIDENTE' && (
         <EnlaceMenu a={`/club/${clubId}/ingresos`} icono={<IconoIngresos />}>

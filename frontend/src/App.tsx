@@ -25,6 +25,7 @@ import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
 import { ListaJugadores } from './privado/jugadores/ListaJugadores';
 import { DetallePartido } from './privado/partidos/DetallePartido';
+import { Goleadores } from './privado/partidos/Goleadores';
 import { Partidos } from './privado/partidos/Partidos';
 import { FichaBasica } from './privado/personas/FichaBasica';
 
@@ -76,6 +77,7 @@ export function App({ conArranque = false }: Props) {
                 <Route path="entrenamientos/:entrenamientoId" element={<DetalleEntrenamiento />} />
                 <Route path="partidos" element={<Partidos />} />
                 <Route path="partidos/:partidoId" element={<DetallePartido />} />
+                <Route path="goleadores" element={<Goleadores />} />
               </Route>
             </Route>
 

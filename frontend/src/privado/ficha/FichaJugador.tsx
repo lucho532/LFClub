@@ -16,6 +16,7 @@ import { DialogoAgregarHermano } from './DialogoAgregarHermano';
 import { FichaDeSoloLectura } from './FichaDeSoloLectura';
 import { FormularioFicha } from './FormularioFicha';
 import { SeccionDocumentos } from './SeccionDocumentos';
+import { SeccionEstadisticas } from './SeccionEstadisticas';
 import { SeccionFoto } from './SeccionFoto';
 import { SeccionIdentidad } from './SeccionIdentidad';
 import { UltimoCambio } from './UltimoCambio';
@@ -112,6 +113,7 @@ export function FichaJugador() {
           ) : (
             <FichaDeSoloLectura ficha={ficha} />
           )}
+          <SeccionEstadisticas rutaDeLaFicha={ruta} />
           {ficha.documentos && (
             <SeccionDocumentos
               rutaDeLaFicha={ruta}

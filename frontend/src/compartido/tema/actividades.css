@@ -211,3 +211,25 @@
 .botones-respuesta {
   gap: 6px;
 }
+
+.estadisticas-fila h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.lista-goleadores {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-goleadores li {
+  display: grid;
+  grid-template-columns: 2.5em minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}

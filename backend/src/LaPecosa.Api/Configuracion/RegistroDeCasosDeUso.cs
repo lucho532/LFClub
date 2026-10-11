@@ -76,6 +76,7 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioResultado, ServicioResultado>();
         servicios.AddScoped<IServicioAsistencia, ServicioAsistencia>();
         servicios.AddScoped<IServicioRespuestas, ServicioRespuestas>();
+        servicios.AddScoped<IServicioEstadisticas, ServicioEstadisticas>();
 
         return servicios;
     }

@@ -515,45 +515,45 @@ paths:
 
   # ------------------------------------------------------------------ Estadísticas
 
-#009-T026   /api/clubes/{clubId}/jugadores/{usuarioRolId}/estadisticas:
-#009-T026     parameters:
-#009-T026       - $ref: '#/components/parameters/clubId'
-#009-T026       - $ref: '#/components/parameters/usuarioRolId'
-#009-T026     get:
-#009-T026       tags: [Estadisticas]
-#009-T026       summary: NUEVO. Estadísticas del jugador, en total y por categoría
-#009-T026       description: Quien puede ver su ficha (`AccesoAFicha` de la 005); los demás, 404 (RF-028).
-#009-T026       responses:
-#009-T026         '200':
-#009-T026           description: Las estadísticas; en cero si no hay registros
-#009-T026           content:
-#009-T026             application/json:
-#009-T026               schema: { $ref: '#/components/schemas/EstadisticasJugadorDto' }
-#009-T026         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T026         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T026         '404': { $ref: '#/components/responses/NoEncontrado' }
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/estadisticas:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Estadisticas]
+      summary: NUEVO. Estadísticas del jugador, en total y por categoría
+      description: Quien puede ver su ficha (`AccesoAFicha` de la 005); los demás, 404 (RF-028).
+      responses:
+        '200':
+          description: Las estadísticas; en cero si no hay registros
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EstadisticasJugadorDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
-#009-T027   /api/clubes/{clubId}/goleadores:
-#009-T027     parameters:
-#009-T027       - $ref: '#/components/parameters/clubId'
-#009-T027     get:
-#009-T027       tags: [Estadisticas]
-#009-T027       summary: NUEVO. Goleadores del club por categoría
-#009-T027       description: |
-#009-T027         Cualquier rol (RF-029). Con `categoriaId`, los goleadores de esa categoría, contando los
-#009-T027         goles marcados con ella aunque el jugador ya esté en otra (escenario 6.4) e incluyendo
-#009-T027         retirados (6.5). Sin él, solo las categorías que tienen goles, para elegir.
-#009-T027       parameters:
-#009-T027         - { name: categoriaId, in: query, required: false, schema: { type: string, format: uuid } }
-#009-T027       responses:
-#009-T027         '200':
-#009-T027           description: Los goleadores
-#009-T027           content:
-#009-T027             application/json:
-#009-T027               schema: { $ref: '#/components/schemas/GoleadoresDto' }
-#009-T027         '401': { $ref: '#/components/responses/SinSesion' }
-#009-T027         '403': { $ref: '#/components/responses/NoAutorizado' }
-#009-T027         '404': { $ref: '#/components/responses/NoEncontrado' }
+  /api/clubes/{clubId}/goleadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Estadisticas]
+      summary: NUEVO. Goleadores del club por categoría
+      description: |
+        Cualquier rol (RF-029). Con `categoriaId`, los goleadores de esa categoría, contando los
+        goles marcados con ella aunque el jugador ya esté en otra (escenario 6.4) e incluyendo
+        retirados (6.5). Sin él, solo las categorías que tienen goles, para elegir.
+      parameters:
+        - { name: categoriaId, in: query, required: false, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Los goleadores
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GoleadoresDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
 
 components:
   securitySchemes:
