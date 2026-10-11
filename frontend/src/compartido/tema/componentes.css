@@ -241,3 +241,8 @@
   text-align: left;
   cursor: pointer;
 }
+
+/* Nombre de una persona, enlace o texto (spec 008): un nombre largo se parte sin desbordar. */
+.nombre-persona {
+  overflow-wrap: anywhere;
+}

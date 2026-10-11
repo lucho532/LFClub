@@ -33,6 +33,8 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 
     public SembradorJugadores Jugadores => new(this);
 
+    public SembradorPersonas Personas => new(this);
+
     public async Task InitializeAsync()
     {
         await _baseDatos.StartAsync();

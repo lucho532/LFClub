@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from '../api/cliente';
 import type { SesionDto, TokenSesionDto } from '../api/tipos';
+import { vaciarFotosEnMemoria } from '../fotos/fotosEnMemoria';
 import { borrarToken, convieneRenovar, guardarToken, leerToken } from './almacenToken';
 import { ContextoSesion, type ValorSesion } from './contextoSesion';
-import { vaciarFotosJugador } from '../../privado/jugadores/fotosJugador';
 import { olvidarJugadoresElegidos } from './jugadorElegido';
 
 /**
@@ -82,7 +82,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
       },
       cerrar: () => {
         olvidarJugadoresElegidos();
-        vaciarFotosJugador();
+        vaciarFotosEnMemoria();
         borrarToken();
         setSesion(null);
         setEstado('sin_sesion');

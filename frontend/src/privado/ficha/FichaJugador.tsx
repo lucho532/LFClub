@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../../compartido/api/cliente';
 import { ErrorApi } from '../../compartido/api/errores';
 import type { ActualizarFichaDto, FichaJugadorDto } from '../../compartido/api/tiposFicha';
@@ -7,6 +7,7 @@ import type { HermanoAgregadoDto } from '../../compartido/api/tiposSesion';
 import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
+import { useVolver } from '../../compartido/navegacion/useVolver';
 import { nombreCompleto, puedeVerCategorias } from '../categorias/textos';
 import { useClub } from '../contextoClub';
 import { BotonRetirarseDelClub } from './BotonRetirarseDelClub';
@@ -25,8 +26,8 @@ import { UltimoCambio } from './UltimoCambio';
  * de la API el mismo "no encontrado" que si no existiera, y aquí se le dice lo mismo.
  * "Agregar un hermano" y "Retirar del club" solo aparecen en la ficha propia de la cuenta de un
  * jugador (RF-032 y RF-043 de la 006): un presidente, un directivo, un entrenador y la ficha de un
- * hermano no elegido no los muestran, y la API se lo negaría. Si se llegó desde la lista
- * "Jugadores", el enlace de volver lleva a ella.
+ * hermano no elegido no los muestran, y la API se lo negaría. El enlace de volver lleva a la
+ * pantalla desde la que se pulsó el nombre del jugador (`useVolver`), con su nombre.
  */
 export function FichaJugador() {
   const { club } = useClub();
@@ -38,17 +39,16 @@ export function FichaJugador() {
   const [agregando, setAgregando] = useState(false);
   const [agregado, setAgregado] = useState<HermanoAgregadoDto | null>(null);
   const esLaPropia = club.miRol === 'JUGADOR' && ficha?.usuarioRolId === club.miUsuarioRolId;
-  const desdeLaLista = (useLocation().state as { desde?: string } | null)?.desde === 'jugadores';
 
-  // Desde la lista se vuelve a ella; si no, quien ve las listas del club vuelve a la categoría del
-  // jugador, y la familia, al inicio.
-  const volver = desdeLaLista
-    ? { a: `/club/${club.clubId}/jugadores`, texto: 'Jugadores' }
-    : !puedeVerCategorias(club.miRol)
-    ? { a: `/club/${club.clubId}`, texto: 'Inicio' }
-    : ficha?.categoriaId
-      ? { a: `/club/${club.clubId}/categorias/${ficha.categoriaId}`, texto: `Categoría ${ficha.categoriaAnio}` }
-      : { a: `/club/${club.clubId}/categorias`, texto: 'Categorías' };
+  // Se vuelve a la pantalla desde la que se pulsó el nombre. Si no se llegó desde un enlace, quien
+  // ve las listas del club vuelve a la categoría del jugador, y la familia, al inicio.
+  const volver = useVolver(
+    !puedeVerCategorias(club.miRol)
+      ? { ruta: `/club/${club.clubId}`, texto: 'Inicio' }
+      : ficha?.categoriaId
+        ? { ruta: `/club/${club.clubId}/categorias/${ficha.categoriaId}`, texto: `Categoría ${ficha.categoriaAnio}` }
+        : { ruta: `/club/${club.clubId}/categorias`, texto: 'Categorías' },
+  );
 
   async function guardar(datos: ActualizarFichaDto): Promise<FichaJugadorDto> {
     const guardada = await api.put<FichaJugadorDto>(ruta, datos);
@@ -58,7 +58,7 @@ export function FichaJugador() {
 
   return (
     <>
-      <Link to={volver.a}>← {volver.texto}</Link>
+      <Link to={volver.ruta}>← {volver.texto}</Link>
       {noLaVe ? (
         <Aviso tono="aviso">Esta ficha no existe o no puedes verla.</Aviso>
       ) : (

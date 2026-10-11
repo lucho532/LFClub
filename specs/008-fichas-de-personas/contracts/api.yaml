@@ -29,104 +29,107 @@ tags:
   - name: Personas
   - name: Cuenta
 
+# Mientras se construye la 008, cada operación nueva lleva delante la marca `#008-T0NN` de la
+# tarea que la descomenta (tasks.md, T001). Al terminar no queda ninguna (T018).
+
 paths:
   # ------------------------------------------------------------------ Ficha básica
 
-  /api/clubes/{clubId}/personas/{usuarioRolId}:
-    parameters:
-      - $ref: '#/components/parameters/clubId'
-      - $ref: '#/components/parameters/usuarioRolId'
-    get:
-      tags: [Personas]
-      summary: NUEVO. Ficha básica de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
-      description: |
-        Cualquier rol del club, también la cuenta de un jugador, sin límite de categoría (RF-003).
-        Solo lo de este club: el rol, y las categorías activas con los equipos activos que dirige
-        en cada una (RF-001, RF-005).
-      responses:
-        '200':
-          description: La ficha básica
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/FichaBasicaDto' }
-        '401': { $ref: '#/components/responses/SinSesion' }
-        '403': { $ref: '#/components/responses/NoAutorizado' }
-        '404': { $ref: '#/components/responses/NoEncontrado' }
+#008-T008   /api/clubes/{clubId}/personas/{usuarioRolId}:
+#008-T008     parameters:
+#008-T008       - $ref: '#/components/parameters/clubId'
+#008-T008       - $ref: '#/components/parameters/usuarioRolId'
+#008-T008     get:
+#008-T008       tags: [Personas]
+#008-T008       summary: NUEVO. Ficha básica de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
+#008-T008       description: |
+#008-T008         Cualquier rol del club, también la cuenta de un jugador, sin límite de categoría (RF-003).
+#008-T008         Solo lo de este club: el rol, y las categorías activas con los equipos activos que dirige
+#008-T008         en cada una (RF-001, RF-005).
+#008-T008       responses:
+#008-T008         '200':
+#008-T008           description: La ficha básica
+#008-T008           content:
+#008-T008             application/json:
+#008-T008               schema: { $ref: '#/components/schemas/FichaBasicaDto' }
+#008-T008         '401': { $ref: '#/components/responses/SinSesion' }
+#008-T008         '403': { $ref: '#/components/responses/NoAutorizado' }
+#008-T008         '404': { $ref: '#/components/responses/NoEncontrado' }
 
-  /api/clubes/{clubId}/personas/{usuarioRolId}/foto:
-    parameters:
-      - $ref: '#/components/parameters/clubId'
-      - $ref: '#/components/parameters/usuarioRolId'
-    get:
-      tags: [Personas]
-      summary: NUEVO. Foto de perfil de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
-      description: |
-        Mismo acceso que la ficha básica (RF-007). Es la foto de perfil de la cuenta de ese
-        integrante, la misma que carga en "Mi perfil". Se sirve con `Cache-Control: private,
-        no-store` y `X-Content-Type-Options: nosniff`. La foto de perfil de una cuenta que en
-        este club es JUGADOR no sale por aquí (404, RF-008).
-      responses:
-        '200':
-          description: La imagen
-          content:
-            image/png: { schema: { type: string, format: binary } }
-            image/jpeg: { schema: { type: string, format: binary } }
-            image/webp: { schema: { type: string, format: binary } }
-        '401': { $ref: '#/components/responses/SinSesion' }
-        '403': { $ref: '#/components/responses/NoAutorizado' }
-        '404':
-          description: '`no_encontrado`: no tiene foto, no es de este club o no tiene ficha básica'
-          content:
-            application/problem+json:
-              schema: { $ref: '#/components/schemas/Problema' }
+#008-T009   /api/clubes/{clubId}/personas/{usuarioRolId}/foto:
+#008-T009     parameters:
+#008-T009       - $ref: '#/components/parameters/clubId'
+#008-T009       - $ref: '#/components/parameters/usuarioRolId'
+#008-T009     get:
+#008-T009       tags: [Personas]
+#008-T009       summary: NUEVO. Foto de perfil de un PRESIDENTE, DIRECTIVO o ENTRENADOR del club
+#008-T009       description: |
+#008-T009         Mismo acceso que la ficha básica (RF-007). Es la foto de perfil de la cuenta de ese
+#008-T009         integrante, la misma que carga en "Mi perfil". Se sirve con `Cache-Control: private,
+#008-T009         no-store` y `X-Content-Type-Options: nosniff`. La foto de perfil de una cuenta que en
+#008-T009         este club es JUGADOR no sale por aquí (404, RF-008).
+#008-T009       responses:
+#008-T009         '200':
+#008-T009           description: La imagen
+#008-T009           content:
+#008-T009             image/png: { schema: { type: string, format: binary } }
+#008-T009             image/jpeg: { schema: { type: string, format: binary } }
+#008-T009             image/webp: { schema: { type: string, format: binary } }
+#008-T009         '401': { $ref: '#/components/responses/SinSesion' }
+#008-T009         '403': { $ref: '#/components/responses/NoAutorizado' }
+#008-T009         '404':
+#008-T009           description: '`no_encontrado`: no tiene foto, no es de este club o no tiene ficha básica'
+#008-T009           content:
+#008-T009             application/problem+json:
+#008-T009               schema: { $ref: '#/components/schemas/Problema' }
 
   # ------------------------------------------------------------------ Datos propios
 
-  /api/cuenta/datos-propios:
-    get:
-      tags: [Cuenta]
-      summary: NUEVO. Datos personales de la cuenta con sesión, para "Mi perfil"
-      description: |
-        Solo para una cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR en algún club (RF-015).
-        Si la tiene en varios, se toman del integrante más antiguo; tras el primer cambio son
-        iguales en todos. Una cuenta que solo tiene jugadores recibe 404: sus datos están en la
-        ficha de cada jugador (RF-017).
-      responses:
-        '200':
-          description: Los datos
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/DatosPropiosDto' }
-        '401': { $ref: '#/components/responses/SinSesion' }
-        '404': { $ref: '#/components/responses/NoEncontrado' }
-    put:
-      tags: [Cuenta]
-      summary: NUEVO. Cambia nombres, apellidos, fecha de nacimiento y celular
-      description: |
-        Valida con las reglas del registro y aplica nombres, apellidos y fecha de nacimiento a
-        todos los integrantes de la cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR, en todos sus
-        clubes, y el celular a la cuenta, en una sola transacción (RF-016). No toca los
-        integrantes JUGADOR de la cuenta ni los nombres ya copiados en aprobaciones, retiros o
-        últimos cambios. El cuerpo no admite documento ni correo: si vienen, se ignoran (RF-018,
-        RF-019).
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/CambiarDatosPropiosDto' }
-      responses:
-        '200':
-          description: Los datos ya guardados
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/DatosPropiosDto' }
-        '400':
-          description: '`datos_invalidos`, con `errores` por campo; no cambia nada'
-          content:
-            application/problem+json:
-              schema: { $ref: '#/components/schemas/Problema' }
-        '401': { $ref: '#/components/responses/SinSesion' }
-        '404': { $ref: '#/components/responses/NoEncontrado' }
+#008-T016   /api/cuenta/datos-propios:
+#008-T016     get:
+#008-T016       tags: [Cuenta]
+#008-T016       summary: NUEVO. Datos personales de la cuenta con sesión, para "Mi perfil"
+#008-T016       description: |
+#008-T016         Solo para una cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR en algún club (RF-015).
+#008-T016         Si la tiene en varios, se toman del integrante más antiguo; tras el primer cambio son
+#008-T016         iguales en todos. Una cuenta que solo tiene jugadores recibe 404: sus datos están en la
+#008-T016         ficha de cada jugador (RF-017).
+#008-T016       responses:
+#008-T016         '200':
+#008-T016           description: Los datos
+#008-T016           content:
+#008-T016             application/json:
+#008-T016               schema: { $ref: '#/components/schemas/DatosPropiosDto' }
+#008-T016         '401': { $ref: '#/components/responses/SinSesion' }
+#008-T016         '404': { $ref: '#/components/responses/NoEncontrado' }
+#008-T017     put:
+#008-T017       tags: [Cuenta]
+#008-T017       summary: NUEVO. Cambia nombres, apellidos, fecha de nacimiento y celular
+#008-T017       description: |
+#008-T017         Valida con las reglas del registro y aplica nombres, apellidos y fecha de nacimiento a
+#008-T017         todos los integrantes de la cuenta con rol PRESIDENTE, DIRECTIVO o ENTRENADOR, en todos sus
+#008-T017         clubes, y el celular a la cuenta, en una sola transacción (RF-016). No toca los
+#008-T017         integrantes JUGADOR de la cuenta ni los nombres ya copiados en aprobaciones, retiros o
+#008-T017         últimos cambios. El cuerpo no admite documento ni correo: si vienen, se ignoran (RF-018,
+#008-T017         RF-019).
+#008-T017       requestBody:
+#008-T017         required: true
+#008-T017         content:
+#008-T017           application/json:
+#008-T017             schema: { $ref: '#/components/schemas/CambiarDatosPropiosDto' }
+#008-T017       responses:
+#008-T017         '200':
+#008-T017           description: Los datos ya guardados
+#008-T017           content:
+#008-T017             application/json:
+#008-T017               schema: { $ref: '#/components/schemas/DatosPropiosDto' }
+#008-T017         '400':
+#008-T017           description: '`datos_invalidos`, con `errores` por campo; no cambia nada'
+#008-T017           content:
+#008-T017             application/problem+json:
+#008-T017               schema: { $ref: '#/components/schemas/Problema' }
+#008-T017         '401': { $ref: '#/components/responses/SinSesion' }
+#008-T017         '404': { $ref: '#/components/responses/NoEncontrado' }
 
   # ------------------------------------------------------------------ Respuestas que cambian
   # Solo añaden campos; el resto de cada respuesta sigue como en su spec.
@@ -134,7 +137,7 @@ paths:
   # GET /api/clubes/{clubId}/mi-categoria          EntrenadorParaFamiliaDto + usuarioRolId, versionFoto
   # GET /api/clubes/{clubId}/jugadores/{id}/ficha   UltimoCambioDto + autorFicha
   #     (y toda operación que responde FichaJugadorDto)
-  # GET /api/clubes/{clubId}/retirados             JugadorRetiradoDto + retiradoPorFicha
+  # GET /api/clubes/{clubId}/jugadores/retirados   JugadorRetiradoDto + retiradoPorFicha
   # GET /api/clubes/{clubId}/ingresos/aprobados    IngresoAprobadoDto + ficha, aprobadoPorFicha
   # GET /api/clubes/{clubId}/ingresos/en-espera    IngresoEnEsperaDto + hermanoDeFicha
   #
