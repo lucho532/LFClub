@@ -12,7 +12,8 @@ namespace LaPecosa.Aplicacion.Mappers;
 /// salga ordenada y que de un jugador o de un entrenador solo salga lo que cada quien puede ver:
 /// en las listas el club nunca recibe documento, correo ni celular (RF-032), solo el PRESIDENTE y
 /// los DIRECTIVOS reciben el estado de la documentación de cada jugador, y la familia recibe un tipo
-/// distinto, sin identificadores (RF-035, §23).
+/// distinto, solo con el identificador de cada entrenador para abrir su ficha básica (RF-035 de la
+/// 003, RF-014 de la 008, §23).
 /// No consulta la base de datos ni decide el alcance de quien pregunta. Solo muestra los equipos
 /// activos y las asignaciones activas, aunque la categoría venga cargada con más.
 /// </summary>
@@ -77,20 +78,24 @@ public static class MapperCategorias
         new(integrante.Id, integrante.Nombres, integrante.Apellidos, integrante.Rol);
 
     /// <summary>
-    /// Jugador retirado. Quién lo retiró sale de lo copiado al retirar, nunca del nombre actual (§13).
+    /// Jugador retirado. Quién lo retiró sale de lo copiado al retirar, nunca del nombre actual (§13);
+    /// <paramref name="retiradoPorFicha"/> es el enlace ya resuelto a su ficha básica de hoy, o nulo.
     /// </summary>
-    public static JugadorRetiradoDto ARetirado(UsuarioRol jugador, int documentosPendientes) => new(
+    public static JugadorRetiradoDto ARetirado(
+        UsuarioRol jugador, int documentosPendientes, EnlaceFichaDto? retiradoPorFicha) => new(
         jugador.Id,
         jugador.Nombres,
         jugador.Apellidos,
         jugador.FechaNacimiento.Year,
         jugador.RetiradoPorNombre ?? string.Empty,
         jugador.RetiradoEn ?? throw new InvalidOperationException("Un jugador retirado debe tener la fecha de su retiro."),
-        documentosPendientes);
+        documentosPendientes,
+        retiradoPorFicha);
 
     /// <summary>
     /// Lo que ve la familia: la categoría de su jugador, los nombres de sus equipos y, de cada
-    /// entrenador, solo su nombre, sus apellidos y los equipos que dirige.
+    /// entrenador, solo su identificador, su nombre, sus apellidos, los equipos que dirige y la
+    /// versión de su foto. Las asignaciones deben venir con la cuenta de cada entrenador.
     /// </summary>
     public static MiCategoriaDto AMiCategoria(UsuarioRol jugador, Categoria? categoria)
     {
@@ -99,9 +104,19 @@ public static class MapperCategorias
             return new MiCategoriaDto(null);
         }
 
+        var versiones = categoria.Asignaciones
+            .Where(asignacion => asignacion.Activa)
+            .Select(asignacion => asignacion.UsuarioRol!)
+            .DistinctBy(integrante => integrante.Id)
+            .ToDictionary(integrante => integrante.Id, integrante => integrante.Usuario?.VersionFoto ?? 0);
+
         var entrenadores = Entrenadores(categoria)
             .Select(entrenador => new EntrenadorParaFamiliaDto(
-                entrenador.Nombres, entrenador.Apellidos, entrenador.Equipos.Select(equipo => equipo.Nombre).ToList()))
+                entrenador.UsuarioRolId,
+                entrenador.Nombres,
+                entrenador.Apellidos,
+                entrenador.Equipos.Select(equipo => equipo.Nombre).ToList(),
+                versiones.GetValueOrDefault(entrenador.UsuarioRolId)))
             .ToList();
 
         var equipos = Referencias(categoria, jugador.Equipos.Select(fila => fila.EquipoId))

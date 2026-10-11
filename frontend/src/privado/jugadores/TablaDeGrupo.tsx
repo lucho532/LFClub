@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { JugadorDeListaDto } from '../../compartido/api/tiposJugadores';
 import { Tabla, type Columna } from '../../compartido/componentes/Tabla';
+import { estadoVolver } from '../../compartido/navegacion/useVolver';
 import { nombreCompleto, rutaDeFicha } from '../categorias/textos';
 import { FotoJugador } from './FotoJugador';
 import { TEXTO_AL_DIA, TITULO_AL_DIA, textoDeEquipos } from './textos';
@@ -14,8 +15,8 @@ interface Props {
 
 /**
  * Los jugadores de un grupo de la lista "Jugadores": su foto en miniatura, que se pide solo cuando
- * la fila entra en pantalla, o sus iniciales; su nombre completo, que abre
- * su ficha recordando que se llegó desde la lista, sus equipos o "Sin equipo", y la columna "Al
+ * la fila entra en pantalla, o sus iniciales; su nombre completo, que abre su ficha con "← Jugadores"
+ * para volver a la lista, sus equipos o "Sin equipo", y la columna "Al
  * día", que es un espacio reservado con el mismo texto suave para todos (RF-006). Un nombre largo
  * se corta con puntos suspensivos sin desbordar la pantalla.
  */
@@ -29,7 +30,7 @@ export function TablaDeGrupo({ clubId, titulo, jugadores }: Props) {
           <Link
             className="nombre-cortado"
             to={rutaDeFicha(clubId, jugador.usuarioRolId)}
-            state={{ desde: 'jugadores' }}
+            state={estadoVolver(`/club/${clubId}/jugadores`, 'Jugadores')}
             title={nombreCompleto(jugador)}
           >
             <strong>{nombreCompleto(jugador)}</strong>

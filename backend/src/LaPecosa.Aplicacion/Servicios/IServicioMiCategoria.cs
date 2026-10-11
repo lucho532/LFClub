@@ -9,7 +9,8 @@ namespace LaPecosa.Aplicacion.Servicios;
 /// Su responsabilidad es devolver, siempre sobre el propio jugador de quien pregunta, su
 /// categoría, los equipos en los que está y el nombre de los entrenadores de esa categoría.
 /// No recibe ningún identificador, así que no hay forma de pedir otra categoría ni otro jugador, y
-/// no devuelve de un entrenador más que su nombre, sus apellidos y los equipos que dirige.
+/// no devuelve de un entrenador más que su identificador en el club, su nombre, sus apellidos, los
+/// equipos que dirige y la versión de su foto (RF-014 de la 008).
 /// </summary>
 public interface IServicioMiCategoria
 {

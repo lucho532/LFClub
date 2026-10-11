@@ -10,7 +10,8 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// lleva nada más que el aviso: ni su nombre ni datos de la otra cuenta.
 /// No sale por ningún otro endpoint: es el único lugar donde la API entrega el nombre del
 /// responsable. No lleva rol: quien está en espera es siempre JUGADOR y lo sigue siendo al
-/// aprobarse (RF-016).
+/// aprobarse (RF-016). Su propio nombre no lleva enlace: quien espera no tiene ficha, y esta
+/// tarjeta es lo que el PRESIDENTE revisa (research §8 de la 008).
 /// </summary>
 /// <param name="UsuarioRolId">Identificador del integrante en este club.</param>
 /// <param name="Nombres">Nombres.</param>
@@ -30,6 +31,10 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// Si aprobar este ingreso retirará a un jugador de otra cuenta en otro club. Se calcula al
 /// consultar y no se guarda.
 /// </param>
+/// <param name="HermanoDeFicha">
+/// Ficha del jugador desde cuya ficha se agregó, si hoy es un JUGADOR aprobado (activo o retirado);
+/// si no, <c>null</c> (spec 008).
+/// </param>
 public record IngresoEnEsperaDto(
     Guid UsuarioRolId,
     string Nombres,
@@ -42,4 +47,5 @@ public record IngresoEnEsperaDto(
     string? NombreResponsable,
     DateTime RegistradoEn,
     string? HermanoDe,
-    bool RetiraDeOtroClub);
+    bool RetiraDeOtroClub,
+    EnlaceFichaDto? HermanoDeFicha);

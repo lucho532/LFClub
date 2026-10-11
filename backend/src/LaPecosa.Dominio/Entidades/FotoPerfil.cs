@@ -5,7 +5,10 @@ namespace LaPecosa.Dominio.Entidades;
 /// Su responsabilidad es guardar los bytes y el tipo de contenido, separados de
 /// <see cref="Usuario"/> para no cargarlos en cada consulta. Es opcional y la misma en todos los
 /// clubes de la persona; se borra con la cuenta.
-/// No pertenece a ningún club y solo la ve su dueño.
+/// No pertenece a ningún club. La ve su dueño y, si la cuenta es PRESIDENTE, DIRECTIVO o
+/// ENTRENADOR en un club, los integrantes de ese club, solo en su ficha básica y en la miniatura
+/// junto a su nombre (§14.2 4.5.0, spec 008). La de una cuenta que en un club es JUGADOR no la ve
+/// nadie de ese club por esa vía. Solo su dueño la carga, la cambia o la quita.
 /// </summary>
 public class FotoPerfil
 {

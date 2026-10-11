@@ -1,6 +1,8 @@
 // Tipos de los esquemas de specs/003-categorias-club/contracts/api.yaml, con los mismos nombres.
 // Van aparte de tipos.ts para que ningún archivo supere las 250 líneas.
 
+import type { EnlaceFichaDto } from './tiposPersonas';
+
 /** Roles de quien puede quedar asignado a una categoría. */
 export type RolDeEntrenador = 'ENTRENADOR' | 'DIRECTIVO' | 'PRESIDENTE';
 
@@ -97,6 +99,8 @@ export interface JugadorRetiradoDto {
   retiradoEn: string;
   /** Cuántos documentos de su ficha le faltan por entregar; 0 es documentación completa. */
   documentosPendientes: number;
+  /** Ficha básica de quien lo retiró; `null` si fue la familia o ya no está en el club (spec 008). */
+  retiradoPorFicha: EnlaceFichaDto | null;
 }
 
 export interface ReincorporacionDto {
@@ -106,12 +110,18 @@ export interface ReincorporacionDto {
   anio: number | null;
 }
 
-/** Lo único que una familia ve de un entrenador: sin identificador, rol ni contacto. */
+/**
+ * Lo que una familia ve de un entrenador: su identificador para abrir su ficha básica, su nombre,
+ * sus equipos y la versión de su foto (spec 008); sin rol ni contacto.
+ */
 export interface EntrenadorParaFamiliaDto {
+  usuarioRolId: string;
   nombres: string;
   apellidos: string;
   /** Nombres de los equipos que dirige; vacía si lo es de la categoría en general. */
   equipos: string[];
+  /** 0 si no tiene foto de perfil: se muestran sus iniciales. */
+  versionFoto: number;
 }
 
 export interface MiCategoriaDto {

@@ -19,7 +19,8 @@ interface Props {
 }
 
 /**
- * Un grupo de datos de la ficha como texto de solo lectura: cada dato con su etiqueta. Lo usan la
+ * Un grupo de datos de la ficha como texto de solo lectura: cada dato con su etiqueta (en el
+ * teléfono, en la misma fila; un texto largo, debajo y a todo el ancho). Lo usan la
  * identidad, siempre, y los demás grupos cuando quien mira la ficha no puede cambiarla.
  */
 export function GrupoDeDatos({ titulo, datos, acciones, children }: Props) {
@@ -29,7 +30,7 @@ export function GrupoDeDatos({ titulo, datos, acciones, children }: Props) {
         {datos.map((dato) => {
           const vacio = dato.valor === null || dato.valor === undefined || dato.valor === '';
           return (
-            <div key={dato.etiqueta} style={dato.largo ? { gridColumn: '1 / -1' } : undefined}>
+            <div key={dato.etiqueta} className={dato.largo ? 'dato-ancho' : undefined}>
               <dt>{dato.etiqueta}</dt>
               <dd className={vacio ? 'texto-suave' : dato.largo ? 'dato-largo' : undefined}>
                 {vacio ? SIN_REGISTRAR : dato.valor}

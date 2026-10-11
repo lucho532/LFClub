@@ -222,6 +222,14 @@ Enmienda 4.4.0 → 4.5.0 (2026-10-10), decidida por el propietario del proyecto 
 - §20: pruebas ajustadas y nuevas de la ficha básica, de la foto de perfil y de los datos propios
 - Principios modificados: ninguno renombrado. Secciones añadidas: §12.6. Eliminadas: ninguna
 - Pendientes: siguen abiertas las siete decisiones de la §28. La spec 008 implementa esta versión
+
+Enmienda 4.5.0 → 4.5.1 (2026-10-10), de redacción, aprobada por el propietario del proyecto al
+analizar la spec 008:
+- §7.1: se añade a las excepciones del límite de club la de los datos propios de §12.6, que ya
+  exigía que el cambio valga en todos los clubes de la persona. No crea ninguna regla nueva: alinea
+  §7.1 con §12.6
+- Principios modificados: ninguno renombrado. Secciones añadidas: ninguna. Eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 008 implementa esta versión
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -572,6 +580,10 @@ excepciones son:
 - Las consultas de la propia cuenta, necesarias para iniciar sesión y elegir club (ver §7.3 y
   §12.4): encontrar la cuenta por su correo o su documento y listar los clubes a los que
   pertenece. Siempre quedan limitadas a esa cuenta.
+- Los datos propios de §12.6: un PRESIDENTE, DIRECTIVO o ENTRENADOR consulta y cambia sus
+  nombres, apellidos, fecha de nacimiento y celular, y el cambio se escribe en sus integrantes
+  con esos roles de todos sus clubes. Queda limitado a la cuenta con sesión, no toca sus
+  integrantes JUGADOR y no devuelve datos de ningún club.
 - Abrir una invitación por su enlace (ver §12.1): devuelve solo esa invitación y su club.
 - El documento de un jugador que pasa a otra cuenta (ver §10, §12.1.2 y §14.1). Al agregar un
   hermano, al aprobarlo y al reincorporar a un jugador retirado se consulta, por ese número de
@@ -1806,4 +1818,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.5.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-10
+**Versión**: 4.5.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-10

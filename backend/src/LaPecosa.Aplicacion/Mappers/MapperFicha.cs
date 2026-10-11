@@ -23,7 +23,9 @@ public static class MapperFicha
     /// La ficha de ese jugador, que debe venir con su cuenta, su categoría y sus equipos cargados.
     /// <paramref name="ficha"/> es nulo si nadie la ha cambiado; <paramref name="entregados"/> solo
     /// se usa si el alcance permite ver los documentos; <paramref name="hoy"/> decide si es menor;
-    /// <paramref name="fotoActualizadaEn"/> es la fecha de su foto, o nula si no tiene.
+    /// <paramref name="fotoActualizadaEn"/> es la fecha de su foto, o nula si no tiene;
+    /// <paramref name="autorFicha"/> es el enlace a la ficha básica de quien la cambió por última
+    /// vez, ya resuelto, o nulo.
     /// </summary>
     public static FichaJugadorDto AFicha(
         UsuarioRol jugador,
@@ -31,7 +33,8 @@ public static class MapperFicha
         IReadOnlyList<DocumentoEntregado> entregados,
         AlcanceDeFicha alcance,
         DateOnly hoy,
-        DateTime? fotoActualizadaEn)
+        DateTime? fotoActualizadaEn,
+        EnlaceFichaDto? autorFicha)
     {
         var cuenta = jugador.Usuario
             ?? throw new InvalidOperationException("El jugador debe venir con su cuenta cargada.");
@@ -53,7 +56,7 @@ public static class MapperFicha
             new SeguridadSocialDto(ficha?.EntidadSalud, ficha?.LugarAtencion),
             alcance.VeDatosClinicos ? DatosClinicos(ficha) : null,
             alcance.VeDocumentos ? Documentos(entregados) : null,
-            ficha is null ? null : UltimoCambio(ficha, jugador),
+            ficha is null ? null : UltimoCambio(ficha, jugador, autorFicha),
             new PermisosDeFichaDto(alcance.Cambia, alcance.CorrigeIdentidad),
             fotoActualizadaEn);
     }
@@ -79,8 +82,13 @@ public static class MapperFicha
 
     /// <summary>
     /// El autor sale de lo copiado al cambiar, nunca del nombre actual (§13). Lo hizo la cuenta del
-    /// jugador cuando la cuenta que cambió es la suya.
+    /// jugador cuando la cuenta que cambió es la suya, y entonces no hay enlace: la familia no tiene
+    /// ficha básica.
     /// </summary>
-    private static UltimoCambioDto UltimoCambio(FichaJugador ficha, UsuarioRol jugador) => new(
-        ficha.UltimoCambioEn, ficha.UltimoCambioPorNombre, ficha.UltimoCambioPorUsuarioId == jugador.UsuarioId);
+    private static UltimoCambioDto UltimoCambio(FichaJugador ficha, UsuarioRol jugador, EnlaceFichaDto? autorFicha)
+    {
+        var porLaFamilia = ficha.UltimoCambioPorUsuarioId == jugador.UsuarioId;
+        return new UltimoCambioDto(
+            ficha.UltimoCambioEn, ficha.UltimoCambioPorNombre, porLaFamilia, porLaFamilia ? null : autorFicha);
+    }
 }

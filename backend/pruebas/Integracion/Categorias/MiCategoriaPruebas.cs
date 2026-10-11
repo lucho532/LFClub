@@ -54,13 +54,15 @@ public class MiCategoriaPruebas
         Assert.Equal(
             new[] { "", "A" }, entrenadores.Select(entrenador => string.Join(",", entrenador.Lista("equipos").Select(n => n.GetString()))).Order());
 
-        // Ni identificadores, ni rol, ni contacto, ni compañeros, ni equipos desactivados (RF-035, §23).
+        // Ni identificadores de otros, ni rol, ni contacto, ni compañeros, ni equipos desactivados
+        // (RF-035, §23). Desde la 008 sí lleva el identificador de cada entrenador, para abrir su
+        // ficha básica (RF-014 de la 008).
         var json = await respuesta.Content.ReadAsStringAsync();
         var ajenos = new[]
         {
-            e.IntegranteEntrenador.Id.ToString(), e.IntegrantePresidente.Id.ToString(), categoria.Id.ToString(),
+            e.IntegranteDirectivo.Id.ToString(), categoria.Id.ToString(),
             equipoA.Id.ToString(), e.IntegranteEntrenador.NumeroDocumento, companero.Apellidos, desactivado.Nombre,
-            "\"rol\"", "PRESIDENTE", "usuarioRolId", "equipoId", "correo", "celular", "documento", "@lapecosa.test", "3001234567",
+            "\"rol\"", "PRESIDENTE", "equipoId", "correo", "celular", "documento", "@lapecosa.test", "3001234567",
         };
         Assert.All(ajenos, texto => Assert.DoesNotContain(texto, json, StringComparison.OrdinalIgnoreCase));
     }

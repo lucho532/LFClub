@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { api } from '../../compartido/api/cliente';
 import { mensajeDe } from '../../compartido/api/errores';
 import type { FichaJugadorDto } from '../../compartido/api/tiposFicha';
@@ -13,15 +13,19 @@ interface Props {
   rutaDeLaFicha: string;
   /** Se llama con la ficha que devuelve la API tras cargar o quitar la foto. */
   alCambiar: (ficha: FichaJugadorDto) => void;
+  /** Lo que va al lado de la foto: el nombre del jugador, su categoría y sus equipos. */
+  children?: ReactNode;
 }
 
 /**
- * Cabecera de la ficha con la foto propia del jugador en grande, o sus iniciales (spec 007). Quien
+ * Cabecera de la ficha: la foto propia del jugador, o sus iniciales (spec 007), y a su lado lo que
+ * reciba como hijos (el nombre, la categoría y los equipos), para que todo se vea de un vistazo
+ * también en el teléfono. Debajo de la foto, discretos, cargarla o cambiarla y quitarla. Quien
  * puede cambiar la ficha (la familia y el presidente) la carga, la cambia y la quita, salvo si el
  * jugador está retirado: un retirado no tiene foto (§14.2). Si la API rechaza una imagen, se dice
  * por qué y la anterior sigue a la vista. No es la foto de perfil de la cuenta.
  */
-export function SeccionFoto({ clubId, ficha, rutaDeLaFicha, alCambiar }: Props) {
+export function SeccionFoto({ clubId, ficha, rutaDeLaFicha, alCambiar, children }: Props) {
   const selector = useRef<HTMLInputElement>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,36 +56,39 @@ export function SeccionFoto({ clubId, ficha, rutaDeLaFicha, alCambiar }: Props) 
   }
 
   return (
-    <div className="foto-de-ficha">
-      <FotoJugador clubId={clubId} jugador={ficha} tamano="grande" />
-      {puedeCambiarla && (
-        <div className="columna">
-          {error && !quitando && <Aviso tono="error">{error}</Aviso>}
-          <div className="fila">
-            <Boton
-              variante="secundario"
-              cargando={ocupado && !quitando}
-              textoCargando="Guardando…"
-              onClick={() => selector.current?.click()}
-            >
-              {tieneFoto ? 'Cambiar foto' : 'Cargar foto'}
-            </Boton>
-            <input
-              ref={selector}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={cargar}
-              hidden
-            />
-            {tieneFoto && (
-              <Boton variante="texto" onClick={() => setQuitando(true)} disabled={ocupado}>
-                Quitar foto
+    <>
+      <div className="cabecera-ficha">
+        <div className="cabecera-ficha-foto">
+          <FotoJugador clubId={clubId} jugador={ficha} tamano="grande" />
+          {puedeCambiarla && (
+            <>
+              <Boton
+                variante="texto"
+                cargando={ocupado && !quitando}
+                textoCargando="Guardando…"
+                onClick={() => selector.current?.click()}
+              >
+                {tieneFoto ? 'Cambiar foto' : 'Cargar foto'}
               </Boton>
-            )}
-          </div>
-          <span className="texto-suave">PNG, JPEG o WebP de hasta 1 MB.</span>
+              <input
+                ref={selector}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={cargar}
+                hidden
+              />
+              {tieneFoto && (
+                <Boton variante="texto" onClick={() => setQuitando(true)} disabled={ocupado}>
+                  Quitar foto
+                </Boton>
+              )}
+              <span className="texto-suave texto-pequeno">PNG, JPEG o WebP de hasta 1 MB.</span>
+            </>
+          )}
         </div>
-      )}
+        <div className="cabecera-ficha-datos">{children}</div>
+      </div>
+      {error && !quitando && <Aviso tono="error">{error}</Aviso>}
       <DialogoConfirmacion
         abierto={quitando}
         titulo="Quitar la foto"
@@ -97,6 +104,6 @@ export function SeccionFoto({ clubId, ficha, rutaDeLaFicha, alCambiar }: Props) 
       >
         <p>La foto se borra y en su lugar se muestran las iniciales del jugador.</p>
       </DialogoConfirmacion>
-    </div>
+    </>
   );
 }

@@ -1,33 +1,30 @@
 import { useEffect, useState, type RefObject } from 'react';
 import { api } from '../../compartido/api/cliente';
+import {
+  cargarFoto,
+  cuantasFotosEnMemoria,
+  llaveDeFotoEnMemoria,
+  useFotoEnMemoria,
+  vaciarFotosEnMemoria,
+  type Pedir,
+} from '../../compartido/fotos/fotosEnMemoria';
 
 /**
  * Fotos propias de los jugadores (spec 007). Son de menores: se piden a la API con la sesión, como
- * la foto de perfil, y se muestran desde memoria, nunca desde una dirección pública (§14.2). Cada
- * foto se guarda por jugador y fecha de carga: mientras la fecha no cambie no se vuelve a pedir, y
- * al cambiar se pide la nueva y se suelta la anterior. Al cerrar sesión se vacía todo.
+ * la foto de perfil, y se muestran desde memoria con `fotosEnMemoria`, nunca desde una dirección
+ * pública (§14.2). El sello de cada foto es su fecha de carga: mientras no cambie no se vuelve a
+ * pedir. Este módulo solo arma la ruta del jugador; guardar, soltar y vaciar es de `fotosEnMemoria`.
  */
 
-interface FotoEnMemoria {
-  llave: string;
-  url: string;
+export type { Pedir };
+
+function rutaDeFoto(clubId: string, usuarioRolId: string): string {
+  return `/api/clubes/${clubId}/jugadores/${usuarioRolId}/foto`;
 }
-
-/** Descarga los bytes de una foto con la sesión; se puede sustituir en las pruebas. */
-export type Pedir = (ruta: string) => Promise<Blob>;
-
-const enMemoria = new Map<string, FotoEnMemoria>();
-const pidiendo = new Map<string, Promise<string | null>>();
 
 /** Llave de la foto de un jugador en un momento dado, o `null` si no tiene foto. */
 export function llaveDeFoto(usuarioRolId: string, fotoActualizadaEn: string | null): string | null {
-  return fotoActualizadaEn ? `${usuarioRolId}@${fotoActualizadaEn}` : null;
-}
-
-/** Dirección local de una foto ya descargada con esa llave, o `null`. */
-export function fotoEnMemoria(usuarioRolId: string, llave: string | null): string | null {
-  const guardada = enMemoria.get(usuarioRolId);
-  return llave && guardada?.llave === llave ? guardada.url : null;
+  return llaveDeFotoEnMemoria(usuarioRolId, fotoActualizadaEn);
 }
 
 /**
@@ -40,52 +37,17 @@ export function cargarFotoJugador(
   fotoActualizadaEn: string | null,
   pedir: Pedir = api.getArchivo,
 ): Promise<string | null> {
-  const llave = llaveDeFoto(usuarioRolId, fotoActualizadaEn);
-  if (!llave) {
-    return Promise.resolve(null);
-  }
-
-  const yaEsta = fotoEnMemoria(usuarioRolId, llave);
-  if (yaEsta) {
-    return Promise.resolve(yaEsta);
-  }
-
-  const enCurso = pidiendo.get(llave);
-  if (enCurso) {
-    return enCurso;
-  }
-
-  const peticion = pedir(`/api/clubes/${clubId}/jugadores/${usuarioRolId}/foto`)
-    .then((archivo) => {
-      const anterior = enMemoria.get(usuarioRolId);
-      if (anterior) {
-        URL.revokeObjectURL(anterior.url);
-      }
-
-      const url = URL.createObjectURL(archivo);
-      enMemoria.set(usuarioRolId, { llave, url });
-      return url;
-    })
-    .catch(() => null)
-    .finally(() => pidiendo.delete(llave));
-
-  pidiendo.set(llave, peticion);
-  return peticion;
+  return cargarFoto(rutaDeFoto(clubId, usuarioRolId), fotoActualizadaEn, pedir);
 }
 
-/** Suelta todas las fotos en memoria; se llama al cerrar sesión. */
+/** Suelta todas las fotos en memoria, también las de las personas; se llama al cerrar sesión. */
 export function vaciarFotosJugador(): void {
-  for (const { url } of enMemoria.values()) {
-    URL.revokeObjectURL(url);
-  }
-
-  enMemoria.clear();
-  pidiendo.clear();
+  vaciarFotosEnMemoria();
 }
 
 /** Cuántas fotos hay en memoria; solo para las pruebas. */
 export function fotosEnMemoria(): number {
-  return enMemoria.size;
+  return cuantasFotosEnMemoria();
 }
 
 /**
@@ -98,27 +60,7 @@ export function useFotoJugador(
   fotoActualizadaEn: string | null,
   activa = true,
 ): string | null {
-  const llave = llaveDeFoto(usuarioRolId, fotoActualizadaEn);
-  const [cargada, setCargada] = useState<FotoEnMemoria | null>(null);
-
-  useEffect(() => {
-    if (!activa || !llave) {
-      return;
-    }
-
-    let cancelado = false;
-    void cargarFotoJugador(clubId, usuarioRolId, fotoActualizadaEn).then((url) => {
-      if (!cancelado && url) {
-        setCargada({ llave, url });
-      }
-    });
-
-    return () => {
-      cancelado = true;
-    };
-  }, [activa, clubId, usuarioRolId, fotoActualizadaEn, llave]);
-
-  return fotoEnMemoria(usuarioRolId, llave) ?? (cargada && cargada.llave === llave ? cargada.url : null);
+  return useFotoEnMemoria(rutaDeFoto(clubId, usuarioRolId), fotoActualizadaEn, activa);
 }
 
 /**

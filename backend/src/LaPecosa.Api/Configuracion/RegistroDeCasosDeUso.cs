@@ -62,6 +62,10 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioFotoJugador, ServicioFotoJugador>();
         servicios.AddScoped<IServicioResumenClub, ServicioResumenClub>();
 
+        servicios.AddScoped<IServicioFichaBasica, ServicioFichaBasica>();
+        servicios.AddScoped<ResolutorDeEnlaces>();
+        servicios.AddScoped<IServicioDatosPropios, ServicioDatosPropios>();
+
         return servicios;
     }
 }

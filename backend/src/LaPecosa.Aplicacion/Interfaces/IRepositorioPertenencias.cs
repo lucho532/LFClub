@@ -4,8 +4,9 @@ namespace LaPecosa.Aplicacion.Interfaces;
 
 /// <summary>
 /// Representa las consultas que cruzan clubes por necesidad: las de la propia cuenta para iniciar
-/// sesión y elegir club, y las del número de documento de un jugador que pasa a otra cuenta
-/// (constitución §7.1, segunda y cuarta excepción).
+/// sesión y elegir club, las del número de documento de un jugador que pasa a otra cuenta y el
+/// cambio de los datos propios de la cuenta con sesión (constitución §7.1, segunda y cuarta
+/// excepción, y la de los datos propios desde la 4.5.1).
 /// Su responsabilidad es responder, siempre acotado a una cuenta o a números de documento, a qué
 /// clubes pertenece una cuenta, cuáles son sus integrantes en uno de ellos (puede tener varios: los
 /// hermanos) y qué integrantes tienen un número, en cualquier club. Un mismo número puede estar en
@@ -80,6 +81,19 @@ public interface IRepositorioPertenencias
 
     /// <summary>Indica si la cuenta tiene algún integrante en algún club.</summary>
     Task<bool> TieneAlgunaAsync(Guid usuarioId, CancellationToken cancelacion = default);
+
+    /// <summary>
+    /// Escribe nombres, apellidos y fecha de nacimiento en todos los integrantes PRESIDENTE,
+    /// DIRECTIVO o ENTRENADOR de la cuenta, en todos sus clubes, y el celular en la cuenta (spec 008,
+    /// §12.6). No toca sus integrantes JUGADOR. Se guarda con la unidad de trabajo.
+    /// </summary>
+    Task CambiarDatosPropiosAsync(
+        Guid usuarioId,
+        string nombres,
+        string apellidos,
+        DateOnly fechaNacimiento,
+        string celular,
+        CancellationToken cancelacion = default);
 
     /// <summary>Añade un integrante nuevo; se guarda con la unidad de trabajo.</summary>
     void Agregar(UsuarioRol integrante);

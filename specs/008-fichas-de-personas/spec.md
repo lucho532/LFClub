@@ -4,7 +4,7 @@
 
 **Creada**: 2026-10-10
 
-**Estado**: Borrador
+**Estado**: Implementada
 
 **Entrada**: Descripción del propietario del proyecto: "Todos los nombres de personas de la
 aplicación son clicables y abren la ficha de esa persona. Para un jugador, su ficha actual
@@ -18,7 +18,7 @@ debería dejarme."
 
 **Plataforma**: La Pecosa
 
-**Constitución aplicable**: versión 4.5.0, en especial §7.1, §7.5, §8, §10, §12.3, §12.6, §14.2,
+**Constitución aplicable**: versión 4.5.1, en especial §7.1, §7.5, §8, §10, §12.3, §12.6, §14.2,
 §15, §20 y §24.
 
 **Depende de**: spec 001 (foto de perfil y "Mi perfil"), spec 003 (categorías, equipos y
@@ -114,21 +114,23 @@ cuáles no son enlace.
 1. **Dado** la familia en su inicio, **cuando** pulsa el nombre de un entrenador de la categoría de
    su jugador, **entonces** se abre la ficha básica de ese entrenador.
 2. **Dado** el PRESIDENTE, un DIRECTIVO o un ENTRENADOR en una pantalla que muestra jugadores que
-   puede ver (lista de jugadores, detalle de una categoría, inicio del entrenador), **cuando** pulsa
+   puede ver (lista de jugadores, detalle de una categoría, jugadores sin categoría), **cuando** pulsa
    el nombre de un jugador, **entonces** se abre el detalle de ese jugador con lo que su rol puede
    ver (spec 007).
 3. **Dado** cualquier rol en el detalle de una categoría o en un resumen que muestra entrenadores,
    **cuando** pulsa el nombre de un entrenador, **entonces** se abre su ficha básica.
-4. **Dado** el nombre de un jugador que quien mira no puede abrir (por ejemplo, el ENTRENADOR que
-   ve en algún lugar a un jugador de otra categoría), **cuando** se muestra, **entonces** aparece
-   como texto normal y no lleva a ninguna parte.
+4. **Dado** el nombre de un jugador que quien mira no puede abrir (por ejemplo, el PRESIDENTE en
+   la sala de espera, ante el "hermano de" cuyo ingreso fue rechazado), **cuando** se muestra,
+   **entonces** aparece como texto normal y no lleva a ninguna parte.
 5. **Dado** el nombre de una persona que ya no pertenece al club (por ejemplo, quien hizo el último
    cambio de una ficha y luego salió del club), **cuando** se muestra, **entonces** aparece como
    texto normal.
 6. **Dado** el PRESIDENTE o un DIRECTIVO en la lista de retirados, **cuando** pulsa el nombre de un
    jugador retirado, **entonces** se abre su ficha, como ya permite la spec 005.
-7. **Dado** el PRESIDENTE en la sala de espera, **cuando** pulsa el nombre de un hermano que espera
-   aprobación, **entonces** se abre la ficha que hoy le permite revisar antes de decidir.
+7. **Dado** el PRESIDENTE en la sala de espera, **cuando** mira a un hermano que espera
+   aprobación, **entonces** su nombre se muestra como texto, porque su tarjeta ya muestra los
+   datos que revisa antes de decidir, y el nombre del hermano desde cuya ficha se agregó abre la
+   ficha de ese hermano.
 8. **Dado** una ficha abierta desde un nombre, **cuando** quien la consulta vuelve atrás,
    **entonces** regresa a la pantalla desde la que la abrió.
 9. **Dado** el propio nombre de quien mira en una pantalla del club, **cuando** lo pulsa,
@@ -191,8 +193,8 @@ permitidos no se pueden cambiar.
    valor no válido, **entonces** el sistema lo rechaza, explica el motivo y conserva el valor
    anterior.
 4. **Dado** un PRESIDENTE, DIRECTIVO o ENTRENADOR en "Mi perfil", **cuando** mira su tipo y
-   número de documento, **entonces** los ve sin poder editarlos, y si intenta cambiarlos por otro
-   camino el sistema se lo niega.
+   número de documento, **entonces** los ve sin poder editarlos, y si los envía por otro camino el
+   sistema no los cambia.
 5. **Dado** una cuenta de jugador, **cuando** abre "Mi perfil", **entonces** ve su foto de perfil y
    un acceso a "Mi ficha" del jugador elegido, y no ve un segundo formulario con los mismos datos.
 6. **Dado** el correo de la cuenta, **cuando** la persona abre "Mi perfil", **entonces** lo ve sin
@@ -216,6 +218,9 @@ permitidos no se pueden cambiar.
 - Una persona que es ENTRENADOR en un club y tiene en otro club una cuenta de jugador con la misma
   cuenta: en el club donde es jugador nadie ve su foto de perfil por esta funcionalidad, porque
   allí no tiene ficha básica.
+- Una persona que es ENTRENADOR en un club y tiene una cuenta de jugador en otro cambia su celular
+  en "Mi perfil": el contacto de la ficha de su jugador muestra el celular nuevo, y los datos del
+  jugador no cambian.
 - Un club suspendido: solo entra su PRESIDENTE, que puede abrir las fichas como siempre.
 - Un nombre muy largo no debe romper la ficha básica ni los enlaces, en teléfono ni en escritorio.
 
@@ -274,13 +279,17 @@ permitidos no se pueden cambiar.
   personales: nombres, apellidos, tipo y número de documento, fecha de nacimiento, correo y
   celular.
 - **RF-016**: La persona DEBE poder cambiar por sí misma su celular, sus nombres, sus apellidos y
-  su fecha de nacimiento. NO DEBE poder cambiar el tipo ni el número de documento. Los cambios DEBEN validarse con las mismas
-  reglas del registro (§10 y §12.1) y aplicarse en todos los clubes de la persona.
+  su fecha de nacimiento. NO DEBE poder cambiar el tipo ni el número de documento. Los cambios
+  DEBEN validarse con las mismas reglas del registro (§10 y §12.1) y aplicarse en todos los
+  clubes de la persona. El celular es de la cuenta: el cambio también se ve en la ficha de los
+  jugadores de esa cuenta, si los tiene. Los nombres, apellidos y fecha de nacimiento de esos
+  jugadores no cambian.
 - **RF-017**: "Mi perfil" de una cuenta de jugador DEBE llevar a "Mi ficha" del jugador elegido en
   lugar de repetir sus datos; lo que la familia puede cambiar sigue siendo lo de la spec 005.
 - **RF-018**: El correo DEBE mostrarse en "Mi perfil" sin poder cambiarse desde ahí.
 - **RF-019**: El tipo y el número de documento DEBEN mostrarse de solo lectura en "Mi perfil", y el
-  sistema DEBE negar su cambio por cualquier camino.
+  sistema NO DEBE cambiarlos por ningún camino: si llegan en un pedido de cambio, se ignoran y el
+  resto del cambio se aplica.
 
 **Aislamiento**
 

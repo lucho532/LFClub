@@ -31,7 +31,8 @@ public class Usuario
     /// <summary>
     /// Celular de contacto. Obligatorio al registrarse. Después lo cambian, desde la ficha de un
     /// jugador de la cuenta, la propia cuenta y el PRESIDENTE del club de ese jugador; como es de
-    /// la cuenta, el cambio se ve en todos sus jugadores y clubes (RF-039 de la 005).
+    /// la cuenta, el cambio se ve en todos sus jugadores y clubes (RF-039 de la 005). Un PRESIDENTE,
+    /// DIRECTIVO o ENTRENADOR también lo cambia desde "Mi perfil" (spec 008).
     /// </summary>
     public string? Celular { get; set; }
 

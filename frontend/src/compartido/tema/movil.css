@@ -121,4 +121,27 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  /* Ficha: la foto más pequeña para que el nombre quepa a su lado. */
+  .cabecera-ficha .foto-jugador-grande {
+    width: 88px;
+    height: 88px;
+    font-size: 30px;
+  }
+
+  .cabecera-ficha-foto {
+    max-width: 104px;
+  }
+
+  /* Datos de la ficha: etiqueta y valor en la misma fila, la mitad de alto. */
+  .ficha-datos > div:not(.dato-ancho) {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  .ficha-datos > div:not(.dato-ancho) dd {
+    overflow-wrap: anywhere;
+  }
 }

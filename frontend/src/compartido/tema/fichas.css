@@ -167,7 +167,8 @@
   max-width: 100%;
 }
 
-.foto-jugador-miniatura {
+.foto-jugador-miniatura,
+.foto-persona-miniatura {
   width: 40px;
   height: 40px;
   font-size: 14px;
@@ -180,7 +181,8 @@
   white-space: nowrap;
 }
 
-.foto-jugador-grande {
+.foto-jugador-grande,
+.foto-persona-grande {
   width: 120px;
   height: 120px;
   font-size: 40px;
@@ -192,4 +194,46 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 16px;
+}
+
+/* Ficha básica (spec 008): el nombre, aunque sea muy largo, se parte al lado o debajo de la foto. */
+.ficha-basica-nombre {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+/* Cabecera de la ficha del jugador: la foto, con sus acciones debajo, y al lado nombre y categoría. */
+.cabecera-ficha {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.cabecera-ficha-foto {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  max-width: 140px;
+  text-align: center;
+}
+
+.cabecera-ficha-datos {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cabecera-ficha-datos h1 {
+  margin: 0;
+}
+
+.texto-pequeno {
+  font-size: 12px;
+}
+
+.ficha-datos .dato-ancho {
+  grid-column: 1 / -1;
 }

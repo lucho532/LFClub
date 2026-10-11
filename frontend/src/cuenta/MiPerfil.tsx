@@ -1,58 +1,24 @@
-import { useId, useState, type ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../compartido/api/cliente';
-import { mensajeDe } from '../compartido/api/errores';
-import type { SesionDto } from '../compartido/api/tipos';
-import { Aviso } from '../compartido/componentes/Aviso';
-import { Boton } from '../compartido/componentes/Boton';
 import { BotonTema } from '../compartido/componentes/BotonTema';
-import { useFotoPerfil } from '../compartido/sesion/useFotoPerfil';
 import { useSesion } from '../compartido/sesion/useSesion';
+import { AccesosMiFicha } from './AccesosMiFicha';
+import { SeccionDatosPropios } from './SeccionDatosPropios';
+import { SeccionFotoPerfil } from './SeccionFotoPerfil';
 
 /**
- * "Mi perfil": la persona carga, cambia y quita su foto de perfil. Es opcional, la misma en todos
- * sus clubes, y solo la ve ella.
+ * "Mi perfil": el correo de la cuenta arriba, de solo lectura (RF-018 de la 008), y la foto de
+ * perfil. Si la cuenta es presidente, directivo o entrenador en algún club, también sus datos
+ * personales, que cambia ella misma (spec 008, historia 4); si es la de un jugador, el acceso a
+ * "Mi ficha", donde están los suyos. Con roles de los dos tipos se ven los dos bloques.
  */
 export function MiPerfil() {
-  const { sesion, actualizar, recargar } = useSesion();
-  const foto = useFotoPerfil();
-  const idArchivo = useId();
-  const [ocupado, setOcupado] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hecho, setHecho] = useState<string | null>(null);
+  const { sesion } = useSesion();
 
   if (!sesion) {
     return null;
   }
 
-  async function ejecutar(accion: () => Promise<void>, mensaje: string) {
-    setError(null);
-    setHecho(null);
-    setOcupado(true);
-    try {
-      await accion();
-      setHecho(mensaje);
-    } catch (fallo) {
-      setError(mensajeDe(fallo));
-    } finally {
-      setOcupado(false);
-    }
-  }
-
-  function cargar(evento: ChangeEvent<HTMLInputElement>) {
-    const archivo = evento.target.files?.[0];
-    evento.target.value = '';
-    if (archivo) {
-      void ejecutar(async () => actualizar(await api.putArchivo<SesionDto>('/api/cuenta/foto', archivo)), 'Foto guardada.');
-    }
-  }
-
-  function quitar() {
-    void ejecutar(async () => {
-      await api.delete('/api/cuenta/foto');
-      await recargar();
-    }, 'Foto quitada.');
-  }
+  const tieneDatosPropios = sesion.clubes.some((club) => club.rol !== 'JUGADOR');
 
   return (
     <div className="centrado">
@@ -65,45 +31,17 @@ export function MiPerfil() {
         <p className="texto-suave">{sesion.correo}</p>
       </header>
 
-      <main className="tarjeta">
-        <h2>Foto de perfil</h2>
-        {error && <Aviso tono="error">{error}</Aviso>}
-        {hecho && <Aviso tono="exito">{hecho}</Aviso>}
-
-        <div className="fila">
-          {foto ? (
-            <img className="distintivo" style={{ width: 96, height: 96 }} src={foto} alt="Tu foto de perfil" />
-          ) : (
-            <span className="distintivo" style={{ width: 96, height: 96, fontSize: 32 }} aria-hidden="true">
-              {sesion.correo.charAt(0).toUpperCase()}
-            </span>
-          )}
-          <p className="texto-suave">
-            {sesion.versionFoto === 0
-              ? 'Todavía no tienes foto. Es opcional.'
-              : 'Es la misma en todos tus clubes y solo la ves tú.'}
-          </p>
-        </div>
-
-        <div className="campo">
-          <label htmlFor={idArchivo}>{sesion.versionFoto === 0 ? 'Cargar una foto' : 'Cambiar la foto'}</label>
-          <input
-            id={idArchivo}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            onChange={cargar}
-            disabled={ocupado}
-          />
-          <span className="texto-suave">PNG, JPEG o WebP de hasta 1 MB.</span>
-        </div>
-
-        {sesion.versionFoto > 0 && (
-          <div className="fila">
-            <Boton variante="secundario" onClick={quitar} disabled={ocupado}>
-              Quitar la foto
-            </Boton>
-          </div>
-        )}
+      <main className="columna">
+        <SeccionFotoPerfil
+          sesion={sesion}
+          quienLaVe={
+            tieneDatosPropios
+              ? 'La ven los integrantes de tus clubes en tu ficha y junto a tu nombre.'
+              : 'Solo la ves tú.'
+          }
+        />
+        {tieneDatosPropios && <SeccionDatosPropios />}
+        <AccesosMiFicha clubes={sesion.clubes} />
       </main>
     </div>
   );

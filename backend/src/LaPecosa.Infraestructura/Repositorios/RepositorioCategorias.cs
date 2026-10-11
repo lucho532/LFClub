@@ -43,6 +43,14 @@ public class RepositorioCategorias : IRepositorioCategorias
         Completas.FirstOrDefaultAsync(categoria => categoria.Id == categoriaId, cancelacion);
 
     /// <inheritdoc />
+    public Task<Categoria?> ObtenerConCuentasDeEntrenadoresAsync(Guid categoriaId, CancellationToken cancelacion = default) =>
+        Completas
+            .Include(categoria => categoria.Asignaciones.Where(asignacion => asignacion.Activa))
+                .ThenInclude(asignacion => asignacion.UsuarioRol!)
+                .ThenInclude(integrante => integrante.Usuario)
+            .FirstOrDefaultAsync(categoria => categoria.Id == categoriaId, cancelacion);
+
+    /// <inheritdoc />
     public Task<Categoria?> BuscarPorAnioAsync(int anio, CancellationToken cancelacion = default) =>
         _contexto.Categorias.AsNoTracking().FirstOrDefaultAsync(categoria => categoria.Anio == anio, cancelacion);
 

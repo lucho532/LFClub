@@ -3,6 +3,7 @@ import { api } from '../../compartido/api/cliente';
 import type { FichaJugadorDto } from '../../compartido/api/tiposFicha';
 import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
+import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { nombreCompleto, rutaDeFicha } from '../categorias/textos';
 import { FotoJugador } from '../jugadores/FotoJugador';
@@ -17,7 +18,8 @@ interface Props {
 /**
  * Tarjeta del inicio de la familia (spec 007, RF-013): la foto de su jugador, o sus iniciales, su
  * nombre, su categoría y sus equipos, y la entrada a su ficha. Lee la ficha del jugador elegido,
- * sin pedir nada nuevo a la API; con varios hermanos, es la del que eligió al entrar.
+ * sin pedir nada nuevo a la API; con varios hermanos, es la del que eligió al entrar. El nombre
+ * también abre "Mi ficha" (spec 008).
  */
 export function TarjetaMiJugador({ clubId, miUsuarioRolId }: Props) {
   const ficha = useCarga(`${clubId}/ficha/${miUsuarioRolId}`, () =>
@@ -33,7 +35,14 @@ export function TarjetaMiJugador({ clubId, miUsuarioRolId }: Props) {
         <div className="foto-de-ficha">
           <FotoJugador clubId={clubId} jugador={jugador} tamano="grande" />
           <div className="columna">
-            <strong>{nombreCompleto(jugador)}</strong>
+            <strong>
+              <NombrePersona
+                nombre={nombreCompleto(jugador)}
+                enlace={{ usuarioRolId: miUsuarioRolId, tipo: 'JUGADOR' }}
+                clubId={clubId}
+                textoVolver="Inicio"
+              />
+            </strong>
             <span>{jugador.categoriaAnio ? `Categoría ${jugador.categoriaAnio}` : SIN_CATEGORIA}</span>
             <span className="texto-suave">{textoDeEquipos(jugador.equipos)}</span>
             <Link to={rutaDeFicha(clubId, miUsuarioRolId)}>Abrir mi ficha</Link>

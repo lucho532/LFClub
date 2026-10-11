@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { api } from '../../compartido/api/cliente';
-import type { IngresoAprobadoDto, IngresoEnEsperaDto, InvitacionClubDto } from '../../compartido/api/tipos';
+import type { InvitacionClubDto } from '../../compartido/api/tipos';
+import type { IngresoAprobadoDto, IngresoEnEsperaDto } from '../../compartido/api/tiposIngresos';
 import { useCarga } from '../../compartido/api/useCarga';
 import { useClub } from '../contextoClub';
 import { SeccionIngresosAprobados } from './SeccionIngresosAprobados';
@@ -49,7 +50,7 @@ function SeccionesDeIngresos({ clubId }: { clubId: string }) {
           invitaciones.recargar();
         }}
       />
-      <SeccionIngresosAprobados aprobados={aprobados} />
+      <SeccionIngresosAprobados clubId={clubId} aprobados={aprobados} />
     </>
   );
 }

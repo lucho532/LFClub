@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { api } from '../../compartido/api/cliente';
 import { ErrorApi, mensajeDe } from '../../compartido/api/errores';
-import type { IngresoAprobadoDto, IngresoEnEsperaDto } from '../../compartido/api/tipos';
+import type { IngresoAprobadoDto, IngresoEnEsperaDto } from '../../compartido/api/tiposIngresos';
 import type { Carga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { DialogoConfirmacion } from '../../compartido/componentes/DialogoConfirmacion';
+import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { dia, fechaYHora, nombreDeRol, nombreDeTipoDocumento } from '../../compartido/formato';
 
@@ -29,7 +30,9 @@ const yaNoEstaPendiente = (fallo: unknown): fallo is ErrorApi =>
  * una invitación no pasa por aquí: llega el jugador que una familia agregó desde la ficha de un
  * hermano, y de cada uno se dice de quién es hermano y si aprobarlo lo retirará de otro club donde
  * está activo con otra cuenta, sin decir cuál. Desde aquí se aprueba o se rechaza un ingreso. Al
- * aprobar no se elige rol: la persona entra siempre como jugador.
+ * aprobar no se elige rol: la persona entra siempre como jugador. El nombre del hermano abre su
+ * ficha si es un jugador aprobado; el de quien espera es texto, porque su tarjeta ya muestra sus
+ * datos y todavía no tiene ficha (spec 008, research §8).
  */
 export function SeccionSalaDeEspera({ clubId, enEspera, alCambiar }: Props) {
   const base = `/api/clubes/${clubId}/ingresos`;
@@ -93,7 +96,12 @@ export function SeccionSalaDeEspera({ clubId, enEspera, alCambiar }: Props) {
           <h3>
             {persona.nombres} {persona.apellidos}
           </h3>
-          {persona.hermanoDe && <p className="texto-suave">Hermano de {persona.hermanoDe}</p>}
+          {persona.hermanoDe && (
+            <p className="texto-suave">
+              Hermano de{' '}
+              <NombrePersona nombre={persona.hermanoDe} enlace={persona.hermanoDeFicha} clubId={clubId} textoVolver="Ingresos" />
+            </p>
+          )}
           {persona.retiraDeOtroClub && <Aviso tono="aviso">{AVISO_OTRO_CLUB}</Aviso>}
           <dl className="ficha-datos">
             <Dato nombre={nombreDeTipoDocumento(persona.tipoDocumento)} valor={persona.numeroDocumento} />

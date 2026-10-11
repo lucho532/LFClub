@@ -77,7 +77,9 @@ public class UsuarioRol : IPerteneceAClub
 
     /// <summary>
     /// Nombres. Obligatorio. Se registran al entrar; los de un jugador solo los corrige después el
-    /// PRESIDENTE, desde su ficha, igual que los apellidos y la fecha de nacimiento.
+    /// PRESIDENTE, desde su ficha, igual que los apellidos y la fecha de nacimiento. Los de un
+    /// PRESIDENTE, DIRECTIVO o ENTRENADOR los cambia él mismo desde "Mi perfil", con sus apellidos y
+    /// su fecha de nacimiento, en todos sus clubes a la vez (§12.6, spec 008).
     /// </summary>
     public string Nombres { get; set; } = string.Empty;
 
