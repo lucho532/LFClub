@@ -24,9 +24,11 @@ public interface IRepositorioAsistencias
 
     /// <summary>
     /// Registra o corrige la asistencia de cada jugador enviado: la fila nueva copia la categoría
-    /// indicada; la que ya existe solo cambia si estuvo presente y cuándo se registró.
+    /// indicada; la que ya existe solo cambia si estuvo presente y cuándo se registró. Devuelve las
+    /// categorías en las que alguna asistencia fue nueva o cambió de valor (spec 012, research §6);
+    /// volver a guardar lo mismo no devuelve ninguna.
     /// </summary>
-    Task RegistrarAsync(
+    Task<IReadOnlyCollection<Guid>> RegistrarAsync(
         Guid entrenamientoId,
         IReadOnlyCollection<(UsuarioRol Jugador, Guid Categoria, bool Presente)> filas,
         DateTime ahoraUtc,

@@ -16,22 +16,33 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// la convocatoria solo en un partido próximo que quien pregunta gestiona, con jugadores activos de
 /// sus categorías (RF-009). Quien sigue convocado conserva su fila, su categoría copiada y su
 /// respuesta aunque haya cambiado de categoría (RF-034); quien sale pierde su fila y su respuesta
-/// (RF-013).
+/// (RF-013). Al guardar toma el bloqueo del club, vuelve a leer el partido y, en la misma
+/// transacción, avisa a la familia de cada jugador recién convocado, con un solo aviso por cuenta
+/// (spec 012, RF-002 y RF-015). Sacar a alguien de la convocatoria no avisa a nadie.
 /// No decide quién ve el partido y no accede al contexto de Entity Framework.
 /// </summary>
 public class ServicioConvocatoria : IServicioConvocatoria
 {
     private readonly AccesoAActividad _acceso;
     private readonly IRepositorioConvocatoria _convocatoria;
+    private readonly IRepositorioClub _club;
+    private readonly IServicioAvisosDeActividad _avisos;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
 
     /// <summary>Crea el servicio con sus dependencias.</summary>
     public ServicioConvocatoria(
-        AccesoAActividad acceso, IRepositorioConvocatoria convocatoria, IUnidadDeTrabajo unidadDeTrabajo, IReloj reloj)
+        AccesoAActividad acceso,
+        IRepositorioConvocatoria convocatoria,
+        IRepositorioClub club,
+        IServicioAvisosDeActividad avisos,
+        IUnidadDeTrabajo unidadDeTrabajo,
+        IReloj reloj)
     {
         _acceso = acceso;
         _convocatoria = convocatoria;
+        _club = club;
+        _avisos = avisos;
         _unidadDeTrabajo = unidadDeTrabajo;
         _reloj = reloj;
     }
@@ -64,6 +75,15 @@ public class ServicioConvocatoria : IServicioConvocatoria
         await _unidadDeTrabajo.EnTransaccionAsync(
             async () =>
             {
+                // Con el club bloqueado se vuelve a leer el partido: un cambio de estado a la vez no
+                // deja convocar a un partido cancelado ni jugado (spec 012, research §5).
+                await _club.BloquearAsync(cancelacion);
+                var vigente = (await _acceso.PartidoAsync(partidoId, quienPregunta, cancelacion)).Partido;
+                if (!ReglaTransicionPartido.PuedeConvocar(vigente.Estado))
+                {
+                    throw ServicioPartidos.ErrorDeEstado(vigente.Estado);
+                }
+
                 var actuales = (await _convocatoria.ConvocadosAsync(partidoId, cancelacion))
                     .Select(fila => fila.UsuarioRolId)
                     .ToHashSet();
@@ -82,6 +102,8 @@ public class ServicioConvocatoria : IServicioConvocatoria
 
                 var bajas = actuales.Where(id => !pedidos.Contains(id)).ToList();
                 await _convocatoria.ReemplazarAsync(partidoId, validos, bajas, _reloj.AhoraUtc, cancelacion);
+                await _avisos.JugadorConvocadoAsync(
+                    vigente, validos.Select(jugador => jugador.Id).ToList(), quienPregunta.UsuarioId, cancelacion);
             },
             cancelacion);
 

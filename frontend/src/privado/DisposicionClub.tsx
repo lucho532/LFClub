@@ -8,6 +8,7 @@ import { useCarga } from '../compartido/api/useCarga';
 import { Aviso } from '../compartido/componentes/Aviso';
 import { inicialesDe } from '../compartido/componentes/Avatar';
 import { BarraSuperior } from '../compartido/componentes/BarraSuperior';
+import { CampanaComunicados } from '../compartido/componentes/CampanaComunicados';
 import { MenuPerfil } from '../compartido/componentes/MenuPerfil';
 import { nombreDeRol } from '../compartido/formato';
 import { jugadorDe, olvidarJugadorElegido, useJugadorElegido } from '../compartido/sesion/jugadorElegido';
@@ -19,6 +20,7 @@ import { AvisoRetirado } from './AvisoRetirado';
 import { BotonCambiarJugador } from './BotonCambiarJugador';
 import type { ContextoDelClub } from './contextoClub';
 import { DesplegableClubes } from './DesplegableClubes';
+import { ProveedorContadorComunicados, useContadorDelClub } from './comunicados/ContadorComunicados';
 import { ElegirJugador } from './ElegirJugador';
 import { MenuDelClub } from './MenuDelClub';
 import { SalaDeEspera } from './SalaDeEspera';
@@ -66,7 +68,13 @@ export function DisposicionClub() {
     return <AvisoRetirado club={deSesion} />;
   }
 
-  return <AplicacionDelClub key={deSesion?.usuarioRolId} clubId={clubId} deSesion={deSesion} />;
+  // El contador de comunicados es de la cuenta: sobrevive al cambio de jugador y lo comparten la
+  // campana de la barra y las pantallas de comunicados.
+  return (
+    <ProveedorContadorComunicados clubId={clubId} activo={deSesion?.rol === 'JUGADOR'}>
+      <AplicacionDelClub key={deSesion?.usuarioRolId} clubId={clubId} deSesion={deSesion} />
+    </ProveedorContadorComunicados>
+  );
 }
 
 interface Props {
@@ -79,7 +87,9 @@ interface Props {
  * Armazón de la aplicación del club elegido: menú lateral con el escudo, el nombre del club
  * siempre visibles (constitución §7.2) y la navegación; barra superior con el tema y el perfil,
  * desde donde se cambia de jugador y se cierra sesión; y el escudo de fondo como marca de agua. Al cambiar de club en el
- * desplegable cambia la identidad. Pide el club a la API en cada entrada: es la API
+ * desplegable cambia la identidad. La cuenta de un jugador tiene además en la barra la campana de los
+ * comunicados (spec 011), con el contador de sin leer que comparte con las pantallas de comunicados. Pide
+ * el club a la API en cada entrada: es la API
  * la que decide si la persona pertenece a él y si el club está disponible.
  */
 function AplicacionDelClub({ clubId, deSesion }: Props) {
@@ -136,6 +146,8 @@ function AplicacionDelClub({ clubId, deSesion }: Props) {
             </>
           }
         >
+          {/* La campana de los comunicados: solo la cuenta de un jugador la tiene (spec 011, RF-019). */}
+          {rol === 'JUGADOR' && <CampanaDelClub clubId={clubId} />}
           {/* El nombre es el del jugador elegido cuando la cuenta tiene varios (RF-024): entonces
               se queda a la vista también en el teléfono. */}
           <MenuPerfil
@@ -173,4 +185,10 @@ function AplicacionDelClub({ clubId, deSesion }: Props) {
       </div>
     </IdentidadClub>
   );
+}
+
+/** La campana de la barra superior, con el contador que comparten las pantallas de comunicados. */
+function CampanaDelClub({ clubId }: { clubId: string }) {
+  const { sinLeer } = useContadorDelClub();
+  return <CampanaComunicados sinLeer={sinLeer} a={`/club/${clubId}/comunicados`} />;
 }

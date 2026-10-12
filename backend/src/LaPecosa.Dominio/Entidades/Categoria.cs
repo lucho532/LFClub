@@ -5,7 +5,9 @@ namespace LaPecosa.Dominio.Entidades;
 /// (constitución §11).
 /// Su responsabilidad es guardar el club, el año, si está activa y si alguna vez tuvo jugadores,
 /// entrenadores o actividades (entrenamientos o partidos, spec 009), que es lo que decide si se
-/// puede borrar o solo desactivar (RF-004a). Una categoría con actividades no se borra.
+/// puede borrar o solo desactivar (RF-004a). Una categoría con actividades no se borra. Puede ser
+/// destino de un comunicado (<see cref="ComunicadoDestino"/>, spec 011), que conserva su nombre
+/// copiado aunque la categoría se borre.
 /// No lleva nombre libre, horario, sede ni cupo, no cubre varios años y no guarda un historial de
 /// quién pasó por ella (§11.2, §18).
 /// </summary>

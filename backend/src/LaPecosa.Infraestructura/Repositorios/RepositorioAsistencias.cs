@@ -53,7 +53,7 @@ public class RepositorioAsistencias : IRepositorioAsistencias
             .ToDictionaryAsync(fila => fila.UsuarioRolId, fila => fila.Respuesta, cancelacion);
 
     /// <inheritdoc />
-    public async Task RegistrarAsync(
+    public async Task<IReadOnlyCollection<Guid>> RegistrarAsync(
         Guid entrenamientoId,
         IReadOnlyCollection<(UsuarioRol Jugador, Guid Categoria, bool Presente)> filas,
         DateTime ahoraUtc,
@@ -64,15 +64,23 @@ public class RepositorioAsistencias : IRepositorioAsistencias
             .Where(fila => fila.EntrenamientoId == entrenamientoId && ids.Contains(fila.UsuarioRolId))
             .ToDictionaryAsync(fila => fila.UsuarioRolId, cancelacion);
 
+        var conCambio = new HashSet<Guid>();
         foreach (var (jugador, categoria, presente) in filas)
         {
             if (existentes.TryGetValue(jugador.Id, out var existente))
             {
                 // Corregir no cambia la categoría copiada la primera vez (§13).
+                if (existente.Presente != presente)
+                {
+                    conCambio.Add(existente.CategoriaId);
+                }
+
                 existente.Presente = presente;
                 existente.RegistradaEn = ahoraUtc;
                 continue;
             }
+
+            conCambio.Add(categoria);
 
             _contexto.AsistenciasEntrenamiento.Add(new AsistenciaEntrenamiento
             {
@@ -87,5 +95,6 @@ public class RepositorioAsistencias : IRepositorioAsistencias
 
         await _contexto.SaveChangesAsync(cancelacion);
         _contexto.ChangeTracker.Clear();
+        return conCambio;
     }
 }

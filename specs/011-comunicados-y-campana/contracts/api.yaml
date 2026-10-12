@@ -1,0 +1,335 @@
+openapi: 3.1.0
+info:
+  title: La Pecosa - API de la funcionalidad 011 (comunicados y campana)
+  version: 0.11.0
+  description: |
+    Contrato de lo que esta funcionalidad añade a los contratos de la 001 a la 010. Lo que no
+    aparece aquí sigue igual. Añade 8 endpoints, todos bajo `/api/clubes/{clubId}`: el contrato
+    completo pasa de 100 a 108, y los de club de 76 a 84. No cambia ningún endpoint existente.
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - `/api/clubes/{clubId}/**` exige un integrante del usuario en ese club. Sin él, también el
+      DESARROLLADOR, responde 404 `no_encontrado`.
+    - Tras decidir quién hace la petición (cabecera `X-Jugador-Elegido`) se aplica lo de
+      siempre: 403 `club_suspendido`, `club_dado_de_baja`, `ingreso_en_espera`,
+      `integrante_retirado` o `rol_no_autorizado`.
+    - Un comunicado que no existe, que es de otro club o que quien pregunta no puede ver responde
+      404 `no_encontrado`, sin distinguir los casos (§7.5).
+    - Una cuenta de jugador nunca recibe quiénes más recibieron el comunicado ni cuántas familias
+      lo recibieron: esas partes se omiten del JSON.
+    - Ningún endpoint envía avisos fuera de la aplicación (RF-028).
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Comunicados
+
+paths:
+  # ------------------------------------------------------------------ Equipo del club
+  /api/clubes/{clubId}/comunicados:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    post:
+      tags: [Comunicados]
+      summary: NUEVO. Publica un comunicado
+      description: |
+        PRESIDENTE, DIRECTIVO y ENTRENADOR (403 `rol_no_autorizado` a los demás roles).
+
+        - `alcance` `CLUB`: sin `categoriaIds` ni `equipoIds`; solo PRESIDENTE y DIRECTIVO.
+        - `alcance` `CATEGORIAS`: una o más `categoriaIds`; sin `equipoIds`.
+        - `alcance` `EQUIPOS`: uno o más `equipoIds` de una sola categoría; sin `categoriaIds`.
+        - Un ENTRENADOR solo puede dirigirse a categorías activas que tiene asignadas, o a equipos
+          activos de ellas: 403 `no_entrena_categoria` en otro caso (§7.5, RF-005).
+        - Categoría o equipo de otro club, inexistente, inactivo o de categorías distintas: 400
+          `audiencia_invalida`.
+        - Sin ningún jugador activo en la audiencia: 400 `sin_destinatarios` (RF-008).
+        - Título o texto vacíos o por encima del límite: 400 `datos_invalidos`.
+        - La `clave` hace idempotente la publicación (RF-010): repetida por el mismo integrante,
+          200 con el comunicado ya creado; usada por otro, 409 `clave_en_uso`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PublicarComunicadoDto' }
+      responses:
+        '201':
+          description: Publicado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ComunicadoPublicadoDto' }
+        '200':
+          description: La clave ya se había usado: devuelve el comunicado existente
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ComunicadoPublicadoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+    get:
+      tags: [Comunicados]
+      summary: NUEVO. Lo que publicó el equipo del club
+      description: |
+        PRESIDENTE y DIRECTIVO: todos los del club, retirados incluidos. ENTRENADOR: solo los suyos
+        (RF-024). JUGADOR: 403 `rol_no_autorizado`. Del más reciente al más antiguo.
+      parameters:
+        - $ref: '#/components/parameters/limite'
+        - $ref: '#/components/parameters/antesDe'
+      responses:
+        '200':
+          description: Página de comunicados publicados
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginaDePublicados' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+
+  /api/clubes/{clubId}/comunicados/{comunicadoId}/retiro:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/comunicadoId'
+    post:
+      tags: [Comunicados]
+      summary: NUEVO. Retira un comunicado
+      description: |
+        Quien lo publicó y el PRESIDENTE. Sale de la campana y del contador de todas las cuentas;
+        queda en la lista de publicados como retirado y no vuelve a publicarse (RF-025 a RF-027).
+
+        - Un ENTRENADOR que no lo publicó: 404 (no lo ve).
+        - Un DIRECTIVO que no lo publicó: 403 `no_retira_comunicado` (lo ve, no lo retira).
+        - Ya retirado: 409 `comunicado_retirado`.
+      responses:
+        '200':
+          description: Retirado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ComunicadoPublicadoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  # ------------------------------------------------------------------ Cuenta de jugador
+  # La lista de recibidos, su contador y "marcar todos" (GET /comunicados/recibidos, GET
+  # /comunicados/recibidos/contador y POST /comunicados/recibidos/lectura-total) pasaron a la
+  # campana unificada de la 012: GET /campana, GET /campana/contador y POST /campana/lectura-total.
+  /api/clubes/{clubId}/comunicados/recibidos/{comunicadoId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/comunicadoId'
+    get:
+      tags: [Comunicados]
+      summary: NUEVO. Un comunicado recibido
+      description: |
+        Solo JUGADOR. 404 si no le llegó a la cuenta, si está retirado o si es de otro club, aunque
+        se conozca el identificador (RF-032). No lo marca como leído: eso es la lectura.
+      responses:
+        '200':
+          description: El comunicado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ComunicadoRecibidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/comunicados/recibidos/{comunicadoId}/lectura:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/comunicadoId'
+    put:
+      tags: [Comunicados]
+      summary: NUEVO. Marca un comunicado como leído
+      description: |
+        Solo JUGADOR. Idempotente: leerlo otra vez no cambia la fecha. Lo marca leído para toda la
+        cuenta, no solo para el jugador elegido (RF-022). Mismos 404 que la consulta.
+      responses:
+        '200':
+          description: El comunicado ya leído
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ComunicadoRecibidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+
+  parameters:
+    clubId:
+      name: clubId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    comunicadoId:
+      name: comunicadoId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    limite:
+      name: limite
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 50, default: 30 }
+    antesDe:
+      name: antesDe
+      in: query
+      required: false
+      description: Identificador del último comunicado ya recibido; devuelve los más antiguos
+      schema: { type: string, format: uuid }
+
+  responses:
+    Validacion:
+      description: Datos inválidos (`datos_invalidos`, `audiencia_invalida`, `sin_destinatarios`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    SinSesion:
+      description: Sin sesión
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoAutorizado:
+      description: |
+        Rol que nunca puede hacerlo (`rol_no_autorizado`), `no_entrena_categoria` o
+        `no_retira_comunicado`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoEncontrado:
+      description: No existe, es de otro club o quien pregunta no puede verlo (`no_encontrado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    Conflicto:
+      description: '`clave_en_uso` o `comunicado_retirado`'
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [titulo, estado, codigo]
+      properties:
+        titulo: { type: string }
+        estado: { type: integer }
+        codigo: { type: string }
+        errores:
+          type: object
+          additionalProperties: { type: array, items: { type: string } }
+
+    AlcanceComunicado:
+      type: string
+      enum: [CLUB, CATEGORIAS, EQUIPOS]
+
+    PublicarComunicadoDto:
+      type: object
+      required: [clave, titulo, texto, alcance]
+      properties:
+        clave: { type: string, format: uuid, description: La genera la pantalla al abrir el formulario }
+        titulo: { type: string, minLength: 1, maxLength: 100 }
+        texto: { type: string, minLength: 1, maxLength: 1000, description: Texto plano }
+        alcance: { $ref: '#/components/schemas/AlcanceComunicado' }
+        categoriaIds:
+          type: array
+          items: { type: string, format: uuid }
+          description: Solo con `CATEGORIAS`
+        equipoIds:
+          type: array
+          items: { type: string, format: uuid }
+          description: Solo con `EQUIPOS`; de una sola categoría
+
+    AutorDeComunicadoDto:
+      type: object
+      required: [nombre, rol]
+      properties:
+        usuarioRolId:
+          type: [string, 'null']
+          format: uuid
+          description: Para abrir su ficha básica (spec 008). Nulo si ya no es del club
+        nombre: { type: string, description: Copiado al publicar }
+        rol: { type: string, enum: [PRESIDENTE, DIRECTIVO, ENTRENADOR] }
+
+    DestinoDeComunicadoDto:
+      type: object
+      required: [categoriaNombre]
+      properties:
+        categoriaId: { type: [string, 'null'], format: uuid }
+        categoriaNombre: { type: string }
+        equipoId: { type: [string, 'null'], format: uuid }
+        equipoNombre: { type: [string, 'null'] }
+
+    RetiroDeComunicadoDto:
+      type: object
+      required: [en, porNombre]
+      properties:
+        en: { type: string, format: date-time }
+        porNombre: { type: string }
+
+    ComunicadoPublicadoDto:
+      type: object
+      description: Lo que ve el equipo del club
+      required: [id, titulo, texto, publicadoEn, publicadoPor, alcance, destinos, familiasAlcanzadas, puedeRetirar]
+      properties:
+        id: { type: string, format: uuid }
+        titulo: { type: string }
+        texto: { type: string }
+        publicadoEn: { type: string, format: date-time }
+        publicadoPor: { $ref: '#/components/schemas/AutorDeComunicadoDto' }
+        alcance: { $ref: '#/components/schemas/AlcanceComunicado' }
+        destinos:
+          type: array
+          items: { $ref: '#/components/schemas/DestinoDeComunicadoDto' }
+          description: Vacío con `CLUB`
+        familiasAlcanzadas: { type: integer, minimum: 0, description: Cuentas que lo recibieron al publicar }
+        retirado: { $ref: '#/components/schemas/RetiroDeComunicadoDto' }
+        puedeRetirar: { type: boolean, description: Falso si ya está retirado o si no es suyo ni es PRESIDENTE }
+
+    ComunicadoRecibidoDto:
+      type: object
+      description: Lo que ve la cuenta de un jugador; nunca la audiencia ni cuántos más lo recibieron
+      required: [id, titulo, texto, publicadoEn, publicadoPor, leido]
+      properties:
+        id: { type: string, format: uuid }
+        titulo: { type: string }
+        texto: { type: string }
+        publicadoEn: { type: string, format: date-time }
+        publicadoPor: { $ref: '#/components/schemas/AutorDeComunicadoDto' }
+        leido: { type: boolean }
+        leidoEn: { type: [string, 'null'], format: date-time }
+
+    PaginaDePublicados:
+      type: object
+      required: [items, hayMas]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/ComunicadoPublicadoDto' }
+        hayMas: { type: boolean }
+
+    PaginaDeRecibidos:
+      type: object
+      required: [items, hayMas, sinLeer]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/ComunicadoRecibidoDto' }
+        hayMas: { type: boolean }
+        sinLeer: { type: integer, minimum: 0, description: El contador, para no pedirlo aparte al abrir la lista }
+
+    ContadorDeComunicadosDto:
+      type: object
+      required: [sinLeer]
+      properties:
+        sinLeer: { type: integer, minimum: 0 }

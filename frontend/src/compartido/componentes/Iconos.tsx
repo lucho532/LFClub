@@ -137,6 +137,16 @@ export function IconoOjoTachado() {
   );
 }
 
+/** La campana de los comunicados: la de la barra superior de la familia y la entrada del menú. */
+export function IconoCampana() {
+  return (
+    <Icono>
+      <path d="M6 9a6 6 0 1 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9Z" />
+      <path d="M10 19a2 2 0 0 0 4 0" />
+    </Icono>
+  );
+}
+
 /** El lápiz de editar una foto o un escudo, pequeño para ir dentro del círculo. */
 export function IconoLapiz() {
   return (

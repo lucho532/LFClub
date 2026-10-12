@@ -13,7 +13,9 @@ namespace LaPecosa.Dominio.Entidades;
 /// sus convocados.
 /// No decide quién lo ve: mientras no se juega solo existe para sus convocados, quienes entrenan
 /// alguna de sus categorías y el PRESIDENTE (§17.2), y eso lo deciden las reglas del dominio. No
-/// guarda historial del resultado (§18) y nunca se borra.
+/// guarda historial del resultado (§18) y nunca se borra. Puede ser la actividad de un aviso
+/// (<see cref="AvisoDeActividad"/>, spec 012), que lo referencia por tipo e identificador sin
+/// foránea.
 /// </summary>
 public class Partido : IPerteneceAClub
 {

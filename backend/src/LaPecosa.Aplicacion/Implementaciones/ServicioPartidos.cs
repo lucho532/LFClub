@@ -17,17 +17,20 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// (research §11) y permitir cada cambio solo desde el estado que admite
 /// <see cref="ReglaTransicionPartido"/>: un partido jugado no se cancela ni cambia sus datos, y un
 /// cancelado se reactiva mientras no haya empezado, con su convocatoria como estaba. Crear bloquea el
-/// club, igual que desactivar una categoría.
+/// club, igual que desactivar una categoría. Cambiar, cancelar y reactivar viven en
+/// <c>ServicioPartidos.Cambios.cs</c>: avisan a las familias en su misma transacción (spec 012).
+/// Crear no avisa a nadie: un partido nace sin convocados (RF-003).
 /// No toca la convocatoria ni el resultado, no decide quién lo ve, no borra nunca un partido y no
 /// accede al contexto de Entity Framework.
 /// </summary>
-public class ServicioPartidos : IServicioPartidos
+public partial class ServicioPartidos : IServicioPartidos
 {
     private readonly AccesoAActividad _acceso;
     private readonly IRepositorioPartidos _partidos;
     private readonly IRepositorioCategorias _categorias;
     private readonly IRepositorioClub _club;
     private readonly IServicioConsultaPartidos _consulta;
+    private readonly IServicioAvisosDeActividad _avisos;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
 
@@ -38,6 +41,7 @@ public class ServicioPartidos : IServicioPartidos
         IRepositorioCategorias categorias,
         IRepositorioClub club,
         IServicioConsultaPartidos consulta,
+        IServicioAvisosDeActividad avisos,
         IUnidadDeTrabajo unidadDeTrabajo,
         IReloj reloj)
     {
@@ -46,6 +50,7 @@ public class ServicioPartidos : IServicioPartidos
         _categorias = categorias;
         _club = club;
         _consulta = consulta;
+        _avisos = avisos;
         _unidadDeTrabajo = unidadDeTrabajo;
         _reloj = reloj;
     }
@@ -91,26 +96,6 @@ public class ServicioPartidos : IServicioPartidos
     }
 
     /// <inheritdoc />
-    public async Task<PartidoDto> CambiarAsync(
-        Guid partidoId, GuardarPartidoDto datos, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
-    {
-        var validos = ValidadorPartido.Validar(datos);
-        var partido = await GestionadoAsync(partidoId, quienPregunta, cancelacion);
-        if (!ReglaTransicionPartido.PuedeCambiarDatos(partido.Estado))
-        {
-            throw ErrorDeEstado(partido.Estado);
-        }
-
-        if (!partido.Categorias.Select(fila => fila.CategoriaId).ToHashSet().SetEquals(validos.CategoriaIds))
-        {
-            throw ErroresDeActividades.CategoriasNoCambian();
-        }
-
-        await _partidos.CambiarDatosAsync(partidoId, Con(validos, new Partido()), cancelacion);
-        return await _consulta.ObtenerAsync(partidoId, quienPregunta, cancelacion);
-    }
-
-    /// <inheritdoc />
     public async Task<PartidoDto> CorregirRivalAsync(
         Guid partidoId, CorregirRivalDto datos, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
     {
@@ -129,39 +114,6 @@ public class ServicioPartidos : IServicioPartidos
         }
 
         await _partidos.CambiarRivalAsync(partidoId, rival, cancelacion);
-        return await _consulta.ObtenerAsync(partidoId, quienPregunta, cancelacion);
-    }
-
-    /// <inheritdoc />
-    public async Task<PartidoDto> CancelarAsync(Guid partidoId, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
-    {
-        var partido = await GestionadoAsync(partidoId, quienPregunta, cancelacion);
-        if (!ReglaTransicionPartido.PuedeCancelar(partido.Estado))
-        {
-            throw ErrorDeEstado(partido.Estado);
-        }
-
-        await _partidos.CambiarEstadoAsync(partidoId, EstadoPartido.CANCELADO, cancelacion);
-        return await _consulta.ObtenerAsync(partidoId, quienPregunta, cancelacion);
-    }
-
-    /// <inheritdoc />
-    public async Task<PartidoDto> ReactivarAsync(Guid partidoId, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
-    {
-        var partido = await GestionadoAsync(partidoId, quienPregunta, cancelacion);
-        if (!ReglaTransicionPartido.PuedeReactivar(partido.Estado))
-        {
-            throw ErroresDeActividades.ActividadNoCancelada();
-        }
-
-        var (hoy, ahora) = HoraDeColombia.Ahora(_reloj);
-        if (ReglaMomentoDeActividad.YaEmpezo(partido.Fecha, partido.Hora, hoy, ahora))
-        {
-            throw ErroresDeActividades.ActividadEmpezada();
-        }
-
-        await ExigirActivasAsync(partido.Categorias.Select(fila => fila.CategoriaId).ToList(), cancelacion);
-        await _partidos.CambiarEstadoAsync(partidoId, EstadoPartido.PROXIMO, cancelacion);
         return await _consulta.ObtenerAsync(partidoId, quienPregunta, cancelacion);
     }
 

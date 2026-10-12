@@ -16,6 +16,8 @@ import { ListaClubes } from './plataforma/ListaClubes';
 import { FormularioActividad } from './privado/actividades/FormularioActividad';
 import { Calendario } from './privado/calendario/Calendario';
 import { Categorias } from './privado/categorias/Categorias';
+import { FormularioComunicado } from './privado/comunicados/FormularioComunicado';
+import { PantallaComunicados } from './privado/comunicados/PantallaComunicados';
 import { DetalleCategoria } from './privado/categorias/DetalleCategoria';
 import { ConfiguracionClub } from './privado/ConfiguracionClub';
 import { DisposicionClub } from './privado/DisposicionClub';
@@ -80,6 +82,9 @@ export function App({ conArranque = false }: Props) {
                 <Route path="partidos" element={<Partidos />} />
                 <Route path="partidos/:partidoId" element={<DetallePartido />} />
                 <Route path="goleadores" element={<Goleadores />} />
+                <Route path="comunicados" element={<PantallaComunicados />} />
+                <Route path="comunicados/nuevo" element={<FormularioComunicado />} />
+                <Route path="comunicados/:comunicadoId" element={<PantallaComunicados />} />
               </Route>
             </Route>
 

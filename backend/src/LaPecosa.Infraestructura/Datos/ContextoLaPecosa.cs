@@ -96,6 +96,21 @@ public class ContextoLaPecosa : DbContext
     /// <summary>Cartas de los jugadores: dorsal, posición y estadísticas (spec 010).</summary>
     public DbSet<CartaJugador> CartasJugador => Set<CartaJugador>();
 
+    /// <summary>Comunicados del club (spec 011).</summary>
+    public DbSet<Comunicado> Comunicados => Set<Comunicado>();
+
+    /// <summary>Categorías y equipos a los que se dirigió cada comunicado.</summary>
+    public DbSet<ComunicadoDestino> ComunicadosDestino => Set<ComunicadoDestino>();
+
+    /// <summary>Jugadores que recibieron cada comunicado y si su cuenta lo leyó.</summary>
+    public DbSet<ComunicadoDestinatario> ComunicadosDestinatario => Set<ComunicadoDestinatario>();
+
+    /// <summary>Avisos de entrenamientos y partidos que ve la campana (spec 012).</summary>
+    public DbSet<AvisoDeActividad> AvisosDeActividad => Set<AvisoDeActividad>();
+
+    /// <summary>Jugadores que recibieron cada aviso y si su cuenta lo leyó.</summary>
+    public DbSet<AvisoDeActividadDestinatario> AvisosDeActividadDestinatario => Set<AvisoDeActividadDestinatario>();
+
     /// <summary>Club de la petición; lo lee el filtro global en cada consulta.</summary>
     private Guid? ClubDeLaPeticion => _contextoClub.ClubId;
 
