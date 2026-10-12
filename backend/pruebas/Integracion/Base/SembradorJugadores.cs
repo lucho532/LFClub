@@ -1,7 +1,7 @@
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Arma el club de la guía de validación de la 007 ("Datos de partida") directamente en la base de

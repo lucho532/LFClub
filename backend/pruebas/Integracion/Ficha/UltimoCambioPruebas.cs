@@ -1,9 +1,9 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Ficha;
+namespace LFClub.Pruebas.Integracion.Ficha;
 
 /// <summary>
 /// La ficha muestra quién la cambió por última vez y cuándo, y solo eso (historia 1, escenarios 9

@@ -1,11 +1,11 @@
-using LaPecosa.Aplicacion.DTOs;
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Aplicacion.DTOs;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
 
-namespace LaPecosa.Pruebas.Integracion.Carta;
+namespace LFClub.Pruebas.Integracion.Carta;
 
 /// <summary>
 /// El generador dibuja un PNG de 750 × 1050 con y sin foto, escudo, colores y estadísticas, con las

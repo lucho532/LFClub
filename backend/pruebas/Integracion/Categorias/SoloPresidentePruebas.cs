@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Categorias;
+namespace LFClub.Pruebas.Integracion.Categorias;
 
 /// <summary>
 /// Solamente el PRESIDENTE crea, desactiva, reactiva y borra categorías y equipos, asigna

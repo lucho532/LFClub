@@ -1,6 +1,6 @@
-using LaPecosa.Infraestructura.Seguridad;
+using LFClub.Infraestructura.Seguridad;
 
-namespace LaPecosa.Pruebas.Unitarias.Seguridad;
+namespace LFClub.Pruebas.Unitarias.Seguridad;
 
 public class HashContrasenaPruebas
 {

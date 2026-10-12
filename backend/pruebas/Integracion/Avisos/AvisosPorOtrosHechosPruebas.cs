@@ -1,10 +1,10 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Avisos;
+namespace LFClub.Pruebas.Integracion.Avisos;
 
 /// <summary>
 /// Solo los diez hechos de actividad generan avisos: ingresar, retirar, cambiar de categoría,

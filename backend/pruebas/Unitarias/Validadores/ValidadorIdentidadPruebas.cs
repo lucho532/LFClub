@@ -1,8 +1,8 @@
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Aplicacion.Validadores;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Validadores;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Unitarias.Validadores;
+namespace LFClub.Pruebas.Unitarias.Validadores;
 
 /// <summary>
 /// La identidad se valida igual en el registro y en la ficha del jugador: nombres y apellidos de

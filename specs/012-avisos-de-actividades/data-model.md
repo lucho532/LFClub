@@ -9,7 +9,7 @@ Dos tablas nuevas y una migración: `AvisosDeActividad`. Todo bajo el filtro de 
 Convenciones de las specs anteriores: `ClubId` obligatorio con foránea a `Clubes` en cascada, fechas
 de registro en UTC (`...En`), enumeraciones guardadas como texto.
 
-## Enumeraciones nuevas (`LaPecosa.Dominio/Enumeraciones`)
+## Enumeraciones nuevas (`LFClub.Dominio/Enumeraciones`)
 
 | Enumeración | Valores | Guardada como |
 | --- | --- | --- |

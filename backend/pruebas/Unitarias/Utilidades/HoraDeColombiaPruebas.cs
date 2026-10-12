@@ -1,7 +1,7 @@
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Aplicacion.Utilidades;
 
-namespace LaPecosa.Pruebas.Unitarias.Utilidades;
+namespace LFClub.Pruebas.Unitarias.Utilidades;
 
 public class HoraDeColombiaPruebas
 {

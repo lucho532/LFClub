@@ -1,7 +1,7 @@
 using System.Text;
-using LaPecosa.Aplicacion.Validadores;
+using LFClub.Aplicacion.Validadores;
 
-namespace LaPecosa.Pruebas.Unitarias.Validadores;
+namespace LFClub.Pruebas.Unitarias.Validadores;
 
 /// <summary>
 /// Los archivos de la ficha se reconocen por su firma binaria, nunca por su nombre, y admiten

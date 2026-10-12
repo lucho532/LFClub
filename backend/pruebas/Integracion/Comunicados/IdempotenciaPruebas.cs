@@ -1,9 +1,9 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
-using static LaPecosa.Pruebas.Integracion.Comunicados.EscenarioComunicados;
+using static LFClub.Pruebas.Integracion.Comunicados.EscenarioComunicados;
 
-namespace LaPecosa.Pruebas.Integracion.Comunicados;
+namespace LFClub.Pruebas.Integracion.Comunicados;
 
 /// <summary>
 /// Un doble toque no publica dos comunicados: la clave hace idempotente la publicación (spec 011,

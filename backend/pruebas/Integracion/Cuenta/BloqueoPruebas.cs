@@ -1,9 +1,9 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Cuenta;
+namespace LFClub.Pruebas.Integracion.Cuenta;
 
 /// <summary>Bloqueo de la cuenta al quinto fallo seguido, hasta recuperar la contraseña (RF-005).</summary>
 [Collection(ColeccionApi.Nombre)]

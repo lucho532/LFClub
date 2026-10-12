@@ -1,9 +1,9 @@
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Aislamiento;
+namespace LFClub.Pruebas.Integracion.Aislamiento;
 
 /// <summary>
 /// Red de seguridad del aislamiento entre clubes (constitución §7.1, research §2): vigila el
@@ -87,11 +87,11 @@ public class ModeloPruebas
     private static string RaizDelBackend()
     {
         var carpeta = new DirectoryInfo(AppContext.BaseDirectory);
-        while (carpeta is not null && !File.Exists(Path.Combine(carpeta.FullName, "LaPecosa.sln")))
+        while (carpeta is not null && !File.Exists(Path.Combine(carpeta.FullName, "LFClub.sln")))
         {
             carpeta = carpeta.Parent;
         }
 
-        return carpeta?.FullName ?? throw new InvalidOperationException("No se encontró LaPecosa.sln.");
+        return carpeta?.FullName ?? throw new InvalidOperationException("No se encontró LFClub.sln.");
     }
 }

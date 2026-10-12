@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Plataforma;
+namespace LFClub.Pruebas.Integracion.Plataforma;
 
 /// <summary>No se puede crear un club sin asignarle un presidente (constitución §20, §12.5).</summary>
 [Collection(ColeccionApi.Nombre)]
@@ -105,7 +105,7 @@ public class CrearClubPruebas
 
     [Theory]
     [InlineData(FabricaApi.CorreoDesarrollador)]
-    [InlineData("  DESARROLLADOR@LaPecosa.Test ")]
+    [InlineData("  DESARROLLADOR@LFClub.Test ")]
     public async Task El_correo_del_desarrollador_responde_409_y_no_se_crea_nada(string correo)
     {
         var cliente = await _fabrica.CrearClienteDePrueba().ConSesionDeDesarrolladorAsync();

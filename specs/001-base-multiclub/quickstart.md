@@ -36,7 +36,7 @@ docker compose logs api | Select-String "Correo para"
 ## Pruebas automatizadas
 
 ```powershell
-dotnet test backend/LaPecosa.sln    # unitarias e integración (la integración necesita Docker)
+dotnet test backend/LFClub.sln    # unitarias e integración (la integración necesita Docker)
 npm --prefix frontend test          # contraste y tema
 ```
 

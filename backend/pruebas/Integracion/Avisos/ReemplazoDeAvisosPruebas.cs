@@ -1,7 +1,7 @@
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Avisos;
+namespace LFClub.Pruebas.Integracion.Avisos;
 
 /// <summary>
 /// Una sola entrada sin leer por actividad en cada familia: varios cambios seguidos se reemplazan por

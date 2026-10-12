@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Ingresos;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Ingresos;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Hermanos;
+namespace LFClub.Pruebas.Integracion.Hermanos;
 
 /// <summary>
 /// La sala de espera le dice al PRESIDENTE de qué jugador del club es hermano cada ingreso

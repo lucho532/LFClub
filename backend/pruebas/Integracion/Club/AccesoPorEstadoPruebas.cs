@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Clubes;
+namespace LFClub.Pruebas.Integracion.Clubes;
 
 /// <summary>
 /// En un club suspendido solo entra su PRESIDENTE; en uno dado de baja no entra nadie (constitución

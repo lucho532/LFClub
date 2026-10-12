@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Avisos;
+namespace LFClub.Pruebas.Integracion.Avisos;
 
 /// <summary>
 /// Cambiar, cancelar y reactivar un partido avisa a las familias que lo ven: un partido próximo,

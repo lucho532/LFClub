@@ -122,7 +122,7 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/
 │   │   ├── + Categoria.cs
 │   │   ├── + Equipo.cs
@@ -136,7 +136,7 @@ backend/src/
 │       ├── + ReglaAlcanceDeCategorias.cs      # qué ve cada rol
 │       ├── ~ ReglaAccesoPorEstado.cs          # también el retiro
 │       └── ~ ResultadoAcceso.cs               # IntegranteRetirado
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + CrearCategoriaDto, CategoriaDto, CategoriaDetalleDto,
 │   │                        CategoriaConUbicadosDto, EquipoDto, EquipoDeReferenciaDto,
 │   │                        NombreEquipoDto, EquiposDeEntrenadorDto, EntrenadorDeCategoriaDto,
@@ -159,9 +159,9 @@ backend/src/
 │   ├── Validadores/       + ValidadorNombreEquipo
 │   └── Utilidades/        + UbicadorDeJugadores, ErroresDeCategorias
 │                          ~ ErroresDeInvitacion (persona retirada), IndicesUnicos
-├── LaPecosa.Infraestructura/
+├── LFClub.Infraestructura/
 │   ├── Datos/
-│   │   ├── ~ ContextoLaPecosa.cs              # cinco DbSet
+│   │   ├── ~ ContextoLFClub.cs              # cinco DbSet
 │   │   ├── Configuraciones/   + una por cada entidad nueva   ~ ConfiguracionUsuarioRol
 │   │   └── Migraciones/       + CategoriasDelClub
 │   └── Repositorios/
@@ -172,7 +172,7 @@ backend/src/
 │       ├── ~ RepositorioClub.cs               # SELECT ... FOR UPDATE del club de la petición
 │       ├── ~ RepositorioInvitacionesClub.cs   # distingue al retirado
 │       └── Plataforma/ ~ RepositorioPertenencias.cs
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Autorizacion/      ~ IntegranteDelClubAttribute   # niega a quien está retirado
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/Club/

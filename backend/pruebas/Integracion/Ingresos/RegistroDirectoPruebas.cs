@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Ingresos;
+namespace LFClub.Pruebas.Integracion.Ingresos;
 
 /// <summary>
 /// Quien se registra con una invitación del club entra directamente con el rol de la invitación,
@@ -119,7 +119,7 @@ public class RegistroDirectoPruebas
         var (invitacion, token) = await _fabrica.Sembrador.CrearInvitacionAsync(club, rol: Rol.JUGADOR);
         var documento = Sembrador.Unico("doc");
         var cuerpo = JsonSerializer.Deserialize<JsonElement>(
-            $"{{\"token\":\"{token}\",\"correo\":\"intruso@lapecosa.test\",\"rol\":\"PRESIDENTE\",\"estadoIngreso\":\"EN_ESPERA\"," +
+            $"{{\"token\":\"{token}\",\"correo\":\"intruso@lfclub.test\",\"rol\":\"PRESIDENTE\",\"estadoIngreso\":\"EN_ESPERA\"," +
             $"\"clubId\":\"{otroClub.Id}\",\"nombres\":\"Ana\",\"apellidos\":\"Pérez\",\"tipoDocumento\":\"CEDULA_CIUDADANIA\"," +
             $"\"numeroDocumento\":\"{documento}\",\"fechaNacimiento\":\"1990-01-01\",\"celular\":\"3001234567\"," +
             $"\"contrasena\":\"{EscenarioIngresos.ContrasenaDeRegistro}\"}}");
@@ -132,7 +132,7 @@ public class RegistroDirectoPruebas
         Assert.Equal(EstadoIngreso.APROBADO, integrante.EstadoIngreso);
         Assert.Equal(invitacion.Correo, (await _fabrica.CuentaAsync(integrante.UsuarioId)).CorreoNormalizado);
         Assert.Equal(0, await ContarIntegrantesAsync(otroClub.Id));
-        Assert.False(await _fabrica.ConContextoAsync(contexto => contexto.Usuarios.AnyAsync(u => u.CorreoNormalizado == "intruso@lapecosa.test")));
+        Assert.False(await _fabrica.ConContextoAsync(contexto => contexto.Usuarios.AnyAsync(u => u.CorreoNormalizado == "intruso@lfclub.test")));
     }
 
     [Theory]

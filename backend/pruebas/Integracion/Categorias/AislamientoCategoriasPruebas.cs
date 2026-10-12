@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Categorias;
+namespace LFClub.Pruebas.Integracion.Categorias;
 
 /// <summary>
 /// Nadie de otro club ve ni cambia una categoría, un equipo o un jugador de este, ni siquiera con

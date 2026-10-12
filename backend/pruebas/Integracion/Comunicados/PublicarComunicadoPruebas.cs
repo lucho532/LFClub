@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Comunicados.EscenarioComunicados;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Comunicados.EscenarioComunicados;
 
-namespace LaPecosa.Pruebas.Integracion.Comunicados;
+namespace LFClub.Pruebas.Integracion.Comunicados;
 
 /// <summary>
 /// Publicar un comunicado: quién puede, qué guarda, qué valida y quién lo recibe (spec 011, bloque 1

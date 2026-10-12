@@ -1,11 +1,11 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
-using LaPecosa.Pruebas.Integracion.Ingresos;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
+using LFClub.Pruebas.Integracion.Ingresos;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Hermanos;
+namespace LFClub.Pruebas.Integracion.Hermanos;
 
 /// <summary>
 /// La familia agrega un hermano desde la ficha de un jugador aprobado: queda en espera, en la misma

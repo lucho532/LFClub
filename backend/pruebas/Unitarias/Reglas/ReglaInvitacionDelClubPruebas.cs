@@ -1,7 +1,7 @@
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Dominio.Reglas;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Dominio.Reglas;
 
-namespace LaPecosa.Pruebas.Unitarias.Reglas;
+namespace LFClub.Pruebas.Unitarias.Reglas;
 
 /// <summary>Una invitación del club solo lleva JUGADOR, ENTRENADOR o DIRECTIVO (RF-001 y RF-002).</summary>
 public class ReglaInvitacionDelClubPruebas

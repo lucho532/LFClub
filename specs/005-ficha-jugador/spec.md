@@ -10,7 +10,7 @@
 funcionalidades que la spec 004 dejó fuera de alcance ("Ficha del jugador, datos médicos y
 documentos").
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.1.0, en especial §1, §7.1, §7.5, §8, §9, §10, §12.3, §12.4,
 §14.1, §15 y §20.

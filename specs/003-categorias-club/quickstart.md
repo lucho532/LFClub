@@ -27,7 +27,7 @@ Con las guías de la 001 y la [002](../002-ingreso-club/quickstart.md), dejar cr
 ## Pruebas automatizadas
 
 ```powershell
-dotnet test backend/LaPecosa.sln    # unitarias e integración (la integración necesita Docker)
+dotnet test backend/LFClub.sln    # unitarias e integración (la integración necesita Docker)
 npm --prefix frontend test
 ```
 

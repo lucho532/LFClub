@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Carta;
+namespace LFClub.Pruebas.Integracion.Carta;
 
 /// <summary>
 /// Ninguna lista entrega, ordena ni compara estadísticas, valoraciones o rarezas de carta de más de

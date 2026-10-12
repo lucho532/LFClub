@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Entrenamientos;
+namespace LFClub.Pruebas.Integracion.Entrenamientos;
 
 /// <summary>
 /// Programar un entrenamiento y consultarlo: lo programa el PRESIDENTE o quien entrena todas sus

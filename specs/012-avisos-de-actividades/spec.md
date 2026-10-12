@@ -13,7 +13,7 @@ el resultado y la asistencia. A las familias de la categoría; en partidos, solo
 convocados. Una línea corta que, al tocarla, abre el detalle, mezclada con los comunicados. El aviso
 con la aplicación cerrada sigue fuera de alcance.
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.9.0, en especial §1, §7.1, §7.5, §8 (Presidente, Directivo,
 Entrenador y Jugador), §11.1, §14, §14.4, §15, §17.2, §20, §24, §25 y §28.

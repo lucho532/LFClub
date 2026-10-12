@@ -10,7 +10,7 @@
 desde la ficha de un jugador ya registrado y elegir con cuál jugador continuar al entrar", elegida
 entre las funcionalidades que la spec 005 dejó fuera de alcance.
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.1.0, en especial §7.1, §7.3, §8 (Jugador), §10, §12.1,
 §12.1.1, §12.1.2, §12.3, §12.4, §14.1, §15 y §20.

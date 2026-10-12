@@ -12,7 +12,7 @@ implementarla. El contrato está en [contracts/api.yaml](contracts/api.yaml), la
   validación y borrarlo al final.
 - SDK de .NET 10 y Node 22 (solo para ejecutar las pruebas fuera de Docker).
 - Puesta en marcha como la de la [001](../001-base-multiclub/quickstart.md), en un proyecto de
-  Compose aparte (`docker compose -p la-pecosa-validacion …`) con `Brevo__Llave` vacía, para no
+  Compose aparte (`docker compose -p lfclub-validacion …`) con `Brevo__Llave` vacía, para no
   enviar correos reales ni tocar los datos de desarrollo. Aplicación en <http://localhost:5173>, API
   en <http://localhost:8080>.
 - La migración `AvisosDeActividad` se aplica sola al arrancar la API.

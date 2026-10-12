@@ -1,9 +1,9 @@
-using LaPecosa.Aplicacion.DTOs;
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Aplicacion.Validadores;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.DTOs;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Validadores;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Unitarias.Validadores;
+namespace LFClub.Pruebas.Unitarias.Validadores;
 
 /// <summary>
 /// Al agregar un hermano se exige su identidad, con las reglas del registro, y el responsable solo

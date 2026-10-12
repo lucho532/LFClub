@@ -1,12 +1,12 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
-using static LaPecosa.Pruebas.Integracion.Personas.LecturaDePersonas;
+using static LFClub.Pruebas.Integracion.Personas.LecturaDePersonas;
 
-namespace LaPecosa.Pruebas.Integracion.Cuenta;
+namespace LFClub.Pruebas.Integracion.Cuenta;
 
 /// <summary>
 /// Un PRESIDENTE, DIRECTIVO o ENTRENADOR ve sus datos en "Mi perfil" y cambia nombres, apellidos,
@@ -112,7 +112,7 @@ public class DatosPropiosPruebas
         var respuesta = await (await ClienteAsync(c.E1.Usuario)).PutAsync(Ruta, new
         {
             nombres = "Ernesto", apellidos = "Otro", fechaNacimiento = "1985-03-14", celular = "3001234567",
-            tipoDocumento = "CEDULA_EXTRANJERIA", numeroDocumento = "999999999", correo = "otro@lapecosa.test",
+            tipoDocumento = "CEDULA_EXTRANJERIA", numeroDocumento = "999999999", correo = "otro@lfclub.test",
         });
 
         var datos = await CuerpoAsync(respuesta);

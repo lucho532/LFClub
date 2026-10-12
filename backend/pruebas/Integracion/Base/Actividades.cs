@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
+using LFClub.Dominio.Entidades;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Cuerpos de las peticiones de entrenamientos y partidos, y lecturas de sus respuestas, para que

@@ -1,9 +1,9 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Entrenamientos;
+namespace LFClub.Pruebas.Integracion.Entrenamientos;
 
 /// <summary>
 /// Quién ve cada entrenamiento en el calendario, en "Próximos entrenamientos" y por su

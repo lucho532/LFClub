@@ -10,7 +10,7 @@ Convenciones de las specs anteriores: `ClubId` obligatorio con foránea a `Clube
 fechas de registro en UTC (`...En`), autores por integrante (`...PorUsuarioRolId`, a nulo si se
 borra) y por nombre copiado en el momento (§13).
 
-## Enumeraciones nuevas (`LaPecosa.Dominio/Enumeraciones`)
+## Enumeraciones nuevas (`LFClub.Dominio/Enumeraciones`)
 
 | Enumeración | Valores | Guardada como |
 | --- | --- | --- |

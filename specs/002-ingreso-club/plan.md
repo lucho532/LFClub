@@ -110,7 +110,7 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/
 │   │   ├── ~ Usuario.cs                    # NombreResponsable
 │   │   ├── ~ UsuarioRol.cs                 # datos de la aprobación
@@ -123,7 +123,7 @@ backend/src/
 │       ├── + ReglaIngresoPorInvitacion.cs  # PRESIDENTE entra aprobado; el resto, en espera
 │       ├── + ReglaAprobacionIngreso.cs     # qué rol puede asignar cada quien
 │       └── + ReglaMayoriaDeEdad.cs
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + InvitarAlClubDto, InvitacionClubDto, IngresoEnEsperaDto,
 │   │                        AprobarIngresoDto, IngresoAprobadoDto
 │   │                      ~ ClubDeSesionDto, InvitacionVigenteDto, RegistrarConInvitacionDto
@@ -138,7 +138,7 @@ backend/src/
 │   ├── Validadores/       ~ ValidadorRegistro
 │   └── Utilidades/        + construcción compartida de invitaciones; eliminación compartida
 │                            de la cuenta que se queda sin club   ~ ErroresDeInvitacion
-├── LaPecosa.Infraestructura/
+├── LFClub.Infraestructura/
 │   ├── Datos/
 │   │   ├── Configuraciones/   ~ ConfiguracionUsuario, ConfiguracionUsuarioRol
 │   │   └── Migraciones/       + IngresoAlClub
@@ -148,7 +148,7 @@ backend/src/
 │   │   └── Plataforma/
 │   │       └── ~ RepositorioInvitacionesPlataforma.cs   # solo invitaciones de presidente
 │   └── Correo/                ~ PlantillasCorreo        # la invitación del club no nombra rol
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Autorizacion/      ~ IntegranteDelClubAttribute  # varios roles; niega a quien está en espera
     └── Controladores/Club/
         ├── + ControladorInvitacionesClub.cs

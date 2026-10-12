@@ -122,10 +122,10 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   └── Entidades/         + FotoJugador.cs
 │                          ~ UsuarioRol.cs, FichaJugador.cs, Club.cs, EscudoClub.cs (solo documentación)
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + GrupoDeJugadoresDto, CategoriaDeGrupoDto, JugadorDeListaDto, ResumenClubDto
 │   │                      ~ FichaJugadorDto (FotoActualizadaEn)
 │   ├── Interfaces/        + IRepositorioFotosJugador, IRepositorioResumenClub
@@ -138,15 +138,15 @@ backend/src/
 │   ├── Mappers/           + MapperListaJugadores
 │   │                      ~ MapperFicha (FotoActualizadaEn)
 │   └── Utilidades/        ~ ErroresDeFicha (foto_no_es_imagen, foto_demasiado_grande, jugador_retirado)
-├── LaPecosa.Infraestructura/
+├── LFClub.Infraestructura/
 │   ├── Datos/
-│   │   ├── ~ ContextoLaPecosa.cs            # DbSet FotosJugador
+│   │   ├── ~ ContextoLFClub.cs            # DbSet FotosJugador
 │   │   ├── Configuraciones/  + ConfiguracionFotoJugador
 │   │   └── Migraciones/      + FotosDeJugadores (generada)
 │   └── Repositorios/      + RepositorioFotosJugador, RepositorioResumenClub
 │                          ~ RepositorioJugadores, RepositorioEscudos,
 │                            Plataforma/RepositorioRetiroEntreClubes (borra las fotos que retira)
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/
         ├── Club/          + ControladorFotoJugador, ControladorIdentidadDelClub

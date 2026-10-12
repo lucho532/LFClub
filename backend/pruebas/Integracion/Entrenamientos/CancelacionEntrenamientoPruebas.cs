@@ -1,9 +1,9 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Entrenamientos;
+namespace LFClub.Pruebas.Integracion.Entrenamientos;
 
 /// <summary>
 /// Cambiar, cancelar y reactivar un entrenamiento: solo quien lo gestiona, un cancelado sigue a la

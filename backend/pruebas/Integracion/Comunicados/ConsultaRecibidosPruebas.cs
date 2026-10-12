@@ -1,8 +1,8 @@
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Comunicados.EscenarioComunicados;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Comunicados.EscenarioComunicados;
 
-namespace LaPecosa.Pruebas.Integracion.Comunicados;
+namespace LFClub.Pruebas.Integracion.Comunicados;
 
 /// <summary>
 /// La familia nunca ve a los demás: lo que recibe no lleva la audiencia, los destinos ni cuántas

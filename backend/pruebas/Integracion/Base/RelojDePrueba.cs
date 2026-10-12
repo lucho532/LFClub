@@ -1,7 +1,7 @@
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Aplicacion.Utilidades;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Reloj de la API en las pruebas: el real mientras nadie lo fije, y fijo en el instante que diga

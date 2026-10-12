@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Entrenamientos;
+namespace LFClub.Pruebas.Integracion.Entrenamientos;
 
 /// <summary>
 /// Las respuestas de las familias: cada cuenta responde por su jugador elegido hasta la hora de
@@ -61,7 +61,7 @@ public class RespuestasPruebas : IDisposable
         var e = await _fabrica.Actividades.CrearClubAsync();
         var entrenamiento = await _fabrica.Actividades.CrearEntrenamientoAsync([e.C2014], Manana, new TimeOnly(16, 0));
         var cancelado = await _fabrica.Actividades.CrearEntrenamientoAsync(
-            [e.C2014], Manana, estado: LaPecosa.Dominio.Enumeraciones.EstadoEntrenamiento.CANCELADO);
+            [e.C2014], Manana, estado: LFClub.Dominio.Enumeraciones.EstadoEntrenamiento.CANCELADO);
         var ruta = e.Ruta($"/entrenamientos/{entrenamiento.Id}/mi-respuesta");
 
         await Actividades.ErrorAsync(await e.M1.Cliente.PutAsync(ruta, Asistira), HttpStatusCode.NotFound, "no_encontrado");

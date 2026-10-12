@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Aislamiento;
+namespace LFClub.Pruebas.Integracion.Aislamiento;
 
 /// <summary>
 /// Aislamiento entre clubes y alcance del DESARROLLADOR sobre cada endpoint de club (constitución

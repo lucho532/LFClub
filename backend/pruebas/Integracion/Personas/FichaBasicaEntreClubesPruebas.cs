@@ -1,7 +1,7 @@
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Personas.LecturaDePersonas;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Personas.LecturaDePersonas;
 
-namespace LaPecosa.Pruebas.Integracion.Personas;
+namespace LFClub.Pruebas.Integracion.Personas;
 
 /// <summary>
 /// La ficha básica no cruza clubes: desde otro club o como DESARROLLADOR es como si no existiera, y

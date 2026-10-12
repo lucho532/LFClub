@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>La Pecosa</title>
-    <!-- El balón de La Pecosa, generado por scripts/generar-balon.py. Declararlo evita que el
+    <title>LFClub</title>
+    <!-- El balón de LFClub, generado por scripts/generar-balon.py. Declararlo evita que el
          navegador muestre el icono que guardó de otra aplicación servida en la misma dirección. -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
@@ -15,7 +15,7 @@
       (function () {
         var tema = null;
         try {
-          tema = localStorage.getItem('lapecosa.tema');
+          tema = localStorage.getItem('lfclub.tema');
         } catch (error) {}
         if (tema !== 'claro' && tema !== 'oscuro') {
           var oscuro = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -28,7 +28,7 @@
         // src/arranque/debeMostrarArranque.ts; la animación quita la marca al terminar.
         try {
           var nativa = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-          if (nativa && !sessionStorage.getItem('lapecosa.arranqueVisto')) {
+          if (nativa && !sessionStorage.getItem('lfclub.arranqueVisto')) {
             document.documentElement.setAttribute('data-arranque', '');
           }
         } catch (error) {}

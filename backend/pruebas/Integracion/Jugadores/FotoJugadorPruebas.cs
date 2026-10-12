@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Jugadores.QuienVeLaFotoPruebas;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Jugadores.QuienVeLaFotoPruebas;
 
-namespace LaPecosa.Pruebas.Integracion.Jugadores;
+namespace LFClub.Pruebas.Integracion.Jugadores;
 
 /// <summary>
 /// La familia y el PRESIDENTE cargan, cambian y quitan la foto propia del jugador; cada cambio

@@ -1,9 +1,9 @@
-using LaPecosa.Aplicacion.DTOs;
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Aplicacion.Validadores;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.DTOs;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Validadores;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Unitarias.Validadores;
+namespace LFClub.Pruebas.Unitarias.Validadores;
 
 /// <summary>
 /// El formulario de la ficha solo exige el celular y, si el jugador es menor de 18 años, el

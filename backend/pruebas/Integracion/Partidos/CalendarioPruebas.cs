@@ -1,7 +1,7 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Partidos;
+namespace LFClub.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// El calendario: un rango de hasta 62 días, ambos incluidos, con lo que quien pregunta puede ver
@@ -46,7 +46,7 @@ public class CalendarioPruebas
         var partido = await _fabrica.Actividades.CrearPartidoAsync(
             [e.C2014], Hoy.AddDays(1), convocados: convocados.Select(numero => e.Jn(numero).Integrante));
         var cancelado = await _fabrica.Actividades.CrearPartidoAsync(
-            [e.C2014], Hoy.AddDays(2), convocados: [e.Jn(3).Integrante], estado: LaPecosa.Dominio.Enumeraciones.EstadoPartido.CANCELADO);
+            [e.C2014], Hoy.AddDays(2), convocados: [e.Jn(3).Integrante], estado: LFClub.Dominio.Enumeraciones.EstadoPartido.CANCELADO);
 
         for (var numero = 1; numero <= 10; numero++)
         {

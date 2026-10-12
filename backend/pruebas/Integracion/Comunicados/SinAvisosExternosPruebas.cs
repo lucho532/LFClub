@@ -1,9 +1,9 @@
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.Extensions.DependencyInjection;
-using static LaPecosa.Pruebas.Integracion.Comunicados.EscenarioComunicados;
+using static LFClub.Pruebas.Integracion.Comunicados.EscenarioComunicados;
 
-namespace LaPecosa.Pruebas.Integracion.Comunicados;
+namespace LFClub.Pruebas.Integracion.Comunicados;
 
 /// <summary>
 /// Publicar y retirar un comunicado no envía nada fuera de la aplicación: ni correo ni ningún otro
@@ -50,7 +50,7 @@ public class SinAvisosExternosPruebas
     [Fact]
     public void El_servicio_de_publicacion_no_depende_del_servicio_de_correo()
     {
-        var constructores = typeof(LaPecosa.Aplicacion.Implementaciones.ServicioPublicacionComunicados).GetConstructors();
+        var constructores = typeof(LFClub.Aplicacion.Implementaciones.ServicioPublicacionComunicados).GetConstructors();
 
         var parametros = constructores.SelectMany(constructor => constructor.GetParameters()).Select(p => p.ParameterType);
         Assert.DoesNotContain(typeof(IServicioCorreo), parametros);

@@ -225,7 +225,7 @@ Plantillas:
 | `PARTIDO_CANCELADO` | `Partido contra Rival del sábado cancelado` |
 | `PARTIDO_REACTIVADO` | `El partido contra Rival del sábado sigue en pie` |
 | `JUGADOR_CONVOCADO` | `Mateo fue convocado al partido contra Rival el sábado a las 15:00` |
-| `RESULTADO_PUBLICADO` | `Resultado del partido contra Rival: La Pecosa 3 - 1 Rival` |
+| `RESULTADO_PUBLICADO` | `Resultado del partido contra Rival: LFClub 3 - 1 Rival` |
 
 Sin rival ("Por definir"): "el partido del sábado". El texto del aviso es una instantánea: si la
 actividad cambia después, el aviso leído no se reescribe (RF-025).

@@ -1,8 +1,8 @@
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Dominio.Reglas;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Dominio.Reglas;
 
-namespace LaPecosa.Pruebas.Unitarias.Utilidades;
+namespace LFClub.Pruebas.Unitarias.Utilidades;
 
 public class RedaccionDeAvisosPruebas
 {
@@ -81,11 +81,11 @@ public class RedaccionDeAvisosPruebas
     [Fact]
     public void El_marcador_sigue_el_orden_local_o_visitante()
     {
-        var local = RedaccionDeAvisos.ResultadoPublicado("Rival", CondicionPartido.LOCAL, "La Pecosa", 3, 1);
-        var visitante = RedaccionDeAvisos.ResultadoPublicado("Rival", CondicionPartido.VISITANTE, "La Pecosa", 3, 1);
+        var local = RedaccionDeAvisos.ResultadoPublicado("Rival", CondicionPartido.LOCAL, "LFClub", 3, 1);
+        var visitante = RedaccionDeAvisos.ResultadoPublicado("Rival", CondicionPartido.VISITANTE, "LFClub", 3, 1);
 
-        Assert.Equal("Resultado del partido contra Rival: La Pecosa 3 - 1 Rival", local);
-        Assert.Equal("Resultado del partido contra Rival: Rival 1 - 3 La Pecosa", visitante);
+        Assert.Equal("Resultado del partido contra Rival: LFClub 3 - 1 Rival", local);
+        Assert.Equal("Resultado del partido contra Rival: Rival 1 - 3 LFClub", visitante);
     }
 
     [Fact]

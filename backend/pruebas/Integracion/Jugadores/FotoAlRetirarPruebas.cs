@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Hermanos;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Hermanos;
 using Microsoft.EntityFrameworkCore;
-using static LaPecosa.Pruebas.Integracion.Jugadores.QuienVeLaFotoPruebas;
+using static LFClub.Pruebas.Integracion.Jugadores.QuienVeLaFotoPruebas;
 
-namespace LaPecosa.Pruebas.Integracion.Jugadores;
+namespace LFClub.Pruebas.Integracion.Jugadores;
 
 /// <summary>
 /// La foto propia del jugador se borra definitivamente cuando deja el club, de cualquiera de las

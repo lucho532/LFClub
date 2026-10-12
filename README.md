@@ -1,4 +1,4 @@
-# La Pecosa
+# LFClub
 
 Plataforma multiclub para escuelas y clubes de fútbol. Una misma instalación atiende a varios
 clubes, cada uno con sus datos aislados, su escudo y sus colores.
@@ -8,7 +8,7 @@ plataforma**: clubes aislados entre sí, cuentas con un rol por club, el panel d
 desarrollador crea y administra clubes, el registro del presidente por invitación, la identidad
 visual de cada club, los temas claro y oscuro y la foto de perfil.
 
-- `backend/`: API en ASP.NET Core 10 por capas (`LaPecosa.Api`, `Aplicacion`, `Dominio`,
+- `backend/`: API en ASP.NET Core 10 por capas (`LFClub.Api`, `Aplicacion`, `Dominio`,
   `Infraestructura`) sobre PostgreSQL 17, con sus pruebas en `backend/pruebas/`.
 - `frontend/`: una sola aplicación React 19 con TypeScript y Vite.
 - `specs/001-base-multiclub/`: especificación, plan, modelo de datos, contrato de la API y guía de
@@ -68,7 +68,7 @@ remitente verificado en `Brevo__Remitente`.
 ## Pruebas
 
 ```powershell
-dotnet test backend/LaPecosa.sln    # unitarias e integración
+dotnet test backend/LFClub.sln    # unitarias e integración
 npm --prefix frontend ci            # solo la primera vez
 npm --prefix frontend test          # contraste, temas y club de entrada
 ```
@@ -92,12 +92,12 @@ El recorrido manual completo, paso a paso y con el resultado esperado de cada un
 `docker-compose.yml` no publica el puerto de la base de datos. Para ejecutar la API fuera de
 Docker hace falta un PostgreSQL 17 accesible (por ejemplo, añadiendo `ports: ["5432:5432"]` al
 servicio `bd` en un archivo `docker-compose.override.yml` propio) y pasar a
-`dotnet run --project backend/src/LaPecosa.Api` la misma configuración de `.env` como variables de
+`dotnet run --project backend/src/LFClub.Api` la misma configuración de `.env` como variables de
 entorno, con `Host=localhost` en la cadena de conexión. El frontend se ejecuta con
 `npm --prefix frontend run dev`; la dirección de la API que usa se fija con `VITE_URL_API`.
 
 Para crear una migración tras cambiar el modelo:
 
 ```powershell
-dotnet ef migrations add <Nombre> -p backend/src/LaPecosa.Infraestructura -s backend/src/LaPecosa.Infraestructura -o Datos/Migraciones
+dotnet ef migrations add <Nombre> -p backend/src/LFClub.Infraestructura -s backend/src/LFClub.Infraestructura -o Datos/Migraciones
 ```

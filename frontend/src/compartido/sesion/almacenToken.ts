@@ -1,6 +1,6 @@
 import type { TokenSesionDto } from '../api/tipos';
 
-const CLAVE = 'lapecosa.sesion';
+const CLAVE = 'lfclub.sesion';
 
 interface TokenGuardado {
   token: string;

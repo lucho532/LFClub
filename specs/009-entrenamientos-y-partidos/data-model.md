@@ -12,7 +12,7 @@ Convenciones de las specs anteriores: clave `Guid` versión 7, `ClubId` obligato
 `Clubes`, fechas de registro en UTC (`...En`), nombres de autores copiados en el momento (§13).
 Fecha y horas de las actividades en hora de Colombia, sin zona (research §2).
 
-## Enumeraciones nuevas (`LaPecosa.Dominio/Enumeraciones`)
+## Enumeraciones nuevas (`LFClub.Dominio/Enumeraciones`)
 
 | Enumeración | Valores | Guardada como |
 | --- | --- | --- |

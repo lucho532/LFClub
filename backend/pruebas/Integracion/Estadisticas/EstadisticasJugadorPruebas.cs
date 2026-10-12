@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Estadisticas;
+namespace LFClub.Pruebas.Integracion.Estadisticas;
 
 /// <summary>
 /// Las estadísticas de la ficha se calculan de lo registrado, por la categoría copiada, y las ve

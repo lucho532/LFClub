@@ -1,8 +1,8 @@
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Dominio.Reglas;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Dominio.Reglas;
 
-namespace LaPecosa.Pruebas.Unitarias.Reglas;
+namespace LFClub.Pruebas.Unitarias.Reglas;
 
 public class ReglaDocumentoCompartidoPruebas
 {

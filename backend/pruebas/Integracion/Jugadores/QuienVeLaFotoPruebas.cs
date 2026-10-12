@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Jugadores;
+namespace LFClub.Pruebas.Integracion.Jugadores;
 
 /// <summary>
 /// La foto de un jugador la ve quien ve su ficha, y nadie más: a los demás se les responde como si

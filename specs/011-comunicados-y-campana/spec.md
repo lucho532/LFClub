@@ -10,7 +10,7 @@
 presidente y directivos, y campana de notificaciones con contador en las pantallas del jugador.
 Sin avisos al teléfono con la app cerrada."
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.9.0, en especial §1, §7.1, §7.5, §8 (Presidente, Directivo,
 Entrenador y Jugador), §11, §11.3, §12.1.1, §12.6, §13, §14, §14.4, §15, §20, §24, §25 y §28.

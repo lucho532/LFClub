@@ -34,7 +34,7 @@ Con las guías de la 003 y la [004](../004-invitacion-con-rol/quickstart.md), de
 ## Pruebas automatizadas
 
 ```powershell
-dotnet test backend/LaPecosa.sln    # unitarias e integración (la integración necesita Docker)
+dotnet test backend/LFClub.sln    # unitarias e integración (la integración necesita Docker)
 npm --prefix frontend test
 ```
 

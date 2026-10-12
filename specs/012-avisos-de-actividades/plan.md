@@ -124,12 +124,12 @@ estructura es la de la 001.
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/         + AvisoDeActividad, AvisoDeActividadDestinatario
 │   │                      ~ UsuarioRol, Entrenamiento, Partido (documentación)
 │   ├── Enumeraciones/     + TipoDeActividad, HechoDeActividad
 │   └── Reglas/            + ReglaCambiosDeActividad, ReglaDestinatariosDeAviso
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + AvisoRecibidoDto, ActividadDeAvisoDto, ElementoDeCampanaDto,
 │   │                        PaginaDeCampanaDto, ContadorDeCampanaDto
 │   │                      - PaginaDeRecibidosDto, ContadorDeComunicadosDto
@@ -145,13 +145,13 @@ backend/src/
 │   │                        ServicioConsultaComunicados, ServicioLecturaComunicados
 │   ├── Mappers/           + MapperCampana
 │   └── Utilidades/        + RedaccionDeAvisos, OrdenDeIdentificadores
-├── LaPecosa.Infraestructura/
-│   ├── Datos/             ~ ContextoLaPecosa (dos DbSet)
+├── LFClub.Infraestructura/
+│   ├── Datos/             ~ ContextoLFClub (dos DbSet)
 │   │   ├── Configuraciones/ + ConfiguracionAvisoDeActividad, ConfiguracionAvisoDeActividadDestinatario
 │   │   └── Migraciones/   + AvisosDeActividad
 │   └── Repositorios/      + RepositorioAvisos, RepositorioAvisos.Campana (parcial)
 │                          ~ RepositorioAsistencias
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/Club/ + ControladorCampana
                            ~ ControladorComunicadosRecibidos (quedan detalle y lectura)

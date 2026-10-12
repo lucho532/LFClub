@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Pantalla de arranque hasta Android 11: el balón de La Pecosa, quieto, centrado sobre el fondo
+<!-- Pantalla de arranque hasta Android 11: el balón de LFClub, quieto, centrado sobre el fondo
      oscuro. Desde Android 12 la dibuja el sistema con windowSplashScreen* y el balón gira. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/fondo_arranque" />

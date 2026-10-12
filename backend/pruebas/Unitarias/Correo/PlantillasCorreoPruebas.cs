@@ -1,7 +1,7 @@
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Infraestructura.Correo;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Infraestructura.Correo;
 
-namespace LaPecosa.Pruebas.Unitarias.Correo;
+namespace LFClub.Pruebas.Unitarias.Correo;
 
 public class PlantillasCorreoPruebas
 {

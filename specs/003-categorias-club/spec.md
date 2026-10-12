@@ -9,7 +9,7 @@
 **Entrada**: Descripción del propietario del proyecto: "Categorías del club: el PRESIDENTE o
 DIRECTIVO crea categorías, les asigna entrenadores y ubica a los jugadores aprobados en ellas"
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 3.7.0, en especial §7.1, §7.4, §7.5, §8, §11, §12.1.1, §12.3,
 §14 y §18.

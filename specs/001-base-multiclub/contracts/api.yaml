@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: La Pecosa - API de la funcionalidad 001 (base multiclub)
+  title: LFClub - API de la funcionalidad 001 (base multiclub)
   version: 0.1.0
   description: |
     Contrato de la API para la base multiclub y el panel de administración de la plataforma.

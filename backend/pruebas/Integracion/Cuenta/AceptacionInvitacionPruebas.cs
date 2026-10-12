@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Cuenta;
+namespace LFClub.Pruebas.Integracion.Cuenta;
 
 /// <summary>
 /// Aceptar una invitación con una cuenta que ya existe (RF-010): nunca una segunda cuenta, y entra

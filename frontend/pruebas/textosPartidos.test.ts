@@ -28,10 +28,10 @@ describe('nombreRival', () => {
 
 describe('textoDeMarcador', () => {
   it('de local pone primero al club', () => {
-    expect(textoDeMarcador({ ...base, rival: 'Equipo C' }, 'La Pecosa')).toBe('La Pecosa 3 - 1 Equipo C');
+    expect(textoDeMarcador({ ...base, rival: 'Equipo C' }, 'LFClub')).toBe('LFClub 3 - 1 Equipo C');
   });
 
   it('de visitante y sin rival pone primero "Por definir"', () => {
-    expect(textoDeMarcador({ ...base, condicion: 'VISITANTE' }, 'La Pecosa')).toBe('Por definir 1 - 3 La Pecosa');
+    expect(textoDeMarcador({ ...base, condicion: 'VISITANTE' }, 'LFClub')).toBe('Por definir 1 - 3 LFClub');
   });
 });

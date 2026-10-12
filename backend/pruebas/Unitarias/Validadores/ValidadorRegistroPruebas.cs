@@ -1,9 +1,9 @@
-using LaPecosa.Aplicacion.DTOs;
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Aplicacion.Validadores;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.DTOs;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Validadores;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Unitarias.Validadores;
+namespace LFClub.Pruebas.Unitarias.Validadores;
 
 /// <summary>
 /// El responsable solo se pide con una invitación de JUGADOR: obligatorio para un menor de 18 años

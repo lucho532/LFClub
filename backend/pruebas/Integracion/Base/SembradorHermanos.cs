@@ -1,8 +1,8 @@
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Crea hermanos directamente en la base de datos: otro jugador de la misma cuenta y el mismo club

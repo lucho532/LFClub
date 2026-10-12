@@ -8,7 +8,7 @@
 
 **Entrada**: Descripción del propietario del proyecto: "con la adaptación a la constitución 4.0.0."
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.1.0, en especial §8, §12.1, §12.1.1, §12.2, §12.3, §14.1 y
 §20. La 4.1.0 nació de esta spec: deja las invitaciones y la aprobación de ingresos solo al

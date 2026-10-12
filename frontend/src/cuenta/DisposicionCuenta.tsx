@@ -23,7 +23,7 @@ export function DisposicionCuenta({ titulo, subtitulo, identidad, children }: Pr
       <header className="columna">
         <div className="cabecera">
           <p className="lateral-marca" style={{ padding: 0 }}>
-            La Pecosa
+            LFClub
           </p>
           <span className="barra-superior-acciones">
             <BotonRecargar />

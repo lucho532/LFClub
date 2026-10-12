@@ -1,9 +1,9 @@
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Carta;
+namespace LFClub.Pruebas.Integracion.Carta;
 
 /// <summary>
 /// La rareza sale de la asistencia a los entrenamientos no cancelados de la temporada y se

@@ -16,7 +16,7 @@ perfil solo la ve su dueño. Una duda que tengo es que cuando doy clic arriba en
 da la opción de modificar o subir la foto pero no me permite modificar los datos personales y
 debería dejarme."
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.5.1, en especial §7.1, §7.5, §8, §10, §12.3, §12.6, §14.2,
 §15, §20 y §24.

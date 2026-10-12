@@ -1,11 +1,11 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Pruebas.Integracion.Aislamiento;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Ficha;
-using LaPecosa.Pruebas.Integracion.Ingresos;
+using LFClub.Dominio.Entidades;
+using LFClub.Pruebas.Integracion.Aislamiento;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Ficha;
+using LFClub.Pruebas.Integracion.Ingresos;
 
-namespace LaPecosa.Pruebas.Integracion.Hermanos;
+namespace LFClub.Pruebas.Integracion.Hermanos;
 
 /// <summary>
 /// Mientras el hermano está en espera no aparece en ninguna lista de jugadores del club ni obtiene

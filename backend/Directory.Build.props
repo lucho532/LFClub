@@ -13,7 +13,7 @@
     documentación, la falta de un comentario (CS1591) es un aviso y, por la regla anterior, un error.
     Los proyectos de pruebas quedan fuera.
   -->
-  <PropertyGroup Condition="!$(MSBuildProjectName.StartsWith('LaPecosa.Pruebas'))">
+  <PropertyGroup Condition="!$(MSBuildProjectName.StartsWith('LFClub.Pruebas'))">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

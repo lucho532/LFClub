@@ -1,12 +1,12 @@
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Infraestructura.Datos;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Dominio.Entidades;
+using LFClub.Infraestructura.Datos;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
-namespace LaPecosa.Pruebas.Integracion.Aislamiento;
+namespace LFClub.Pruebas.Integracion.Aislamiento;
 
 /// <summary>Solo existe una cuenta DESARROLLADOR (constitución §20, RF-001).</summary>
 [Collection(ColeccionApi.Nombre)]
@@ -39,16 +39,16 @@ public class CuentaDesarrolladorPruebas
         // Otras pruebas le crean una contraseña a la cuenta real; aquí se recrea dentro de una
         // transacción que se deshace, para ver cómo nace.
         await using var ambito = _fabrica.Services.CreateAsyncScope();
-        var contexto = ambito.ServiceProvider.GetRequiredService<ContextoLaPecosa>();
+        var contexto = ambito.ServiceProvider.GetRequiredService<ContextoLFClub>();
         await using var transaccion = await contexto.Database.BeginTransactionAsync();
 
         await contexto.Usuarios.Where(usuario => usuario.EsDesarrollador).ExecuteDeleteAsync();
-        await ambito.ServiceProvider.GetRequiredService<CuentaInicial>().CrearSiFaltaAsync(" Nuevo@LaPecosa.test ");
+        await ambito.ServiceProvider.GetRequiredService<CuentaInicial>().CrearSiFaltaAsync(" Nuevo@LFClub.test ");
 
         var cuenta = await contexto.Usuarios.AsNoTracking().SingleAsync(usuario => usuario.EsDesarrollador);
         Assert.Null(cuenta.ContrasenaHash);
         Assert.False(cuenta.PuedeIniciarSesion);
-        Assert.Equal("nuevo@lapecosa.test", cuenta.CorreoNormalizado);
+        Assert.Equal("nuevo@lfclub.test", cuenta.CorreoNormalizado);
         Assert.False(await contexto.UsuariosRol.IgnoreQueryFilters().AnyAsync(integrante => integrante.UsuarioId == cuenta.Id));
 
         await transaccion.RollbackAsync();
@@ -59,7 +59,7 @@ public class CuentaDesarrolladorPruebas
     {
         await using (var ambito = _fabrica.Services.CreateAsyncScope())
         {
-            await ambito.ServiceProvider.GetRequiredService<CuentaInicial>().CrearSiFaltaAsync("otro@lapecosa.test");
+            await ambito.ServiceProvider.GetRequiredService<CuentaInicial>().CrearSiFaltaAsync("otro@lfclub.test");
         }
 
         var cantidad = await _fabrica.ConContextoAsync(contexto =>

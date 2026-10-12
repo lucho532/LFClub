@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text;
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Pruebas.Integracion.Base;
 using SkiaSharp;
-using static LaPecosa.Pruebas.Integracion.Carta.ConsultaCartaPruebas;
+using static LFClub.Pruebas.Integracion.Carta.ConsultaCartaPruebas;
 
-namespace LaPecosa.Pruebas.Integracion.Carta;
+namespace LFClub.Pruebas.Integracion.Carta;
 
 /// <summary>
 /// La imagen de la carta solo la obtienen la familia del jugador y el PRESIDENTE, también la de un

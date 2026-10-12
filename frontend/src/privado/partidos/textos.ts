@@ -8,8 +8,8 @@ export function nombreRival(partido: PartidoResumenDto): string {
 }
 
 /**
- * El marcador escrito según la condición: "La Pecosa 3 - 1 Equipo C" de local y
- * "Equipo C 1 - 3 La Pecosa" de visitante. Vacío si el partido no tiene resultado.
+ * El marcador escrito según la condición: "LFClub 3 - 1 Equipo C" de local y
+ * "Equipo C 1 - 3 LFClub" de visitante. Vacío si el partido no tiene resultado.
  */
 export function textoDeMarcador(partido: PartidoResumenDto, nombreClub: string): string {
   if (partido.golesClub === null || partido.golesClub === undefined) {

@@ -1,16 +1,16 @@
-name: la-pecosa
+name: lfclub
 
 services:
   bd:
     image: postgres:17
     environment:
-      POSTGRES_DB: lapecosa
-      POSTGRES_USER: lapecosa
-      POSTGRES_PASSWORD: lapecosa
+      POSTGRES_DB: lfclub
+      POSTGRES_USER: lfclub
+      POSTGRES_PASSWORD: lfclub
     volumes:
       - datos-bd:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lapecosa -d lapecosa"]
+      test: ["CMD-SHELL", "pg_isready -U lfclub -d lfclub"]
       interval: 5s
       timeout: 5s
       retries: 10

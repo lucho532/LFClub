@@ -1,6 +1,6 @@
-using LaPecosa.Infraestructura.Imagenes;
+using LFClub.Infraestructura.Imagenes;
 
-namespace LaPecosa.Pruebas.Unitarias.Utilidades;
+namespace LFClub.Pruebas.Unitarias.Utilidades;
 
 // Los mismos casos y resultados que frontend/pruebas/plano.test.ts: pantalla e imagen eligen igual.
 public class ContrasteDeColorPruebas
