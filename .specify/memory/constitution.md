@@ -282,6 +282,22 @@ Enmienda 4.8.0 → 4.8.1 (2026-10-12), aclaración pedida por el propietario del
 - §20 y §28: sin cambios. Principios modificados: ninguno. Secciones añadidas y eliminadas:
   ninguna
 - Pendientes: los de la 4.8.0
+
+Enmienda 4.8.1 → 4.9.0 (2026-10-12), decidida por el propietario del proyecto en la spec 011:
+- §14.4 (nueva): comunicados del club y campana. Los publican el PRESIDENTE, los DIRECTIVOS y los
+  ENTRENADORES; llegan a las cuentas de jugador con un jugador activo en la audiencia; la campana
+  con contador es solo de la cuenta de jugador y vive dentro de la aplicación; se retiran, no se
+  editan ni se eliminan físicamente; no hay avisos con la aplicación cerrada
+- §8 (Directivo): nueva función de publicar comunicados; se cierra lo que la §8 (Entrenador)
+  aplazaba para el DIRECTIVO asignado en cuanto a comunicados
+- §8 (Presidente, Entrenador y Jugador): remisiones a §14.4 y función de consultar comunicados
+- §14: un comunicado nunca se elimina físicamente
+- §20: pruebas nuevas de quién publica, a quién llega y quién retira
+- §24: la campana de la barra superior, con nombre accesible y estado por texto
+- §28: sin cambios. Principios modificados: ninguno renombrado. Secciones añadidas: §14.4.
+  Eliminadas: ninguna
+- Pendientes: las siete decisiones de la §28. La spec 011 implementa esta versión; los avisos con la
+  aplicación cerrada (teléfono, número sobre el icono) quedan para una spec posterior
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -786,7 +802,8 @@ Puede:
 - Definir el valor de la mensualidad del club y modificar el de jugadores concretos (ver §16.7).
 - Consultar las finanzas completas del club.
 - Registrar, anular y corregir pagos.
-- Gestionar torneos, partidos, arbitrajes y comunicados.
+- Gestionar torneos, partidos y arbitrajes.
+- Publicar comunicados dirigidos a cualquier audiencia del club y retirar cualquiera (ver §14.4).
 - Enviar invitaciones de registro a su club con el rol JUGADOR, ENTRENADOR o DIRECTIVO (ver
   §12.1).
 - Aprobar o rechazar a los jugadores agregados desde la ficha de un hermano (ver §12.1.2).
@@ -817,6 +834,7 @@ Puede:
 - Consultar la seguridad social de cada jugador: su entidad de salud y dónde lo atienden.
 - Consultar las categorías del club, con sus equipos, sus entrenadores y sus jugadores, y la lista
   de jugadores retirados.
+- Publicar comunicados dirigidos a cualquier audiencia del club, y retirar los suyos (ver §14.4).
 
 Si además entrena, en las categorías que tiene asignadas actúa como entrenador en lo deportivo
 (ver "Entrenador").
@@ -842,9 +860,10 @@ Conserva su rol como único rol en el club. En las categorías que tiene asignad
 entrenador en lo deportivo: programa entrenamientos, registra asistencia, crea convocatorias, ve
 los partidos próximos de esas categorías, registra y corrige resultados y goles y pone las
 estadísticas de la carta, igual que un ENTRENADOR en las suyas (ver §14.3, §17.2 y §17.3). Para un PRESIDENTE esto no añade nada, porque su rol ya lo cubre en todo el
-club. Un DIRECTIVO, fuera de sus categorías asignadas, sigue con su acceso de consulta. Lo demás
-que hace un ENTRENADOR (evaluaciones, comunicados, pagos en efectivo) se decidirá para el
-DIRECTIVO asignado con esas funcionalidades.
+club. Un DIRECTIVO, fuera de sus categorías asignadas, sigue con su acceso de consulta. Los
+comunicados los publica con el alcance de su rol, no con el de entrenador (ver §14.4). Lo demás
+que hace un ENTRENADOR (evaluaciones, pagos en efectivo) se decidirá para el DIRECTIVO asignado
+con esas funcionalidades.
 
 Cuando la categoría tiene equipos, la asignación indica cuáles dirige (ver §11.3).
 
@@ -858,7 +877,8 @@ Dentro de sus categorías puede:
   una familia (ver §17.3).
 - Poner las estadísticas, el dorsal y la posición de la carta de sus jugadores (ver §14.3).
 - Registrar evaluaciones del jugador.
-- Enviar comunicados a las familias de sus categorías.
+- Publicar comunicados dirigidos a sus categorías o a equipos de ellas, y retirar los suyos (ver
+  §14.4).
 - Consultar el estado de pago de sus jugadores.
 - Registrar pagos en efectivo recibidos de sus jugadores.
 
@@ -900,6 +920,8 @@ Puede, únicamente sobre su propio jugador:
 - Consultar la carta de su jugador, poner su dorsal y su posición y exportarla como imagen (ver
   §14.3).
 - Publicar el resultado de un partido ya empezado al que su jugador fue convocado (ver §17.3).
+- Consultar los comunicados que le llegan, marcarlos como leídos y ver en la campana cuántos le
+  faltan por leer (ver §14.4).
 - Retirar del club a su propio jugador (ver §14.1). No puede reincorporarlo.
 
 No accede a la ficha, la carta, los pagos ni los datos de contacto de otros jugadores.
@@ -1425,6 +1447,26 @@ datos de su ficha, su foto (ver §14.2), el escudo y los colores de su club y un
 - Nunca se muestran como clasificación: ni tablas, ni listas ordenadas por ellas, ni
   comparaciones entre jugadores, ni posiciones.
 
+### 14.4. Comunicados y campana
+
+Un comunicado es un mensaje escrito, con título y texto plano, que el equipo del club dirige a las
+familias.
+
+- Lo publican el PRESIDENTE, los DIRECTIVOS y los ENTRENADORES, y nadie más.
+- Se dirige a todo el club, a una o varias categorías, o a uno o varios equipos de una categoría.
+  El PRESIDENTE y los DIRECTIVOS pueden dirigirlo a cualquier audiencia; un ENTRENADOR, solo a sus
+  categorías asignadas o a equipos de ellas (ver §7.5).
+- Llega únicamente a las cuentas con al menos un jugador activo en la audiencia. Quien entra a la
+  audiencia después no recibe lo publicado antes.
+- No se edita. Quien lo publicó, o el PRESIDENTE, lo retira; el DIRECTIVO retira solo los suyos. No
+  se elimina físicamente: queda marcado como retirado, con quién y cuándo (ver §14).
+- Cada cuenta de jugador tiene una campana con el contador de comunicados sin leer. Lo leído es por
+  cuenta. El equipo del club no tiene campana.
+- La campana vive dentro de la aplicación. No se envían avisos con la aplicación cerrada, ni
+  número sobre el icono, ni correo por comunicados, ni se crean comunicados automáticos por otros
+  eventos.
+- Sigue el aislamiento de §7.1: ningún comunicado sale de su club.
+
 ## 15. Reglas de negocio en backend
 
 Las reglas de negocio deben estar protegidas en el backend.
@@ -1767,6 +1809,12 @@ Las pruebas deben validar principalmente:
   cuenta y el PRESIDENTE de su club; que sus estadísticas las ponen solo quien entrena su categoría
   y el PRESIDENTE; que el dorsal y la posición los ponen además su propia cuenta; y que ningún endpoint entrega esas estadísticas ordenadas ni comparadas entre
   jugadores.
+- Que solo el PRESIDENTE, los DIRECTIVOS y los ENTRENADORES publican comunicados, que un
+  ENTRENADOR no los dirige fuera de sus categorías, y que solo quien lo publicó y el PRESIDENTE
+  retiran un comunicado.
+- Que un comunicado llega solo a las cuentas con un jugador activo en su audiencia, no se ve desde
+  otro club ni con su identificador, y que retirarlo lo quita del contador de todas las cuentas.
+- Que publicar un comunicado no envía ningún aviso fuera de la aplicación.
 - Que los endpoints públicos no exponen documento, contacto, datos médicos ni pagos.
 - Cálculo de estadísticas deportivas.
 - Transiciones de estados.
@@ -1832,6 +1880,10 @@ En el diseño, las pantallas móviles rotuladas para "acudientes" corresponden a
 jugador.
 
 Los estados de pago deben distinguirse por texto además de por color.
+
+La campana de comunicados (ver §14.4) va en la barra superior de la cuenta de jugador, sin saturarla
+en el teléfono. Su nombre accesible dice cuántos comunicados hay sin leer, y leído y sin leer se
+distinguen por texto además de por color.
 
 ## 25. Regla para Claude Code
 
@@ -1948,4 +2000,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.8.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12
+**Versión**: 4.9.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12
