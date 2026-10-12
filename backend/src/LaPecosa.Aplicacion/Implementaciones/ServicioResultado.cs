@@ -18,7 +18,9 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// decidir fila por fila con <see cref="ReglaCorreccionDeIndicacion"/> qué convocados se corrigen; y
 /// dejar el partido jugado con origen GESTION, el marcador, quiénes jugaron, los goles y quién lo
 /// cambió, con su nombre copiado (§13), todo en una transacción. Si el partido no tenía marcador,
-/// queda también como la primera publicación.
+/// queda también como la primera publicación. En esa misma transacción avisa a las familias de todas
+/// las categorías del partido, solo si el partido no estaba jugado o algún gol del marcador cambió:
+/// corregir solo los goles de un jugador no avisa (spec 012, RF-014; research §6).
 /// No atiende a la familia (eso es <see cref="ServicioResultadoFamilia"/>), no decide quién ve el
 /// partido, no guarda historial y no accede al contexto de Entity Framework.
 /// </summary>
@@ -29,6 +31,7 @@ public class ServicioResultado : IServicioResultado
     private readonly IRepositorioPartidos _partidos;
     private readonly IRepositorioClub _club;
     private readonly IServicioConsultaPartidos _consulta;
+    private readonly IServicioAvisosDeActividad _avisos;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
 
@@ -39,6 +42,7 @@ public class ServicioResultado : IServicioResultado
         IRepositorioPartidos partidos,
         IRepositorioClub club,
         IServicioConsultaPartidos consulta,
+        IServicioAvisosDeActividad avisos,
         IUnidadDeTrabajo unidadDeTrabajo,
         IReloj reloj)
     {
@@ -47,6 +51,7 @@ public class ServicioResultado : IServicioResultado
         _partidos = partidos;
         _club = club;
         _consulta = consulta;
+        _avisos = avisos;
         _unidadDeTrabajo = unidadDeTrabajo;
         _reloj = reloj;
     }
@@ -84,6 +89,22 @@ public class ServicioResultado : IServicioResultado
                     quienPregunta.UsuarioId,
                     $"{quienPregunta.Nombres} {quienPregunta.Apellidos}",
                     cancelacion);
+
+                if (partido.Estado != EstadoPartido.JUGADO || partido.GolesClub != golesClub || partido.GolesRival != golesRival)
+                {
+                    var jugado = new Partido
+                    {
+                        Id = partido.Id,
+                        ClubId = partido.ClubId,
+                        Rival = partido.Rival,
+                        Condicion = partido.Condicion,
+                        Estado = EstadoPartido.JUGADO,
+                        GolesClub = golesClub,
+                        GolesRival = golesRival,
+                        Categorias = partido.Categorias,
+                    };
+                    await _avisos.ResultadoPublicadoAsync(jugado, quienPregunta.UsuarioId, cancelacion);
+                }
             },
             cancelacion);
 

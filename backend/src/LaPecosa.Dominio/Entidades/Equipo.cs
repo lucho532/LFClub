@@ -5,6 +5,8 @@ namespace LaPecosa.Dominio.Entidades;
 /// constitución §11.3).
 /// Su responsabilidad es guardar la categoría a la que pertenece, su nombre, si está activo y si
 /// alguna vez tuvo jugadores o entrenadores (RF-024a).
+/// Puede ser destino de un comunicado (<see cref="ComunicadoDestino"/>, spec 011), que conserva su
+/// nombre copiado aunque el equipo se borre.
 /// No pasa a otra categoría (RF-024), no se reactiva una vez desactivado y no guarda un historial
 /// de quién jugó en él.
 /// </summary>

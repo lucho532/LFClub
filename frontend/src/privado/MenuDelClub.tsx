@@ -2,6 +2,7 @@ import type { ClubDto, Rol } from '../compartido/api/tipos';
 import { EnlaceMenu } from '../compartido/componentes/EnlaceMenu';
 import {
   IconoCalendario,
+  IconoCampana,
   IconoCategorias,
   IconoDatosClub,
   IconoFicha,
@@ -24,7 +25,8 @@ interface Props {
 }
 
 /**
- * Menú del club en el lateral: cada entrada solo para los roles que la usan. Ocultar una entrada
+ * Menú del club en el lateral: cada entrada solo para los roles que la usan. "Comunicados" es para los
+ * cuatro roles: la familia ve lo que recibió y el equipo del club, lo que publicó (spec 011). Ocultar una entrada
  * es comodidad: la API vuelve a comprobar cada permiso. No decide nada del club ni de la sesión.
  */
 export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
@@ -41,6 +43,9 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
       )}
       <EnlaceMenu a={`/club/${clubId}/calendario`} icono={<IconoCalendario />}>
         Calendario
+      </EnlaceMenu>
+      <EnlaceMenu a={`/club/${clubId}/comunicados`} icono={<IconoCampana />}>
+        Comunicados
       </EnlaceMenu>
       <EnlaceMenu a={`/club/${clubId}/partidos`} icono={<IconoPartido />}>
         Partidos

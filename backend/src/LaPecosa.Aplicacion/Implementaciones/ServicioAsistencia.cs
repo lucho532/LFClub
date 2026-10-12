@@ -16,20 +16,34 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// a las categorías marcables con <see cref="ReglaAlcanceDeAsistencia"/> (los jugadores activos de
 /// esas categorías y los que ya tienen asistencia en ellas) y registrar la asistencia solo en un
 /// entrenamiento programado cuya fecha ya llegó, y solo de jugadores de la planilla. La respuesta de
-/// la familia no se toca: son datos distintos (RF-025).
+/// la familia no se toca: son datos distintos (RF-025). Al registrar toma el bloqueo del club,
+/// vuelve a leer el entrenamiento y, en la misma transacción, avisa a las familias de las categorías
+/// en las que una asistencia fue nueva o cambió (spec 012), sin decir quién asistió ni quién faltó.
 /// No decide quién ve el entrenamiento y no accede al contexto de Entity Framework.
 /// </summary>
 public class ServicioAsistencia : IServicioAsistencia
 {
     private readonly AccesoAActividad _acceso;
     private readonly IRepositorioAsistencias _asistencias;
+    private readonly IRepositorioClub _club;
+    private readonly IServicioAvisosDeActividad _avisos;
+    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
 
     /// <summary>Crea el servicio con sus dependencias.</summary>
-    public ServicioAsistencia(AccesoAActividad acceso, IRepositorioAsistencias asistencias, IReloj reloj)
+    public ServicioAsistencia(
+        AccesoAActividad acceso,
+        IRepositorioAsistencias asistencias,
+        IRepositorioClub club,
+        IServicioAvisosDeActividad avisos,
+        IUnidadDeTrabajo unidadDeTrabajo,
+        IReloj reloj)
     {
         _acceso = acceso;
         _asistencias = asistencias;
+        _club = club;
+        _avisos = avisos;
+        _unidadDeTrabajo = unidadDeTrabajo;
         _reloj = reloj;
     }
 
@@ -67,7 +81,24 @@ public class ServicioAsistencia : IServicioAsistencia
         var filas = enviadas
             .Select(enviada => (planilla[enviada.UsuarioRolId].Jugador, planilla[enviada.UsuarioRolId].CategoriaId, enviada.Presente!.Value))
             .ToList();
-        await _asistencias.RegistrarAsync(entrenamientoId, filas, _reloj.AhoraUtc, cancelacion);
+        await _unidadDeTrabajo.EnTransaccionAsync(
+            async () =>
+            {
+                await _club.BloquearAsync(cancelacion);
+                var vigente = (await _acceso.EntrenamientoAsync(entrenamientoId, quienPregunta, cancelacion)).Entrenamiento;
+                if (vigente.Estado == EstadoEntrenamiento.CANCELADO)
+                {
+                    throw ErroresDeActividades.ActividadCancelada();
+                }
+
+                var conCambio = await _asistencias.RegistrarAsync(entrenamientoId, filas, _reloj.AhoraUtc, cancelacion);
+                if (conCambio.Count > 0)
+                {
+                    await _avisos.AsistenciaRegistradaAsync(vigente, conCambio, quienPregunta.UsuarioId, cancelacion);
+                }
+            },
+            cancelacion);
+
         return await LeerAsync(visible, cancelacion);
     }
 

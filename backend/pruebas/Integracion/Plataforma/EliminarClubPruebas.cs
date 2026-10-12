@@ -141,6 +141,16 @@ public class EliminarClubPruebas
 
         // Spec 010: la carta del jugador.
         await _fabrica.Cartas.PonerCartaAsync(jugador, 10, PosicionJugador.DELANTERO, [70, 65, 80, 72, 60, 88]);
+
+        // Spec 011: un comunicado a la categoría, con su destino y su destinatario.
+        var (_, presidente) = await _fabrica.Sembrador.CrearIntegranteAsync(club, Rol.PRESIDENTE);
+        await _fabrica.Comunicados.PublicarAsync(
+            club, presidente, "Aviso", "Texto", AlcanceComunicado.CATEGORIAS, [categoria], destinatarios: [jugador]);
+
+        // Spec 012: un aviso de actividad con su destinatario.
+        await _fabrica.Avisos.GenerarAsync(
+            club, HechoDeActividad.ENTRENAMIENTO_PROGRAMADO, TipoDeActividad.ENTRENAMIENTO, entrenamiento.Id,
+            "Nuevo entrenamiento", [jugador]);
     }
 
     private Task<bool> ExisteClubAsync(Guid clubId) =>

@@ -28,6 +28,7 @@ public class ServicioResultadoFamilia : IServicioResultadoFamilia
     private readonly IRepositorioConvocatoria _convocatoria;
     private readonly IRepositorioClub _club;
     private readonly IServicioConsultaPartidos _consulta;
+    private readonly IServicioAvisosDeActividad _avisos;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
 
@@ -38,6 +39,7 @@ public class ServicioResultadoFamilia : IServicioResultadoFamilia
         IRepositorioConvocatoria convocatoria,
         IRepositorioClub club,
         IServicioConsultaPartidos consulta,
+        IServicioAvisosDeActividad avisos,
         IUnidadDeTrabajo unidadDeTrabajo,
         IReloj reloj)
     {
@@ -46,6 +48,7 @@ public class ServicioResultadoFamilia : IServicioResultadoFamilia
         _convocatoria = convocatoria;
         _club = club;
         _consulta = consulta;
+        _avisos = avisos;
         _unidadDeTrabajo = unidadDeTrabajo;
         _reloj = reloj;
     }
@@ -100,6 +103,21 @@ public class ServicioResultadoFamilia : IServicioResultadoFamilia
                 {
                     await _convocatoria.PublicarPorFamiliaAsync(
                         partidoId, datos.GolesClub!.Value, datos.GolesRival!.Value, ahora, quienPregunta.UsuarioId, nombre, cancelacion);
+
+                    // El primer marcador avisa a las demás familias de las categorías, no a quien lo
+                    // publicó (spec 012, RF-005 y RF-014).
+                    var jugado = new Partido
+                    {
+                        Id = partido.Id,
+                        ClubId = partido.ClubId,
+                        Rival = partido.Rival,
+                        Condicion = partido.Condicion,
+                        Estado = EstadoPartido.JUGADO,
+                        GolesClub = datos.GolesClub,
+                        GolesRival = datos.GolesRival,
+                        Categorias = partido.Categorias,
+                    };
+                    await _avisos.ResultadoPublicadoAsync(jugado, quienPregunta.UsuarioId, cancelacion);
                 }
 
                 await _convocatoria.IndicarPorFamiliaAsync(

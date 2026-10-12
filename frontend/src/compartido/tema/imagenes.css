@@ -114,3 +114,29 @@
   line-height: 1;
   cursor: pointer;
 }
+
+/* Lápiz único de la tarjeta "Identidad" de la ficha: mismo lenguaje que el de la foto, con zona táctil de 44 px. */
+.lapiz-tarjeta {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -6px -6px -6px 0;
+  padding: 0;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 50%;
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.lapiz-tarjeta:hover {
+  border-color: var(--color-club-principal);
+}
+
+.lapiz-tarjeta:focus-visible {
+  outline: 3px solid var(--color-club-principal);
+  outline-offset: 2px;
+}

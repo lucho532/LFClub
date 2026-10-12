@@ -1,0 +1,35 @@
+/* Elección de jugador y nombres de personas (specs 006 y 008); salió de componentes.css por el límite de 250 líneas. */
+
+/* Lista en la que la familia elige con cuál de sus jugadores continúa. */
+.jugadores-a-elegir {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jugador-a-elegir {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 2px solid var(--borde-fuerte);
+  border-radius: 8px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Nombre de una persona, enlace o texto (spec 008): un nombre largo se parte sin desbordar. */
+.nombre-persona {
+  overflow-wrap: anywhere;
+}

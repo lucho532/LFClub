@@ -9,7 +9,9 @@ namespace LaPecosa.Dominio.Entidades;
 /// programó, en hora de Colombia, su nota, su estado actual y quién lo creó. De él cuelgan sus
 /// categorías, las respuestas de las familias y la asistencia registrada.
 /// No decide quién lo ve ni quién lo gestiona (eso es de las reglas del dominio), no guarda
-/// historial de cambios (§18) y nunca se borra: se cancela (RF-035).
+/// historial de cambios (§18) y nunca se borra: se cancela (RF-035). Puede ser la actividad de un
+/// aviso (<see cref="AvisoDeActividad"/>, spec 012), que lo referencia por tipo e identificador sin
+/// foránea.
 /// </summary>
 public class Entrenamiento : IPerteneceAClub
 {

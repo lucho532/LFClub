@@ -25,4 +25,7 @@ public static class IndicesUnicos
 
     /// <summary>Nombre de un equipo activo dentro de su categoría, sin distinguir mayúsculas (RF-023).</summary>
     public const string EquipoEnCategoria = "IX_Equipos_CategoriaId_NombreNormalizado";
+
+    /// <summary>Clave de publicación de un comunicado dentro de un club (spec 011, RF-010).</summary>
+    public const string ClaveDeComunicado = "IX_Comunicados_ClubId_Clave";
 }

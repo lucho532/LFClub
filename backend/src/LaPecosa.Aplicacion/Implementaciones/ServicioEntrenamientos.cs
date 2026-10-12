@@ -15,8 +15,10 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// Su responsabilidad es validar los datos, exigir categorías activas del club y que quien pregunta
 /// gestione la actividad con <see cref="ReglaGestionDeActividad"/>, marcar cada categoría como
 /// usada al dirigirle un entrenamiento (research §11) y permitir cada cambio de estado solo cuando
-/// corresponde: cancelar uno programado y reactivar uno cancelado que no ha empezado. Programar
-/// bloquea el club, igual que desactivar una categoría, para que no se crucen.
+/// corresponde: cancelar uno programado y reactivar uno cancelado que no ha empezado. Programar,
+/// cambiar, cancelar y reactivar bloquean el club, igual que desactivar una categoría, para que no
+/// se crucen, y dentro de esa misma transacción avisan a las familias (spec 012) solo si algo
+/// cambió de verdad: fecha, hora o lugar, o el estado.
 /// No decide quién lo ve, no borra nunca un entrenamiento ni toca sus respuestas, y no accede al
 /// contexto de Entity Framework.
 /// </summary>
@@ -27,6 +29,7 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
     private readonly IRepositorioCategorias _categorias;
     private readonly IRepositorioClub _club;
     private readonly IServicioConsultaEntrenamientos _consulta;
+    private readonly IServicioAvisosDeActividad _avisos;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
     private readonly IReloj _reloj;
 
@@ -37,6 +40,7 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
         IRepositorioCategorias categorias,
         IRepositorioClub club,
         IServicioConsultaEntrenamientos consulta,
+        IServicioAvisosDeActividad avisos,
         IUnidadDeTrabajo unidadDeTrabajo,
         IReloj reloj)
     {
@@ -45,6 +49,7 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
         _categorias = categorias;
         _club = club;
         _consulta = consulta;
+        _avisos = avisos;
         _unidadDeTrabajo = unidadDeTrabajo;
         _reloj = reloj;
     }
@@ -88,6 +93,7 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
                 }
 
                 await _entrenamientos.AgregarAsync(entrenamiento, cancelacion);
+                await _avisos.EntrenamientoProgramadoAsync(entrenamiento, quienPregunta.UsuarioId, cancelacion);
                 return entrenamiento.Id;
             },
             cancelacion);
@@ -100,20 +106,49 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
         Guid entrenamientoId, GuardarEntrenamientoDto datos, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
     {
         var validos = ValidadorEntrenamiento.Validar(datos);
-        var entrenamiento = await GestionadoAsync(entrenamientoId, quienPregunta, cancelacion);
-        if (entrenamiento.Estado != EstadoEntrenamiento.PROGRAMADO)
-        {
-            throw ErroresDeActividades.ActividadCancelada();
-        }
+        await GestionadoAsync(entrenamientoId, quienPregunta, cancelacion);
 
-        var actuales = entrenamiento.Categorias.Select(fila => fila.CategoriaId).ToHashSet();
-        if (!actuales.SetEquals(validos.CategoriaIds))
-        {
-            throw ErroresDeActividades.CategoriasNoCambian();
-        }
+        await _unidadDeTrabajo.EnTransaccionAsync(
+            async () =>
+            {
+                // Se vuelve a leer dentro del bloqueo para comparar contra lo que hay ahora (spec 012).
+                await _club.BloquearAsync(cancelacion);
+                var antes = await _entrenamientos.ObtenerAsync(entrenamientoId, cancelacion)
+                    ?? throw ExcepcionDeAplicacion.NoEncontrado();
+                if (antes.Estado != EstadoEntrenamiento.PROGRAMADO)
+                {
+                    throw ErroresDeActividades.ActividadCancelada();
+                }
 
-        await _entrenamientos.CambiarDatosAsync(
-            entrenamientoId, validos.Fecha, validos.HoraInicio, validos.HoraFin, validos.Lugar, validos.Nota, cancelacion);
+                var actuales = antes.Categorias.Select(fila => fila.CategoriaId).ToHashSet();
+                if (!actuales.SetEquals(validos.CategoriaIds))
+                {
+                    throw ErroresDeActividades.CategoriasNoCambian();
+                }
+
+                var cambios = ReglaCambiosDeActividad.Evaluar(
+                    antes.Fecha, antes.HoraInicio, antes.HoraFin, antes.Lugar,
+                    validos.Fecha, validos.HoraInicio, validos.HoraFin, validos.Lugar);
+                await _entrenamientos.CambiarDatosAsync(
+                    entrenamientoId, validos.Fecha, validos.HoraInicio, validos.HoraFin, validos.Lugar, validos.Nota, cancelacion);
+
+                if (cambios != CambiosDeActividad.Ninguno)
+                {
+                    var despues = new Entrenamiento
+                    {
+                        Id = antes.Id,
+                        ClubId = antes.ClubId,
+                        Fecha = validos.Fecha,
+                        HoraInicio = validos.HoraInicio,
+                        HoraFin = validos.HoraFin,
+                        Lugar = validos.Lugar,
+                        Categorias = antes.Categorias,
+                    };
+                    await _avisos.EntrenamientoCambiadoAsync(despues, cambios, quienPregunta.UsuarioId, cancelacion);
+                }
+            },
+            cancelacion);
+
         return await _consulta.ObtenerAsync(entrenamientoId, quienPregunta, cancelacion);
     }
 
@@ -121,13 +156,24 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
     public async Task<EntrenamientoDto> CancelarAsync(
         Guid entrenamientoId, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
     {
-        var entrenamiento = await GestionadoAsync(entrenamientoId, quienPregunta, cancelacion);
-        if (entrenamiento.Estado == EstadoEntrenamiento.CANCELADO)
-        {
-            throw ErroresDeActividades.ActividadCancelada();
-        }
+        await GestionadoAsync(entrenamientoId, quienPregunta, cancelacion);
 
-        await _entrenamientos.CambiarEstadoAsync(entrenamientoId, EstadoEntrenamiento.CANCELADO, cancelacion);
+        await _unidadDeTrabajo.EnTransaccionAsync(
+            async () =>
+            {
+                await _club.BloquearAsync(cancelacion);
+                var entrenamiento = await _entrenamientos.ObtenerAsync(entrenamientoId, cancelacion)
+                    ?? throw ExcepcionDeAplicacion.NoEncontrado();
+                if (entrenamiento.Estado == EstadoEntrenamiento.CANCELADO)
+                {
+                    throw ErroresDeActividades.ActividadCancelada();
+                }
+
+                await _entrenamientos.CambiarEstadoAsync(entrenamientoId, EstadoEntrenamiento.CANCELADO, cancelacion);
+                await _avisos.EntrenamientoCanceladoAsync(entrenamiento, quienPregunta.UsuarioId, cancelacion);
+            },
+            cancelacion);
+
         return await _consulta.ObtenerAsync(entrenamientoId, quienPregunta, cancelacion);
     }
 
@@ -135,20 +181,31 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
     public async Task<EntrenamientoDto> ReactivarAsync(
         Guid entrenamientoId, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
     {
-        var entrenamiento = await GestionadoAsync(entrenamientoId, quienPregunta, cancelacion);
-        if (entrenamiento.Estado != EstadoEntrenamiento.CANCELADO)
-        {
-            throw ErroresDeActividades.ActividadNoCancelada();
-        }
+        await GestionadoAsync(entrenamientoId, quienPregunta, cancelacion);
 
-        var (hoy, ahora) = HoraDeColombia.Ahora(_reloj);
-        if (ReglaMomentoDeActividad.YaEmpezo(entrenamiento.Fecha, entrenamiento.HoraInicio, hoy, ahora))
-        {
-            throw ErroresDeActividades.ActividadEmpezada();
-        }
+        await _unidadDeTrabajo.EnTransaccionAsync(
+            async () =>
+            {
+                await _club.BloquearAsync(cancelacion);
+                var entrenamiento = await _entrenamientos.ObtenerAsync(entrenamientoId, cancelacion)
+                    ?? throw ExcepcionDeAplicacion.NoEncontrado();
+                if (entrenamiento.Estado != EstadoEntrenamiento.CANCELADO)
+                {
+                    throw ErroresDeActividades.ActividadNoCancelada();
+                }
 
-        await ExigirActivasAsync(entrenamiento.Categorias.Select(fila => fila.CategoriaId).ToList(), cancelacion);
-        await _entrenamientos.CambiarEstadoAsync(entrenamientoId, EstadoEntrenamiento.PROGRAMADO, cancelacion);
+                var (hoy, ahora) = HoraDeColombia.Ahora(_reloj);
+                if (ReglaMomentoDeActividad.YaEmpezo(entrenamiento.Fecha, entrenamiento.HoraInicio, hoy, ahora))
+                {
+                    throw ErroresDeActividades.ActividadEmpezada();
+                }
+
+                await ExigirActivasAsync(entrenamiento.Categorias.Select(fila => fila.CategoriaId).ToList(), cancelacion);
+                await _entrenamientos.CambiarEstadoAsync(entrenamientoId, EstadoEntrenamiento.PROGRAMADO, cancelacion);
+                await _avisos.EntrenamientoReactivadoAsync(entrenamiento, quienPregunta.UsuarioId, cancelacion);
+            },
+            cancelacion);
+
         return await _consulta.ObtenerAsync(entrenamientoId, quienPregunta, cancelacion);
     }
 

@@ -1,0 +1,245 @@
+openapi: 3.1.0
+info:
+  title: La Pecosa - API de la funcionalidad 012 (avisos de actividades)
+  version: 0.12.0
+  description: |
+    Contrato de lo que esta funcionalidad añade o cambia respecto de los contratos de la 001 a la
+    011. Lo que no aparece aquí sigue igual.
+
+    Cuenta de operaciones (partiendo de 108 en el contrato y 84 en las de club, con la 011 ya
+    construida; confirmar contra Swagger al empezar):
+    - **+4** (lista unificada, contador, marcar todos y leer un aviso) y **-3** que se mueven de
+      `/comunicados/recibidos` a `/campana` (lista, contador y marcar todos). Neto +1.
+    - Total: 108 -> 109 operaciones; las de club, 84 -> 85. El detalle de un comunicado recibido y
+      su lectura no cambian.
+    - La ficha no cambia de contrato: el lápiz único de la tarjeta "Identidad" es solo de interfaz
+      y usa los endpoints de la 005.
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - `/api/clubes/{clubId}/**` exige un integrante del usuario en ese club. Sin él, también el
+      DESARROLLADOR, responde 404 `no_encontrado`.
+    - Solo JUGADOR usa `/campana`; los demás roles reciben 403 `rol_no_autorizado`.
+    - Un aviso que no existe, que es de otro club o que no le llegó a la cuenta responde 404
+      `no_encontrado`, sin distinguir los casos (§7.5).
+    - Ningún endpoint envía avisos fuera de la aplicación (RF-027).
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Campana
+
+paths:
+  /api/clubes/{clubId}/campana:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Campana]
+      summary: CAMBIA DE RUTA. Comunicados y avisos que le llegan a la cuenta, mezclados
+      description: |
+        Sustituye a `GET /comunicados/recibidos`. Del más reciente al más antiguo por `Id` (los
+        identificadores son UUID v7). Un elemento que llega por dos hermanos sale una sola vez. Los
+        comunicados retirados no aparecen. Una sesión limitada a un jugador solo ve lo de ese
+        jugador. `hayMas` es verdadero si quedan elementos más antiguos de cualquiera de los dos
+        tipos.
+      parameters:
+        - $ref: '#/components/parameters/limite'
+        - $ref: '#/components/parameters/antesDe'
+      responses:
+        '200':
+          description: Página de la campana
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginaDeCampanaDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+
+  /api/clubes/{clubId}/campana/contador:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Campana]
+      summary: CAMBIA DE RUTA. Cuántos elementos sin leer tiene la cuenta
+      description: |
+        Sustituye a `GET /comunicados/recibidos/contador`. Suma comunicados y avisos, cada uno una
+        sola vez por cuenta. La pantalla muestra "99+" desde 100.
+      responses:
+        '200':
+          description: El contador
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContadorDeCampanaDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+
+  /api/clubes/{clubId}/campana/lectura-total:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    post:
+      tags: [Campana]
+      summary: CAMBIA DE RUTA. Marca todos los comunicados y avisos de la cuenta como leídos
+      description: |
+        Sustituye a `POST /comunicados/recibidos/lectura-total`. Idempotente. Devuelve el contador
+        ya en cero.
+      responses:
+        '200':
+          description: El contador
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContadorDeCampanaDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+
+  /api/clubes/{clubId}/campana/avisos/{avisoId}/lectura:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/avisoId'
+    put:
+      tags: [Campana]
+      summary: NUEVO. Marca un aviso como leído y dice si su actividad sigue disponible
+      description: |
+        Idempotente: leerlo otra vez no cambia la fecha. Lo marca leído para toda la cuenta, no
+        solo para el jugador elegido. `actividad.disponible` se calcula en el servidor con las
+        reglas de visibilidad de la 009 (RF-021); si es falso, la pantalla no abre nada. Nunca
+        devuelve datos de la actividad más allá de su tipo e identificador.
+      responses:
+        '200':
+          description: El aviso ya leído
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AvisoRecibidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+
+  parameters:
+    clubId:
+      name: clubId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    avisoId:
+      name: avisoId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    limite:
+      name: limite
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1, maximum: 50, default: 30 }
+    antesDe:
+      name: antesDe
+      in: query
+      required: false
+      description: Identificador del último elemento ya recibido, comunicado o aviso; devuelve los más antiguos
+      schema: { type: string, format: uuid }
+
+  responses:
+    SinSesion:
+      description: Sin sesión
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoAutorizado:
+      description: Rol que nunca puede hacerlo (`rol_no_autorizado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoEncontrado:
+      description: No existe, es de otro club o no le llegó a la cuenta (`no_encontrado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [titulo, estado, codigo]
+      properties:
+        titulo: { type: string }
+        estado: { type: integer }
+        codigo: { type: string }
+        errores:
+          type: object
+          additionalProperties: { type: array, items: { type: string } }
+
+    TipoDeElementoDeCampana:
+      type: string
+      enum: [COMUNICADO, AVISO]
+
+    TipoDeActividad:
+      type: string
+      enum: [ENTRENAMIENTO, PARTIDO]
+
+    ActividadDeAvisoDto:
+      type: object
+      required: [tipo, id, disponible]
+      properties:
+        tipo: { $ref: '#/components/schemas/TipoDeActividad' }
+        id: { type: string, format: uuid }
+        disponible:
+          type: boolean
+          description: |
+            Falso si la cuenta ya no puede ver la actividad (salió de la convocatoria, cambió de
+            categoría). La pantalla muestra el mensaje y no navega.
+
+    AvisoRecibidoDto:
+      type: object
+      description: Una línea corta escrita por el sistema; sin autor, título ni audiencia
+      required: [id, texto, generadoEn, actividad, leido]
+      properties:
+        id: { type: string, format: uuid }
+        texto: { type: string, maxLength: 300, description: Texto plano; nunca se interpreta }
+        generadoEn: { type: string, format: date-time }
+        actividad: { $ref: '#/components/schemas/ActividadDeAvisoDto' }
+        leido: { type: boolean }
+        leidoEn: { type: [string, 'null'], format: date-time }
+
+    ComunicadoRecibidoDto:
+      type: object
+      description: Sin cambios respecto de la 011
+      required: [id, titulo, texto, publicadoEn, publicadoPor, leido]
+      properties:
+        id: { type: string, format: uuid }
+        titulo: { type: string }
+        texto: { type: string }
+        publicadoEn: { type: string, format: date-time }
+        publicadoPor: { type: object }
+        leido: { type: boolean }
+        leidoEn: { type: [string, 'null'], format: date-time }
+
+    ElementoDeCampanaDto:
+      type: object
+      description: Exactamente uno de `comunicado` o `aviso`, el que indica `tipo`
+      required: [tipo]
+      properties:
+        tipo: { $ref: '#/components/schemas/TipoDeElementoDeCampana' }
+        comunicado: { $ref: '#/components/schemas/ComunicadoRecibidoDto' }
+        aviso: { $ref: '#/components/schemas/AvisoRecibidoDto' }
+
+    PaginaDeCampanaDto:
+      type: object
+      required: [elementos, hayMas, sinLeer]
+      properties:
+        elementos:
+          type: array
+          items: { $ref: '#/components/schemas/ElementoDeCampanaDto' }
+        hayMas: { type: boolean }
+        sinLeer: { type: integer, minimum: 0, description: Comunicados más avisos sin leer }
+
+    ContadorDeCampanaDto:
+      type: object
+      required: [sinLeer]
+      properties:
+        sinLeer: { type: integer, minimum: 0 }

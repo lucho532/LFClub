@@ -298,6 +298,24 @@ Enmienda 4.8.1 → 4.9.0 (2026-10-12), decidida por el propietario del proyecto 
   Eliminadas: ninguna
 - Pendientes: las siete decisiones de la §28. La spec 011 implementa esta versión; los avisos con la
   aplicación cerrada (teléfono, número sobre el icono) quedan para una spec posterior
+
+Enmienda 4.9.0 → 4.10.0 (2026-10-12), decidida por el propietario del proyecto en la spec 012:
+- §14.4: la campana deja de ser solo de comunicados y reúne comunicados y avisos de actividades,
+  con un solo contador. Se sustituye la frase "ni se crean comunicados automáticos por otros
+  eventos": un entrenamiento o un partido genera avisos automáticos a las familias que ya podían
+  verlo, solo dentro de la aplicación. Un aviso no es un comunicado: no lo escribe ni lo retira
+  nadie del equipo del club
+- §8 (Jugador): consulta también los avisos de actividades que le llegan
+- §14: un aviso de actividad no se elimina físicamente por una acción de usuario
+- §17.2: los avisos de partidos respetan la visibilidad de los partidos; un partido próximo solo se
+  avisa a quien está convocado
+- §20: pruebas nuevas de a quién llega cada aviso, de que no revela lo que la familia no puede ver
+  y de que no sale nada fuera de la aplicación
+- §24: la campana distingue en texto un comunicado de un aviso de actividad
+- §28: sin cambios. Principios modificados: ninguno renombrado. Secciones añadidas y eliminadas:
+  ninguna
+- Pendientes: las siete decisiones de la §28. La spec 012 implementa esta versión; el aviso con la
+  aplicación cerrada sigue para una spec posterior
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -920,8 +938,8 @@ Puede, únicamente sobre su propio jugador:
 - Consultar la carta de su jugador, poner su dorsal y su posición y exportarla como imagen (ver
   §14.3).
 - Publicar el resultado de un partido ya empezado al que su jugador fue convocado (ver §17.3).
-- Consultar los comunicados que le llegan, marcarlos como leídos y ver en la campana cuántos le
-  faltan por leer (ver §14.4).
+- Consultar los comunicados y los avisos de actividades que le llegan, marcarlos como leídos y ver
+  en la campana cuántos le faltan por leer (ver §14.4).
 - Retirar del club a su propio jugador (ver §14.1). No puede reincorporarlo.
 
 No accede a la ficha, la carta, los pagos ni los datos de contacto de otros jugadores.
@@ -1359,6 +1377,9 @@ Al desactivarla, sus entrenadores dejan de estar asignados a ella.
 
 La eliminación física deberá justificarse explícitamente.
 
+Un comunicado o un aviso de actividad no se elimina físicamente por una acción de usuario (ver
+§14.4).
+
 El rechazo de un jugador en espera (ver §12.1.1) es una eliminación física justificada: ese
 jugador nunca llegó a entrar al club y no tiene historial en él.
 
@@ -1460,12 +1481,27 @@ familias.
   audiencia después no recibe lo publicado antes.
 - No se edita. Quien lo publicó, o el PRESIDENTE, lo retira; el DIRECTIVO retira solo los suyos. No
   se elimina físicamente: queda marcado como retirado, con quién y cuándo (ver §14).
-- Cada cuenta de jugador tiene una campana con el contador de comunicados sin leer. Lo leído es por
-  cuenta. El equipo del club no tiene campana.
+- Cada cuenta de jugador tiene una campana con un solo contador de lo que no ha leído, entre
+  comunicados y avisos de actividades. Lo leído es por cuenta. El equipo del club no tiene campana.
 - La campana vive dentro de la aplicación. No se envían avisos con la aplicación cerrada, ni
-  número sobre el icono, ni correo por comunicados, ni se crean comunicados automáticos por otros
-  eventos.
-- Sigue el aislamiento de §7.1: ningún comunicado sale de su club.
+  número sobre el icono, ni correo por comunicados o avisos.
+- Sigue el aislamiento de §7.1: ningún comunicado ni aviso sale de su club.
+
+#### Avisos de actividades
+
+Un aviso de actividad es una línea corta y automática que genera el sistema, no una persona, cuando
+cambia un entrenamiento o un partido. Al tocarla se abre el detalle de la actividad.
+
+- Avisan: la creación de un entrenamiento o de un partido, los cambios de fecha, hora y lugar, la
+  cancelación y su reactivación, la convocatoria, el resultado y la asistencia.
+- Llegan a las cuentas con al menos un jugador activo en la categoría de la actividad. En un
+  partido próximo, solo a las cuentas con un jugador convocado (ver §17.2).
+- Un aviso no revela nada que la familia no pueda ver de esa actividad (ver §17.2). Quien entra a
+  la categoría después no recibe los avisos anteriores.
+- Una actividad cancelada sigue existiendo (ver §14): su aviso abre el detalle, marcado como
+  cancelado.
+- Un aviso comparte con los comunicados la misma lista, el mismo contador y las mismas reglas de
+  lectura, pero no se escribe, no se edita y no lo retira nadie del equipo del club.
 
 ## 15. Reglas de negocio en backend
 
@@ -1635,7 +1671,8 @@ Un DIRECTIVO que no entrena ninguna de las categorías del partido no lo ve mien
 jugado.
 
 Para una cuenta no convocada, ese partido no existe: no aparece en su calendario, ni en listados,
-ni en contadores, ni en mensajes, ni puede consultarse por su identificador.
+ni en contadores, ni en mensajes, ni en avisos de la campana (ver §14.4), ni puede consultarse por
+su identificador.
 
 Nadie puede ver desde una cuenta de jugador la lista de los demás convocados.
 
@@ -1815,6 +1852,9 @@ Las pruebas deben validar principalmente:
 - Que un comunicado llega solo a las cuentas con un jugador activo en su audiencia, no se ve desde
   otro club ni con su identificador, y que retirarlo lo quita del contador de todas las cuentas.
 - Que publicar un comunicado no envía ningún aviso fuera de la aplicación.
+- Que un aviso de actividad llega solo a las cuentas con un jugador activo en la categoría y, en un
+  partido próximo, solo a las de los convocados; que no revela lo que la familia no puede ver; que
+  no se ve desde otro club ni con su identificador; y que no sale nada fuera de la aplicación.
 - Que los endpoints públicos no exponen documento, contacto, datos médicos ni pagos.
 - Cálculo de estadísticas deportivas.
 - Transiciones de estados.
@@ -1881,9 +1921,10 @@ jugador.
 
 Los estados de pago deben distinguirse por texto además de por color.
 
-La campana de comunicados (ver §14.4) va en la barra superior de la cuenta de jugador, sin saturarla
-en el teléfono. Su nombre accesible dice cuántos comunicados hay sin leer, y leído y sin leer se
-distinguen por texto además de por color.
+La campana (ver §14.4) va en la barra superior de la cuenta de jugador, sin saturarla en el
+teléfono. Su nombre accesible dice cuántos avisos hay sin leer, y leído y sin leer se distinguen por
+texto además de por color. Un comunicado y un aviso de actividad se distinguen por texto, no solo
+por icono o color.
 
 ## 25. Regla para Claude Code
 
@@ -2000,4 +2041,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.9.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12
+**Versión**: 4.10.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12

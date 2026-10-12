@@ -60,6 +60,8 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioAsistencias, RepositorioAsistencias>();
         servicios.AddScoped<IRepositorioEstadisticas, RepositorioEstadisticas>();
         servicios.AddScoped<IRepositorioCartas, RepositorioCartas>();
+        servicios.AddScoped<IRepositorioComunicados, RepositorioComunicados>();
+        servicios.AddScoped<IRepositorioAvisos, RepositorioAvisos>();
         servicios.AddSingleton<IGeneradorImagenCarta, GeneradorImagenCarta>();
 
         servicios.Configure<OpcionesCorreo>(opciones =>

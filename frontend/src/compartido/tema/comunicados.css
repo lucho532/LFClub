@@ -1,0 +1,236 @@
+/*
+  Comunicados del club y campana (spec 011). Todo estado se lee como texto ("Sin leer", "Leído",
+  "Publicado", "Retirado"); el color solo acompaña. Sin colores fijos: todo sale de las variables, así
+  funcionan los dos temas y los colores de cualquier club.
+*/
+
+/* La campana de la barra superior: 44 × 44 px, sin texto visible. */
+.campana {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 50%;
+  background: var(--superficie);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+/*
+  La insignia usa el acento del club con el texto que contraste con él (contraste.ts garantiza 4,5:1
+  entre los dos) y un borde del color de la superficie para separarla de la barra en cualquier tema.
+  No parpadea ni se anima.
+*/
+.campana-insignia {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  box-sizing: border-box;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border: 2px solid var(--superficie);
+  border-radius: 999px;
+  background: var(--color-club-acento);
+  color: var(--color-club-acento-texto);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* Lista y detalle: dos columnas en escritorio; en el teléfono, o la una o el otro. */
+.comunicados-disposicion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+.comunicados-lista,
+.comunicados-detalle {
+  min-width: 0;
+}
+
+.lista-comunicados {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comunicados-acciones {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.comunicados {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comunicado-fila {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie);
+}
+
+.comunicado-fila.abierto {
+  border-color: var(--color-club-principal);
+  box-shadow: inset 4px 0 0 var(--color-club-principal);
+}
+
+.comunicado-titulo {
+  color: var(--texto);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.comunicado-fila.sin-leer .comunicado-titulo {
+  font-weight: 800;
+}
+
+.comunicado-fila.retirado .comunicado-titulo {
+  color: var(--texto-suave);
+}
+
+.comunicado-datos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.comunicado-retiro {
+  margin: 0;
+}
+
+/* Estado escrito, con borde para no depender solo del fondo. */
+.etiqueta-leido {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.etiqueta-leido.no-leido,
+.etiqueta-leido.publicado {
+  color: var(--info-texto);
+}
+
+.etiqueta-leido.leido,
+.etiqueta-leido.retirado {
+  color: var(--texto-suave);
+}
+
+/* Aviso de actividad (spec 012): una línea corta; el texto es el botón que lo abre. */
+.aviso-texto {
+  display: -webkit-box;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  cursor: pointer;
+}
+
+.aviso-fila.sin-leer .aviso-texto {
+  font-weight: 800;
+}
+
+.aviso-texto:focus-visible {
+  outline: 3px solid var(--color-club-principal);
+  outline-offset: 2px;
+}
+
+.etiqueta-leido.tipo-aviso,
+.etiqueta-leido.tipo-comunicado {
+  color: var(--texto);
+}
+
+.aviso-no-disponible {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--texto);
+  font-size: 14px;
+}
+
+/* El texto del comunicado se pinta tal cual: conserva los saltos de línea y parte lo largo. */
+.comunicado-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie);
+}
+
+.comunicado-detalle h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.comunicado-texto {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.volver-lista {
+  display: none;
+}
+
+.selector-audiencia .fila {
+  margin-top: 8px;
+}
+
+@media (min-width: 900px) {
+  .comunicados-disposicion.con-detalle {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+}
+
+/* En el teléfono, abrir un comunicado lo muestra en lugar de la lista, con un enlace para volver. */
+@media (max-width: 899px) {
+  .comunicados-disposicion.con-detalle .comunicados-lista {
+    display: none;
+  }
+
+  .volver-lista {
+    display: inline-block;
+    min-height: 44px;
+    line-height: 44px;
+  }
+}
