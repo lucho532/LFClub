@@ -11,7 +11,9 @@ namespace LaPecosa.Infraestructura.Repositorios;
 /// Representa el acceso a los convocados de los partidos del club de la petición con Entity
 /// Framework.
 /// Su responsabilidad es leer la planilla y los convocables y aplicar los cambios de la
-/// convocatoria con sentencias directas. Trabaja siempre con el filtro de aislamiento activo.
+/// convocatoria y del resultado con sentencias directas: el de quien gestiona, fila por fila con su
+/// origen, y lo que publica o indica la familia de un convocado (spec 010). Trabaja siempre con el
+/// filtro de aislamiento activo.
 /// No decide quién convoca ni a quién, y no se salta el filtro de aislamiento.
 /// </summary>
 public class RepositorioConvocatoria : IRepositorioConvocatoria
@@ -93,12 +95,13 @@ public class RepositorioConvocatoria : IRepositorioConvocatoria
         Guid partidoId,
         int golesClub,
         int golesRival,
-        IReadOnlyCollection<FilaDeResultado> filas,
+        IReadOnlyCollection<FilaGuardada> filas,
         DateTime ahoraUtc,
         Guid autorUsuarioId,
         string autorNombre,
         CancellationToken cancelacion = default)
     {
+        // La primera publicación no cambia; el origen pasa a GESTION y ya no vuelve (spec 010).
         await _contexto.Partidos
             .Where(partido => partido.Id == partidoId)
             .ExecuteUpdateAsync(
@@ -108,23 +111,94 @@ public class RepositorioConvocatoria : IRepositorioConvocatoria
                     .SetProperty(partido => partido.GolesRival, golesRival)
                     .SetProperty(partido => partido.ResultadoCambiadoEn, ahoraUtc)
                     .SetProperty(partido => partido.ResultadoCambiadoPorUsuarioId, autorUsuarioId)
-                    .SetProperty(partido => partido.ResultadoCambiadoPorNombre, autorNombre),
+                    .SetProperty(partido => partido.ResultadoCambiadoPorNombre, autorNombre)
+                    .SetProperty(partido => partido.OrigenResultado, OrigenResultado.GESTION)
+                    .SetProperty(partido => partido.PublicadoEn, partido => partido.PublicadoEn ?? ahoraUtc)
+                    .SetProperty(
+                        partido => partido.PublicadoPorUsuarioId,
+                        partido => partido.PublicadoEn == null ? autorUsuarioId : partido.PublicadoPorUsuarioId)
+                    .SetProperty(partido => partido.PublicadoPorNombre, partido => partido.PublicadoPorNombre ?? autorNombre),
                 cancelacion);
 
-        // Corregir corrige: primero nadie jugó y después cada fila enviada (RF-027).
-        await _contexto.PartidosJugador
-            .Where(fila => fila.PartidoId == partidoId)
-            .ExecuteUpdateAsync(cambios => cambios.SetProperty(fila => fila.Jugo, false).SetProperty(fila => fila.Goles, 0), cancelacion);
-
-        foreach (var enviada in filas.Where(fila => fila.Jugo))
+        // Cada convocado queda como se envió; la fila corregida pasa a GESTION con quien la corrigió.
+        foreach (var guardada in filas)
         {
-            await _contexto.PartidosJugador
-                .Where(fila => fila.PartidoId == partidoId && fila.UsuarioRolId == enviada.UsuarioRolId)
-                .ExecuteUpdateAsync(
-                    cambios => cambios.SetProperty(fila => fila.Jugo, true).SetProperty(fila => fila.Goles, enviada.Goles),
+            var consulta = _contexto.PartidosJugador
+                .Where(fila => fila.PartidoId == partidoId && fila.UsuarioRolId == guardada.UsuarioRolId);
+            if (guardada.Corregida)
+            {
+                await consulta.ExecuteUpdateAsync(
+                    cambios => cambios
+                        .SetProperty(fila => fila.Jugo, guardada.Jugo)
+                        .SetProperty(fila => fila.Goles, guardada.Goles)
+                        .SetProperty(fila => fila.IndicadoPor, OrigenResultado.GESTION)
+                        .SetProperty(fila => fila.IndicadoEn, ahoraUtc)
+                        .SetProperty(fila => fila.IndicadoPorUsuarioId, autorUsuarioId)
+                        .SetProperty(fila => fila.IndicadoPorNombre, autorNombre),
                     cancelacion);
+            }
+            else
+            {
+                await consulta.ExecuteUpdateAsync(
+                    cambios => cambios.SetProperty(fila => fila.Jugo, guardada.Jugo).SetProperty(fila => fila.Goles, guardada.Goles),
+                    cancelacion);
+            }
         }
     }
+
+    /// <inheritdoc />
+    public async Task<int> GolesDeLosDemasAsync(Guid partidoId, Guid usuarioRolId, CancellationToken cancelacion = default) =>
+        await _contexto.PartidosJugador
+            .Where(fila => fila.PartidoId == partidoId && fila.UsuarioRolId != usuarioRolId)
+            .SumAsync(fila => fila.Goles, cancelacion);
+
+    /// <inheritdoc />
+    public Task PublicarPorFamiliaAsync(
+        Guid partidoId,
+        int golesClub,
+        int golesRival,
+        DateTime ahoraUtc,
+        Guid autorUsuarioId,
+        string autorNombre,
+        CancellationToken cancelacion = default) =>
+        _contexto.Partidos
+            .Where(partido => partido.Id == partidoId && partido.GolesClub == null)
+            .ExecuteUpdateAsync(
+                cambios => cambios
+                    .SetProperty(partido => partido.Estado, EstadoPartido.JUGADO)
+                    .SetProperty(partido => partido.GolesClub, golesClub)
+                    .SetProperty(partido => partido.GolesRival, golesRival)
+                    .SetProperty(partido => partido.ResultadoCambiadoEn, ahoraUtc)
+                    .SetProperty(partido => partido.ResultadoCambiadoPorUsuarioId, autorUsuarioId)
+                    .SetProperty(partido => partido.ResultadoCambiadoPorNombre, autorNombre)
+                    .SetProperty(partido => partido.OrigenResultado, OrigenResultado.FAMILIA)
+                    .SetProperty(partido => partido.PublicadoEn, ahoraUtc)
+                    .SetProperty(partido => partido.PublicadoPorUsuarioId, autorUsuarioId)
+                    .SetProperty(partido => partido.PublicadoPorNombre, autorNombre)
+                    .SetProperty(partido => partido.PublicadoPorFamilia, true),
+                cancelacion);
+
+    /// <inheritdoc />
+    public Task IndicarPorFamiliaAsync(
+        Guid partidoId,
+        Guid usuarioRolId,
+        bool jugo,
+        int goles,
+        DateTime ahoraUtc,
+        Guid autorUsuarioId,
+        string autorNombre,
+        CancellationToken cancelacion = default) =>
+        _contexto.PartidosJugador
+            .Where(fila => fila.PartidoId == partidoId && fila.UsuarioRolId == usuarioRolId)
+            .ExecuteUpdateAsync(
+                cambios => cambios
+                    .SetProperty(fila => fila.Jugo, jugo)
+                    .SetProperty(fila => fila.Goles, goles)
+                    .SetProperty(fila => fila.IndicadoPor, OrigenResultado.FAMILIA)
+                    .SetProperty(fila => fila.IndicadoEn, ahoraUtc)
+                    .SetProperty(fila => fila.IndicadoPorUsuarioId, autorUsuarioId)
+                    .SetProperty(fila => fila.IndicadoPorNombre, autorNombre),
+                cancelacion);
 
     /// <inheritdoc />
     public Task ResponderAsync(

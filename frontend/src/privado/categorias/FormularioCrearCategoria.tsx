@@ -65,7 +65,7 @@ export function FormularioCrearCategoria({ clubId, alCrear }: Props) {
         Una categoría agrupa a los jugadores nacidos en un mismo año. Al crearla entran solos los jugadores sin
         categoría nacidos ese año.
       </p>
-      <form className="fila" onSubmit={(evento) => void crear(evento)} noValidate>
+      <form className="fila fila-con-campos" onSubmit={(evento) => void crear(evento)} noValidate>
         <Campo
           etiqueta="Año de nacimiento"
           type="text"

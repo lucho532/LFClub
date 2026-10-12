@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { temaContrario } from '../tema/tema';
+import { useTema } from '../tema/useTema';
 import { Avatar } from './Avatar';
 
 interface Props {
@@ -20,7 +22,8 @@ interface Props {
 
 /**
  * Perfil de la persona en la barra superior: su foto o sus iniciales, su nombre y su rol. Al
- * pulsarlo despliega su nombre, "Mi perfil", las opciones que pase la pantalla y "Cerrar sesión".
+ * pulsarlo despliega su nombre, "Mi perfil", las opciones que pase la pantalla, el cambio entre tema
+ * claro y oscuro (RF-032) y "Cerrar sesión".
  * Se cierra al elegir una opción, al pulsar fuera o con Escape. No decide nada: cada opción la resuelve
  * quien la pasa.
  */
@@ -34,6 +37,7 @@ export function MenuPerfil({
 }: Props) {
   const [abierto, setAbierto] = useState(false);
   const contenedor = useRef<HTMLDivElement>(null);
+  const { tema, alternar } = useTema();
 
   useEffect(() => {
     if (!abierto) {
@@ -94,6 +98,9 @@ export function MenuPerfil({
             Mi perfil
           </Link>
           {opciones}
+          <button type="button" role="menuitem" onClick={alternar}>
+            {`Cambiar a tema ${temaContrario(tema)}`}
+          </button>
           <button type="button" role="menuitem" onClick={alCerrarSesion}>
             Cerrar sesión
           </button>

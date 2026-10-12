@@ -5,7 +5,7 @@ import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { fechaYHora } from '../../compartido/formato';
 import { FormularioResultado } from './FormularioResultado';
-import { textoDeMarcador } from './textos';
+import { estadoDelResultado, textoDeMarcador } from './textos';
 
 interface Props {
   clubId: string;
@@ -16,7 +16,8 @@ interface Props {
 
 /**
  * El resultado de un partido: en uno jugado, el marcador según la condición, los goleadores y, para
- * quien ve la planilla, quién lo cambió por última vez y cuándo; y, para quien lo gestiona y una vez
+ * quien ve la planilla, su estado escrito ("Publicado por una familia", "Corregido por quien
+ * entrena"…), quién lo publicó primero y quién lo cambió por última vez (spec 010); y, para quien lo gestiona y una vez
  * empezado, "Registrar resultado" o "Corregir resultado". No se pinta en un partido próximo que no
  * ha empezado ni en uno cancelado.
  */
@@ -73,6 +74,12 @@ export function SeccionResultado({ clubId, nombreClub, partido, alCambiar }: Pro
           ) : (
             <p className="texto-suave">Sin goleadores registrados.</p>
           )}
+          {estadoDelResultado(partido) && <p className="texto-pequeno">{estadoDelResultado(partido)}</p>}
+          {partido.publicacion && (
+            <p className="texto-suave texto-pequeno">
+              Publicado por {partido.publicacion.autor}, {fechaYHora(partido.publicacion.fecha)}
+            </p>
+          )}
           {cambio && (
             <p className="texto-suave texto-pequeno">
               Último cambio por{' '}
@@ -82,7 +89,7 @@ export function SeccionResultado({ clubId, nombreClub, partido, alCambiar }: Pro
           )}
         </>
       ) : (
-        <p className="texto-suave">Falta el resultado de este partido.</p>
+        <p className="texto-suave">Falta el resultado de este partido. Lo puede publicar la familia de un convocado.</p>
       )}
     </Tarjeta>
   );

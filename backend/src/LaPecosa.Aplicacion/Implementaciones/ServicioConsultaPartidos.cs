@@ -14,7 +14,9 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// Su responsabilidad es resolver el acceso con <see cref="AccesoAActividad"/> para el detalle y
 /// pedir al repositorio solo los visibles para las listas, con la respuesta propia solo para la
 /// cuenta de un jugador convocado. En un partido jugado añade sus goleadores para todos y, para
-/// quien ve la planilla, quién cambió el resultado por última vez (RF-019, RF-020). Las operaciones
+/// quien ve la planilla, quién cambió el resultado por última vez (RF-019, RF-020); lo de su propio
+/// jugador para la familia y la publicación del resultado los añade <see cref="MapperPartidos"/>
+/// (spec 010). Las operaciones
 /// que cambian un partido responden con lo que arma este servicio.
 /// No modifica datos, no decide quién ve qué y no accede al contexto de Entity Framework.
 /// </summary>

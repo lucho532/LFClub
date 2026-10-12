@@ -7,8 +7,9 @@ namespace LaPecosa.Infraestructura.Datos.Configuraciones;
 /// <summary>
 /// Representa la configuración de persistencia de <see cref="Partido"/>.
 /// Su responsabilidad es fijar la tabla, las longitudes, las enumeraciones como texto, las
-/// restricciones del marcador y del torneo, el índice del calendario, el borrado en cascada desde
-/// el club y las referencias a quien lo creó y a quien cambió su resultado.
+/// restricciones del marcador, del torneo y de la publicación (origen y primera publicación solo en
+/// un partido jugado, spec 010), el índice del calendario, el borrado en cascada desde el club y las
+/// referencias a quien lo creó, a quien publicó el resultado y a quien lo cambió por última vez.
 /// No contiene reglas de negocio: las restricciones solo impiden que la base guarde un partido
 /// imposible.
 /// </summary>
@@ -27,6 +28,13 @@ public class ConfiguracionPartido : IEntityTypeConfiguration<Partido>
                 + " OR (\"Estado\" <> 'JUGADO' AND \"GolesClub\" IS NULL AND \"GolesRival\" IS NULL)");
             tabla.HasCheckConstraint(
                 "CK_Partidos_Torneo", "\"Tipo\" <> 'TORNEO' OR \"NombreTorneo\" IS NOT NULL");
+
+            // Origen y primera publicación existen si y solo si está jugado (spec 010).
+            tabla.HasCheckConstraint(
+                "CK_Partidos_Publicacion",
+                "(\"Estado\" = 'JUGADO') = (\"OrigenResultado\" IS NOT NULL)"
+                + " AND (\"Estado\" = 'JUGADO') = (\"PublicadoEn\" IS NOT NULL)"
+                + " AND (\"Estado\" = 'JUGADO') = (\"PublicadoPorNombre\" IS NOT NULL)");
         });
         builder.HasKey(partido => partido.Id);
         builder.Property(partido => partido.Id).ValueGeneratedNever();
@@ -38,6 +46,8 @@ public class ConfiguracionPartido : IEntityTypeConfiguration<Partido>
         builder.Property(partido => partido.Tipo).HasConversion<string>().HasMaxLength(20).IsRequired();
         builder.Property(partido => partido.Estado).HasConversion<string>().HasMaxLength(20).IsRequired();
         builder.Property(partido => partido.ResultadoCambiadoPorNombre).HasMaxLength(161);
+        builder.Property(partido => partido.OrigenResultado).HasConversion<string>().HasMaxLength(20);
+        builder.Property(partido => partido.PublicadoPorNombre).HasMaxLength(161);
 
         builder.HasOne(partido => partido.Club)
             .WithMany()
@@ -54,6 +64,11 @@ public class ConfiguracionPartido : IEntityTypeConfiguration<Partido>
         builder.HasOne<Usuario>()
             .WithMany()
             .HasForeignKey(partido => partido.ResultadoCambiadoPorUsuarioId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne<Usuario>()
+            .WithMany()
+            .HasForeignKey(partido => partido.PublicadoPorUsuarioId)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasIndex(partido => new { partido.ClubId, partido.Fecha, partido.Hora });

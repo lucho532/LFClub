@@ -15,6 +15,14 @@ public interface IRepositorioEstadisticas
     /// <summary>Las cifras de un jugador por cada categoría en la que tiene registros.</summary>
     Task<IReadOnlyList<CifrasDeCategoria>> DelJugadorAsync(Guid usuarioRolId, CancellationToken cancelacion = default);
 
+    /// <summary>
+    /// Las asistencias registradas de un jugador y a cuántas asistió, en entrenamientos no
+    /// cancelados con fecha entre <paramref name="desde"/> y <paramref name="hasta"/>, ambas
+    /// incluidas: la temporada de la rareza de su carta (spec 010).
+    /// </summary>
+    Task<(int Registrados, int Asistidos)> AsistenciaEntreAsync(
+        Guid usuarioRolId, DateOnly desde, DateOnly hasta, CancellationToken cancelacion = default);
+
     /// <summary>Las categorías del club con al menos un gol en partidos jugados.</summary>
     Task<IReadOnlyList<Categoria>> CategoriasConGolesAsync(CancellationToken cancelacion = default);
 

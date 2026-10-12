@@ -69,7 +69,8 @@ public static class ConfiguracionSeguridad
         {
             if (urlFrontend.Length > 0)
             {
-                politica.WithOrigins(urlFrontend).AllowAnyHeader().AllowAnyMethod();
+                // Content-Disposition: la pantalla lee el nombre de la imagen de la carta (spec 010).
+                politica.WithOrigins(urlFrontend).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Content-Disposition");
             }
         }));
 

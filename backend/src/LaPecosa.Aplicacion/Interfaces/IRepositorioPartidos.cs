@@ -26,6 +26,9 @@ public interface IRepositorioPartidos
     /// <summary>Cambia rival, fecha, hora, lugar, condición, tipo y torneo con los valores de <paramref name="datos"/>.</summary>
     Task CambiarDatosAsync(Guid partidoId, Partido datos, CancellationToken cancelacion = default);
 
+    /// <summary>Cambia solo el rival del partido; nulo lo deja por definir.</summary>
+    Task CambiarRivalAsync(Guid partidoId, string? rival, CancellationToken cancelacion = default);
+
     /// <summary>Deja el partido en ese estado; no toca sus categorías ni su convocatoria.</summary>
     Task CambiarEstadoAsync(Guid partidoId, EstadoPartido estado, CancellationToken cancelacion = default);
 

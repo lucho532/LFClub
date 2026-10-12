@@ -58,6 +58,12 @@ public class RepositorioPartidos : IRepositorioPartidos
                 cancelacion);
 
     /// <inheritdoc />
+    public Task CambiarRivalAsync(Guid partidoId, string? rival, CancellationToken cancelacion = default) =>
+        _contexto.Partidos
+            .Where(partido => partido.Id == partidoId)
+            .ExecuteUpdateAsync(cambios => cambios.SetProperty(partido => partido.Rival, rival), cancelacion);
+
+    /// <inheritdoc />
     public Task CambiarEstadoAsync(Guid partidoId, EstadoPartido estado, CancellationToken cancelacion = default) =>
         _contexto.Partidos
             .Where(partido => partido.Id == partidoId)

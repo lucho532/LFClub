@@ -39,6 +39,10 @@ public static class ErroresDeActividades
     public static ExcepcionDeAplicacion PartidoJugado() => ExcepcionDeAplicacion.Conflicto(
         "partido_jugado", "Este partido ya se jugó: solo se puede corregir su resultado.");
 
+    /// <summary>409: el rival solo se corrige en un partido ya jugado; uno próximo se edita completo.</summary>
+    public static ExcepcionDeAplicacion PartidoNoJugado() => ExcepcionDeAplicacion.Conflicto(
+        "partido_no_jugado", "Este partido todavía no se juega: cambia su rival al editarlo.");
+
     /// <summary>409: una de las categorías no está activa o no es del club (RF-005).</summary>
     public static ExcepcionDeAplicacion CategoriaInactiva() => ExcepcionDeAplicacion.Conflicto(
         "categoria_inactiva", "Una de las categorías no está activa. Elige categorías activas del club.");
@@ -59,6 +63,18 @@ public static class ErroresDeActividades
     /// <summary>400: los goles de los jugadores suman más que los del club (RF-017).</summary>
     public static ExcepcionDeAplicacion GolesSuperanMarcador() => new(
         "goles_superan_marcador", 400, "Los goles de los jugadores suman más que los goles del club.");
+
+    /// <summary>400: la familia publica en un partido sin marcador y no lo envía entero (spec 010, RF-001).</summary>
+    public static ExcepcionDeAplicacion FaltaMarcador() => new(
+        "falta_marcador", 400, "Escribe el marcador del partido.");
+
+    /// <summary>409: la familia envía un marcador cuando ya hay uno publicado, aunque sea igual (spec 010, RF-003).</summary>
+    public static ExcepcionDeAplicacion MarcadorYaPublicado() => ExcepcionDeAplicacion.Conflicto(
+        "marcador_ya_publicado", "El marcador ya fue publicado: solo puedes indicar lo de tu jugador.");
+
+    /// <summary>409: quien entrena o el PRESIDENTE ya corrigió lo del jugador (spec 010, RF-012).</summary>
+    public static ExcepcionDeAplicacion IndicacionCorregida() => ExcepcionDeAplicacion.Conflicto(
+        "indicacion_corregida", "Quien entrena ya corrigió lo de tu jugador.");
 
     /// <summary>400: una fila del resultado es de alguien que no está convocado.</summary>
     public static ExcepcionDeAplicacion JugadorNoConvocado() => new(

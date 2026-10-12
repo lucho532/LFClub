@@ -1,0 +1,107 @@
+/*
+  La carta del jugador (spec 010), siguiendo specs/010-ficha-resultado-y-carta/contracts/carta.md.
+  Las posiciones van en porcentajes del lienzo de 750 x 1050 y las letras en unidades del ancho del
+  contenedor, así la carta escala sin deformarse. No cambia con el tema: tiene su propio fondo.
+*/
+/* El contenedor da la unidad de medida (cqw); el lienzo, dentro, la usa también en su marco y sus esquinas. */
+.carta {
+  container-type: inline-size;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.carta-lienzo {
+  position: relative;
+  aspect-ratio: 750 / 1050;
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (min-width: 721px) {
+  .carta {
+    max-width: 360px;
+  }
+}
+
+.carta-caja {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.carta-valoracion,
+.carta-dorsal,
+.carta-estadistica > span:first-child {
+  font-weight: 800;
+}
+
+.carta-dorsal {
+  justify-content: flex-end;
+}
+
+.carta-foto img,
+.carta-figura {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carta-escudo {
+  object-fit: contain;
+}
+
+.carta-nombre {
+  flex-direction: column;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.carta-linea {
+  opacity: 0.5;
+}
+
+.carta-estadistica {
+  justify-content: flex-start;
+  gap: 6%;
+}
+
+.carta-pantalla {
+  display: grid;
+  gap: 16px;
+}
+
+.carta-rareza-texto {
+  text-align: center;
+}
+
+/* Reflejo sobre el fondo: lo pinta el estilo en línea (plano.ts, BRILLO). */
+.carta-brillo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Marco metálico: un anillo con el degradado de la rareza, por dentro del lienzo. */
+.carta-marco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+/* Destellos de luz por encima de todo, sin capturar los toques. */
+.carta-destellos {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

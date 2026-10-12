@@ -20,11 +20,12 @@ import { SeccionEstadisticas } from './SeccionEstadisticas';
 import { SeccionFoto } from './SeccionFoto';
 import { SeccionIdentidad } from './SeccionIdentidad';
 import { UltimoCambio } from './UltimoCambio';
+import { textosCarta } from '../carta/textos';
 
 /**
  * Pantalla de la ficha de un jugador, la misma para todos los roles. Carga la ficha y la reparte en
- * secciones; arriba, la foto propia del jugador (spec 007) con su nombre, su categoría y sus equipos
- * al lado. Muestra y permite solo lo que trae la respuesta: los grupos que la API no entrega no
+ * secciones; arriba, la foto propia del jugador (spec 007) con su nombre, su categoría, sus equipos
+ * y el enlace a su carta (spec 010) al lado. Muestra y permite solo lo que trae la respuesta: los grupos que la API no entrega no
  * se pintan, y los botones dependen de `permisos`, no del rol. Quien no puede ver la ficha recibe
  * de la API el mismo "no encontrado" que si no existiera, y aquí se le dice lo mismo.
  * "Agregar un hermano" y "Retirar del club" solo aparecen en la ficha propia de la cuenta de un
@@ -77,6 +78,7 @@ export function FichaJugador() {
             <h1 className="nombre-persona">{nombreCompleto(ficha)}</h1>
             <span>{ficha.categoriaAnio ? `Categoría ${ficha.categoriaAnio}` : SIN_CATEGORIA}</span>
             <span className="texto-suave">{textoDeEquipos(ficha.equipos)}</span>
+            <Link to={`/club/${club.clubId}/jugadores/${ficha.usuarioRolId}/carta`}>{textosCarta.verCarta}</Link>
           </SeccionFoto>
           <div className="columna">
             <UltimoCambio cambio={ficha.ultimoCambio} clubId={club.clubId} textoVolver={nombreCompleto(ficha)} />

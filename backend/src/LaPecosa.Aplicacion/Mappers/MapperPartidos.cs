@@ -9,8 +9,10 @@ namespace LaPecosa.Aplicacion.Mappers;
 /// <summary>
 /// Representa la conversión de los partidos y sus planillas en los DTOs del contrato (spec 009).
 /// Su responsabilidad es armar el resumen, el detalle y la planilla, con la hora como <c>HH:mm</c>,
-/// las categorías por año, los convocados por categoría copiada y apellidos, y el enlace a la ficha
-/// de cada jugador solo si quien mira puede abrirla.
+/// las categorías por año, los convocados por categoría copiada y apellidos con quién indicó lo de
+/// cada uno, el enlace a la ficha de cada jugador solo si quien mira puede abrirla, y, en el
+/// detalle, lo de su propio jugador para la familia y la publicación para quien ve la planilla
+/// (spec 010).
 /// No decide quién ve qué ni consulta nada: lo que no se le pasa no sale.
 /// </summary>
 public static class MapperPartidos
@@ -33,11 +35,23 @@ public static class MapperPartidos
             Categorias(partido),
             miRespuesta);
 
-    /// <summary>El detalle de un partido que quien pregunta puede ver.</summary>
+    /// <summary>
+    /// El detalle de un partido que quien pregunta puede ver. Lo de su propio jugador va solo a la
+    /// cuenta de un convocado a un partido que ya empezó; la publicación y el origen, solo a quien ve
+    /// la planilla de un partido jugado (spec 010).
+    /// </summary>
     public static PartidoDto ADetalle(
         PartidoVisible visible, IReadOnlyList<GoleadorDePartidoDto>? goleadores, UltimoCambioDto? ultimoCambio)
     {
         var partido = visible.Partido;
+        var miFila = visible.MiFila;
+        var miParticipacion = PartidoVisible.Participa(partido, miFila, visible.Empezo)
+            ? new MiParticipacionDto(miFila!.Jugo, miFila.Goles, miFila.IndicadoPor, miFila.IndicadoPor != OrigenResultado.GESTION)
+            : null;
+        var conPublicacion = visible.Permisos.VePlanilla && partido.Estado == EstadoPartido.JUGADO && partido.PublicadoEn is not null;
+        var publicacion = conPublicacion
+            ? new PublicacionResultadoDto(partido.PublicadoEn!.Value, partido.PublicadoPorNombre ?? string.Empty, partido.PublicadoPorFamilia)
+            : null;
         return new PartidoDto(
             partido.Id,
             partido.Rival,
@@ -55,7 +69,10 @@ public static class MapperPartidos
             visible.MiFila?.Respuesta,
             visible.Permisos,
             goleadores,
-            ultimoCambio);
+            ultimoCambio,
+            miParticipacion,
+            publicacion,
+            conPublicacion ? partido.OrigenResultado : null);
     }
 
     /// <summary>La planilla con los conteos de respuestas y, si se pasan, los convocables.</summary>
@@ -78,7 +95,10 @@ public static class MapperPartidos
                     MapperActividades.Categoria(fila.CategoriaId, fila.Categoria),
                     fila.Respuesta,
                     fila.Jugo,
-                    fila.Goles))
+                    fila.Goles,
+                    fila.IndicadoPor is { } origen
+                        ? new IndicacionDto(origen, fila.IndicadoPorNombre ?? string.Empty, fila.IndicadoEn!.Value)
+                        : null))
                 .ToList(),
             convocables
                 .OrderBy(jugador => jugador.Categoria?.Anio)

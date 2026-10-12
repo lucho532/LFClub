@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { IdentidadClubDto } from '../compartido/api/tipos';
+import { BotonRecargar } from '../compartido/componentes/BotonRecargar';
 import { BotonTema } from '../compartido/componentes/BotonTema';
 import { Escudo, IdentidadClub } from '../compartido/tema/IdentidadClub';
 
@@ -24,7 +25,10 @@ export function DisposicionCuenta({ titulo, subtitulo, identidad, children }: Pr
           <p className="lateral-marca" style={{ padding: 0 }}>
             La Pecosa
           </p>
-          <BotonTema />
+          <span className="barra-superior-acciones">
+            <BotonRecargar />
+            <BotonTema />
+          </span>
         </div>
         {identidad && <Escudo identidad={identidad} nombre={titulo} />}
         <h1>{titulo}</h1>

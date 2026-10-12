@@ -3,14 +3,15 @@ import { api } from '../compartido/api/cliente';
 import { mensajeDe } from '../compartido/api/errores';
 import type { SesionDto } from '../compartido/api/tipos';
 import { Aviso } from '../compartido/componentes/Aviso';
+import { FotoAmpliable } from '../compartido/componentes/FotoAmpliable';
 import { LapizDeImagen } from '../compartido/componentes/LapizDeImagen';
 import { useFotoPerfil } from '../compartido/sesion/useFotoPerfil';
 import { useSesion } from '../compartido/sesion/useSesion';
 
 /**
  * Foto de perfil en "Mi perfil": la persona la carga, la cambia y la quita con el lápiz del
- * círculo (`LapizDeImagen`). Es opcional y la misma
- * en todos sus clubes. Solo ella la cambia; si es presidente, directivo o entrenador, la ven además
+ * círculo (`LapizDeImagen`) y, al tocarla, la ve en tamaño completo (`FotoAmpliable`). Es opcional
+ * y la misma en todos sus clubes. Solo ella la cambia; si es presidente, directivo o entrenador, la ven además
  * los integrantes de sus clubes en su ficha básica y junto a su nombre (spec 008, §14.2).
  */
 export function SeccionFotoPerfil({ sesion, quienLaVe }: { sesion: SesionDto; quienLaVe: string }) {
@@ -58,9 +59,9 @@ export function SeccionFotoPerfil({ sesion, quienLaVe }: { sesion: SesionDto; qu
           alQuitar={quitar}
         >
           {foto ? (
-            <img className="distintivo" style={{ width: 96, height: 96 }} src={foto} alt="Tu foto de perfil" />
+            <FotoAmpliable className="distintivo foto-perfil-grande" src={foto} alt="Tu foto de perfil" />
           ) : (
-            <span className="distintivo" style={{ width: 96, height: 96, fontSize: 32 }} aria-hidden="true">
+            <span className="distintivo foto-perfil-grande" aria-hidden="true">
               {sesion.correo.charAt(0).toUpperCase()}
             </span>
           )}

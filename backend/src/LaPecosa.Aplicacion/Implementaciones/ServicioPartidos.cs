@@ -111,6 +111,28 @@ public class ServicioPartidos : IServicioPartidos
     }
 
     /// <inheritdoc />
+    public async Task<PartidoDto> CorregirRivalAsync(
+        Guid partidoId, CorregirRivalDto datos, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
+    {
+        var errores = new ErroresDeValidacion();
+        var rival = CamposDeActividad.Limpio(datos.Rival);
+        errores.Maximo("rival", rival, Partido.LongitudMaximaDeTexto, "El rival");
+        errores.LanzarSiHayErrores();
+
+        var partido = await GestionadoAsync(partidoId, quienPregunta, cancelacion);
+        if (partido.Estado != EstadoPartido.JUGADO)
+        {
+            // Uno próximo se cambia con el formulario completo; uno cancelado, tras reactivarlo.
+            throw partido.Estado == EstadoPartido.CANCELADO
+                ? ErroresDeActividades.ActividadCancelada()
+                : ErroresDeActividades.PartidoNoJugado();
+        }
+
+        await _partidos.CambiarRivalAsync(partidoId, rival, cancelacion);
+        return await _consulta.ObtenerAsync(partidoId, quienPregunta, cancelacion);
+    }
+
+    /// <inheritdoc />
     public async Task<PartidoDto> CancelarAsync(Guid partidoId, UsuarioRol quienPregunta, CancellationToken cancelacion = default)
     {
         var partido = await GestionadoAsync(partidoId, quienPregunta, cancelacion);

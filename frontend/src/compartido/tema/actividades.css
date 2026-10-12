@@ -103,6 +103,12 @@
   min-width: 0;
 }
 
+/* Nombre e indicación de un convocado, uno debajo del otro (spec 010). */
+.columna-compacta {
+  display: grid;
+  min-width: 0;
+}
+
 .goles-de-jugador {
   width: 72px;
   min-height: 40px;

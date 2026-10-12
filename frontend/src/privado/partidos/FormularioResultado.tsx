@@ -6,6 +6,7 @@ import { useCarga } from '../../compartido/api/useCarga';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { Campo } from '../../compartido/componentes/Campo';
+import { textoDeIndicacion } from './textos';
 
 interface Props {
   clubId: string;
@@ -23,7 +24,8 @@ interface Fila {
  * El formulario del resultado: goles del club y del rival y la lista de convocados, todos marcados
  * como que jugaron al registrarlo por primera vez (escenario 3.3); al corregirlo, como estaba. Los
  * goles de un jugador solo se escriben si jugó, y avisa si la suma no cuadra con el marcador. Los
- * rechazos los decide la API (RF-017) y se muestran tal como los explica.
+ * rechazos los decide la API (RF-017) y se muestran tal como los explica. Cada fila dice quién
+ * indicó lo de ese jugador y cuándo, o "Sin indicar" (spec 010, RF-009).
  */
 export function FormularioResultado({ clubId, partido, alGuardar, alCancelar }: Props) {
   const ruta = `/api/clubes/${clubId}/partidos/${partido.partidoId}`;
@@ -86,6 +88,10 @@ export function FormularioResultado({ clubId, partido, alGuardar, alCancelar }: 
       {convocados.length > 0 && (
         <fieldset className="opciones">
           <legend>Quiénes jugaron y sus goles</legend>
+          <p className="texto-suave texto-pequeno">
+            El número a la derecha de cada nombre son los goles que anotó ese jugador en este partido. Solo se
+            puede escribir en quien jugó.
+          </p>
           <div className="filas-resultado">
             {convocados.map((convocado) => {
               const fila = filaDe(convocado.usuarioRolId);
@@ -97,8 +103,11 @@ export function FormularioResultado({ clubId, partido, alGuardar, alCancelar }: 
                       checked={fila.jugo}
                       onChange={(evento) => cambiar(convocado.usuarioRolId, { jugo: evento.target.checked })}
                     />
-                    <span className="dato-largo">
-                      {convocado.nombres} {convocado.apellidos} · {fila.jugo ? 'Jugó' : 'No jugó'}
+                    <span className="columna-compacta">
+                      <span className="dato-largo">
+                        {convocado.nombres} {convocado.apellidos} · {fila.jugo ? 'Jugó' : 'No jugó'}
+                      </span>
+                      <span className="texto-suave texto-pequeno">{textoDeIndicacion(convocado.indicacion)}</span>
                     </span>
                   </label>
                   <input
@@ -106,6 +115,7 @@ export function FormularioResultado({ clubId, partido, alGuardar, alCancelar }: 
                     min={0}
                     max={99}
                     aria-label={`Goles de ${convocado.nombres} ${convocado.apellidos}`}
+                    title={`Goles que anotó ${convocado.nombres} en este partido`}
                     className="goles-de-jugador"
                     value={fila.jugo ? fila.goles : '0'}
                     disabled={!fila.jugo}

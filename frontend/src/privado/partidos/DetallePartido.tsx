@@ -13,15 +13,18 @@ import { FormularioPartido } from '../actividades/FormularioPartido';
 import { BotonesRespuesta } from '../calendario/BotonesRespuesta';
 import { textoDeCategorias, textoDeCondicion } from '../calendario/TarjetaActividad';
 import { useClub } from '../contextoClub';
+import { CorregirRival } from './CorregirRival';
 import { SeccionConvocatoria } from './SeccionConvocatoria';
 import { SeccionResultado } from './SeccionResultado';
+import { SeccionResultadoFamilia } from './SeccionResultadoFamilia';
 import { nombreRival, textoDeTipo } from './textos';
 
 /**
  * Detalle de un partido: rival, fecha, hora, lugar, condición, tipo y torneo, categorías y estado
  * escrito; si está jugado, el marcador y los goleadores. Quien gestiona un partido próximo lo
  * edita (con `?editar=1` el formulario ya viene abierto) o lo cancela, y uno cancelado que no ha empezado lo reactiva. Quien ve la planilla ve la
- * convocatoria. Si no existe o quien pregunta no lo ve, dice lo mismo que si no existiera (RF-011).
+ * convocatoria. En uno jugado, quien lo gestiona puede corregir el nombre del rival. La familia de un convocado, una vez empezado, publica el resultado o indica lo de su
+ * jugador (spec 010). Si no existe o quien pregunta no lo ve, dice lo mismo que si no existiera (RF-011).
  */
 export function DetallePartido() {
   const { club } = useClub();
@@ -49,6 +52,13 @@ export function DetallePartido() {
             <EtiquetaActividad tipo="PARTIDO" estado={partido.estado} faltaResultado={partido.faltaResultado} />
           </div>
           <SeccionResultado clubId={club.clubId} nombreClub={club.nombre} partido={partido} alCambiar={carga.fijar} />
+          <SeccionResultadoFamilia
+            clubId={club.clubId}
+            nombreClub={club.nombre}
+            partido={partido}
+            alCambiar={carga.fijar}
+            recargar={carga.recargar}
+          />
           {cambiando && partido.permisos.gestiona && partido.estado === 'PROXIMO' ? (
             <Tarjeta titulo="Editar el partido">
               <FormularioPartido
@@ -97,6 +107,9 @@ export function DetallePartido() {
                   actual={partido.miRespuesta}
                   habilitado={partido.permisos.responde}
                 />
+              )}
+              {partido.permisos.gestiona && partido.estado === 'JUGADO' && (
+                <CorregirRival ruta={ruta} partido={partido} alCorregir={carga.fijar} />
               )}
               {partido.permisos.gestiona && partido.estado !== 'JUGADO' && (
                 <AccionesDeEstado

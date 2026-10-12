@@ -138,6 +138,9 @@ public class EliminarClubPruebas
         await _fabrica.Actividades.RegistrarAsistenciaAsync(entrenamiento, jugador, presente: true);
         await _fabrica.Actividades.ResponderAsync(entrenamiento, jugador, RespuestaFamilia.ASISTIRA);
         await _fabrica.Actividades.CrearPartidoAsync([categoria], new DateOnly(2026, 10, 17), convocados: [jugador]);
+
+        // Spec 010: la carta del jugador.
+        await _fabrica.Cartas.PonerCartaAsync(jugador, 10, PosicionJugador.DELANTERO, [70, 65, 80, 72, 60, 88]);
     }
 
     private Task<bool> ExisteClubAsync(Guid clubId) =>

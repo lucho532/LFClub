@@ -85,6 +85,79 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.ToTable("AsistenciasEntrenamiento", (string)null);
                 });
 
+            modelBuilder.Entity("LaPecosa.Dominio.Entidades.CartaJugador", b =>
+                {
+                    b.Property<Guid>("UsuarioRolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Defensa")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Dorsal")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DorsalCambiadoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DorsalCambiadoPorNombre")
+                        .HasMaxLength(161)
+                        .HasColumnType("character varying(161)");
+
+                    b.Property<Guid?>("DorsalCambiadoPorUsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("EstadisticasCambiadasEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EstadisticasCambiadasPorNombre")
+                        .HasMaxLength(161)
+                        .HasColumnType("character varying(161)");
+
+                    b.Property<Guid?>("EstadisticasCambiadasPorUsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Fisico")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Pase")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Posicion")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int?>("Regate")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Ritmo")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Tiro")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UsuarioRolId");
+
+                    b.HasIndex("ClubId");
+
+                    b.HasIndex("DorsalCambiadoPorUsuarioId");
+
+                    b.HasIndex("EstadisticasCambiadasPorUsuarioId");
+
+                    b.ToTable("CartasJugador", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CartasJugador_Dorsal", "\"Dorsal\" IS NULL OR \"Dorsal\" BETWEEN 1 AND 99");
+
+                            t.HasCheckConstraint("CK_CartasJugador_Estadisticas", "(\"Ritmo\" IS NULL AND \"Tiro\" IS NULL AND \"Pase\" IS NULL AND \"Regate\" IS NULL AND \"Defensa\" IS NULL AND \"Fisico\" IS NULL) OR (\"Ritmo\" BETWEEN 1 AND 99 AND \"Tiro\" BETWEEN 1 AND 99 AND \"Pase\" BETWEEN 1 AND 99 AND \"Regate\" BETWEEN 1 AND 99 AND \"Defensa\" BETWEEN 1 AND 99 AND \"Fisico\" BETWEEN 1 AND 99)");
+
+                            t.HasCheckConstraint("CK_CartasJugador_SelloDorsal", "(\"DorsalCambiadoEn\" IS NULL) = (\"DorsalCambiadoPorNombre\" IS NULL)");
+
+                            t.HasCheckConstraint("CK_CartasJugador_SelloEstadisticas", "(\"EstadisticasCambiadasEn\" IS NULL) = (\"EstadisticasCambiadasPorNombre\" IS NULL)");
+                        });
+                });
+
             modelBuilder.Entity("LaPecosa.Dominio.Entidades.Categoria", b =>
                 {
                     b.Property<Guid>("Id")
@@ -595,6 +668,23 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");
 
+                    b.Property<string>("OrigenResultado")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime?>("PublicadoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("PublicadoPorFamilia")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PublicadoPorNombre")
+                        .HasMaxLength(161)
+                        .HasColumnType("character varying(161)");
+
+                    b.Property<Guid?>("PublicadoPorUsuarioId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("ResultadoCambiadoEn")
                         .HasColumnType("timestamp with time zone");
 
@@ -618,6 +708,8 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
 
                     b.HasIndex("CreadoPorUsuarioRolId");
 
+                    b.HasIndex("PublicadoPorUsuarioId");
+
                     b.HasIndex("ResultadoCambiadoPorUsuarioId");
 
                     b.HasIndex("ClubId", "Fecha", "Hora");
@@ -625,6 +717,8 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.ToTable("Partidos", null, t =>
                         {
                             t.HasCheckConstraint("CK_Partidos_Marcador", "(\"Estado\" = 'JUGADO' AND \"GolesClub\" IS NOT NULL AND \"GolesRival\" IS NOT NULL AND \"GolesClub\" BETWEEN 0 AND 99 AND \"GolesRival\" BETWEEN 0 AND 99) OR (\"Estado\" <> 'JUGADO' AND \"GolesClub\" IS NULL AND \"GolesRival\" IS NULL)");
+
+                            t.HasCheckConstraint("CK_Partidos_Publicacion", "(\"Estado\" = 'JUGADO') = (\"OrigenResultado\" IS NOT NULL) AND (\"Estado\" = 'JUGADO') = (\"PublicadoEn\" IS NOT NULL) AND (\"Estado\" = 'JUGADO') = (\"PublicadoPorNombre\" IS NOT NULL)");
 
                             t.HasCheckConstraint("CK_Partidos_Torneo", "\"Tipo\" <> 'TORNEO' OR \"NombreTorneo\" IS NOT NULL");
                         });
@@ -670,6 +764,20 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.Property<int>("Goles")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime?>("IndicadoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IndicadoPor")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("IndicadoPorNombre")
+                        .HasMaxLength(161)
+                        .HasColumnType("character varying(161)");
+
+                    b.Property<Guid?>("IndicadoPorUsuarioId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("Jugo")
                         .HasColumnType("boolean");
 
@@ -686,11 +794,15 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
 
                     b.HasIndex("ClubId");
 
+                    b.HasIndex("IndicadoPorUsuarioId");
+
                     b.HasIndex("UsuarioRolId");
 
                     b.ToTable("PartidosJugador", null, t =>
                         {
                             t.HasCheckConstraint("CK_PartidosJugador_Goles", "\"Goles\" >= 0 AND (\"Jugo\" OR \"Goles\" = 0)");
+
+                            t.HasCheckConstraint("CK_PartidosJugador_Indicacion", "(\"IndicadoPor\" IS NULL) = (\"IndicadoEn\" IS NULL) AND (\"IndicadoPor\" IS NULL) = (\"IndicadoPorNombre\" IS NULL)");
                         });
                 });
 
@@ -981,6 +1093,33 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                     b.Navigation("UsuarioRol");
                 });
 
+            modelBuilder.Entity("LaPecosa.Dominio.Entidades.CartaJugador", b =>
+                {
+                    b.HasOne("LaPecosa.Dominio.Entidades.Club", null)
+                        .WithMany()
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LaPecosa.Dominio.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("DorsalCambiadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LaPecosa.Dominio.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("EstadisticasCambiadasPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LaPecosa.Dominio.Entidades.UsuarioRol", "UsuarioRol")
+                        .WithOne()
+                        .HasForeignKey("LaPecosa.Dominio.Entidades.CartaJugador", "UsuarioRolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UsuarioRol");
+                });
+
             modelBuilder.Entity("LaPecosa.Dominio.Entidades.Categoria", b =>
                 {
                     b.HasOne("LaPecosa.Dominio.Entidades.Club", "Club")
@@ -1218,6 +1357,11 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
 
                     b.HasOne("LaPecosa.Dominio.Entidades.Usuario", null)
                         .WithMany()
+                        .HasForeignKey("PublicadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LaPecosa.Dominio.Entidades.Usuario", null)
+                        .WithMany()
                         .HasForeignKey("ResultadoCambiadoPorUsuarioId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -1264,6 +1408,11 @@ namespace LaPecosa.Infraestructura.Datos.Migraciones
                         .HasForeignKey("ClubId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("LaPecosa.Dominio.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IndicadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("LaPecosa.Dominio.Entidades.Partido", "Partido")
                         .WithMany("Jugadores")

@@ -74,9 +74,15 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioConsultaPartidos, ServicioConsultaPartidos>();
         servicios.AddScoped<IServicioConvocatoria, ServicioConvocatoria>();
         servicios.AddScoped<IServicioResultado, ServicioResultado>();
+        servicios.AddScoped<IServicioResultadoFamilia, ServicioResultadoFamilia>();
         servicios.AddScoped<IServicioAsistencia, ServicioAsistencia>();
         servicios.AddScoped<IServicioRespuestas, ServicioRespuestas>();
         servicios.AddScoped<IServicioEstadisticas, ServicioEstadisticas>();
+
+        servicios.AddScoped<AccesoACarta>();
+        servicios.AddScoped<IServicioConsultaCarta, ServicioConsultaCarta>();
+        servicios.AddScoped<IServicioCarta, ServicioCarta>();
+        servicios.AddScoped<IServicioImagenCarta, ServicioImagenCarta>();
 
         return servicios;
     }

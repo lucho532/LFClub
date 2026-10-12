@@ -29,6 +29,8 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 
     public Sembrador Sembrador => new(this);
 
+    public SembradorCartas Cartas => new(this);
+
     public SembradorCategorias Categorias => new(this);
 
     public SembradorFichas Fichas => new(this);

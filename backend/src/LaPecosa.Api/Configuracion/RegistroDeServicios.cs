@@ -2,6 +2,7 @@ using LaPecosa.Aplicacion.Interfaces;
 using LaPecosa.Aplicacion.Utilidades;
 using LaPecosa.Infraestructura.Correo;
 using LaPecosa.Infraestructura.Datos;
+using LaPecosa.Infraestructura.Imagenes;
 using LaPecosa.Infraestructura.Repositorios;
 using LaPecosa.Infraestructura.Repositorios.Plataforma;
 using LaPecosa.Infraestructura.Seguridad;
@@ -58,6 +59,8 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioConvocatoria, RepositorioConvocatoria>();
         servicios.AddScoped<IRepositorioAsistencias, RepositorioAsistencias>();
         servicios.AddScoped<IRepositorioEstadisticas, RepositorioEstadisticas>();
+        servicios.AddScoped<IRepositorioCartas, RepositorioCartas>();
+        servicios.AddSingleton<IGeneradorImagenCarta, GeneradorImagenCarta>();
 
         servicios.Configure<OpcionesCorreo>(opciones =>
         {

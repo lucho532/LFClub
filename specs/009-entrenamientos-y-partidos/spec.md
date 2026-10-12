@@ -452,6 +452,12 @@ un partido.
   elegida DEBE escribirse además con texto (RF-036).
 - **RF-040**: Quien gestiona una actividad que no está cancelada ni jugada DEBE tener la opción
   "Editar" en su detalle y en su tarjeta del calendario. Es comodidad: la API sigue decidiendo.
+- **RF-042**: Quien gestiona un partido ya jugado DEBE poder corregir el nombre de su rival (o
+  dejarlo por definir) sin tocar el marcador ni los goles. Es lo único de un partido jugado, además
+  de su resultado, que se puede cambiar (ajuste pedido por el propietario el 2026-10-12).
+- **RF-043**: La lista de partidos DEBE separar en su propio bloque "Falta el resultado" a los
+  partidos cuya hora ya pasó sin resultado, encima de "Próximos". Siguen sin ser "jugados" hasta que
+  se registre el marcador (ajuste pedido por el propietario el 2026-10-12).
 
 ### Entidades clave
 

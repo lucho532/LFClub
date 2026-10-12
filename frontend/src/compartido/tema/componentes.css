@@ -54,6 +54,21 @@
 .campo label {
   font-weight: 700;
   font-size: 14px;
+  line-height: 20px;
+}
+
+/*
+ * Formulario en línea de un campo y su botón: el botón queda a la altura de la entrada, y no de la
+ * etiqueta ni del error que pueda salir debajo. 20px es el alto de la etiqueta y 4px el espacio
+ * entre ella y la entrada (`.campo`).
+ */
+.fila-con-campos {
+  align-items: flex-start;
+}
+
+.fila-con-campos > .boton {
+  min-height: 48px;
+  margin-top: 24px;
 }
 
 .campo input,

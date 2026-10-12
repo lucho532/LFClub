@@ -60,6 +60,10 @@
     flex: 1 1 100%;
   }
 
+  .principal form.fila-con-campos > .boton {
+    margin-top: 0;
+  }
+
   /* El menú lateral pasa a ser una barra de pestañas fija abajo: icono sobre el texto. */
   .disposicion > .lateral {
     position: fixed;

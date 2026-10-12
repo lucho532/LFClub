@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ClubDeSesionDto, JugadorDeSesionDto } from '../compartido/api/tiposSesion';
 import type { Tono } from '../compartido/componentes/Aviso';
 import { Boton } from '../compartido/componentes/Boton';
+import { BotonRecargar } from '../compartido/componentes/BotonRecargar';
 import { BotonTema } from '../compartido/componentes/BotonTema';
 import { EtiquetaEstado } from '../compartido/componentes/EtiquetaEstado';
 import { guardarJugadorElegido } from '../compartido/sesion/jugadorElegido';
@@ -45,7 +46,10 @@ export function ElegirJugador({ club }: { club: ClubDeSesionDto }) {
       <header className="columna">
         <div className="cabecera">
           <Escudo identidad={club.identidad} nombre={club.nombre} />
-          <BotonTema />
+          <span className="barra-superior-acciones">
+            <BotonRecargar />
+            <BotonTema />
+          </span>
         </div>
         <h1>{club.nombre}</h1>
       </header>

@@ -20,6 +20,13 @@ public interface IServicioPartidos
     Task<PartidoDto> CambiarAsync(
         Guid partidoId, GuardarPartidoDto datos, UsuarioRol quienPregunta, CancellationToken cancelacion = default);
 
+    /// <summary>
+    /// Corrige el rival de un partido ya jugado, que no admite otro cambio de datos; el marcador y los
+    /// goles no se tocan.
+    /// </summary>
+    Task<PartidoDto> CorregirRivalAsync(
+        Guid partidoId, CorregirRivalDto datos, UsuarioRol quienPregunta, CancellationToken cancelacion = default);
+
     /// <summary>Cancela un partido próximo.</summary>
     Task<PartidoDto> CancelarAsync(Guid partidoId, UsuarioRol quienPregunta, CancellationToken cancelacion = default);
 

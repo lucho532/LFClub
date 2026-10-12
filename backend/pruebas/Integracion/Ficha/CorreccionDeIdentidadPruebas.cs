@@ -7,9 +7,11 @@ using LaPecosa.Pruebas.Integracion.Categorias;
 namespace LaPecosa.Pruebas.Integracion.Ficha;
 
 /// <summary>
-/// Solo el PRESIDENTE corrige los nombres, los apellidos y la fecha de nacimiento; corregir la
+/// El PRESIDENTE corrige los nombres, los apellidos y la fecha de nacimiento; corregir la
 /// fecha no mueve a quien ya tiene categoría y ubica a quien no tiene (historia 4, escenarios 4 a
-/// 7; historia 1, escenario 6; RF-017, RF-018, RF-021, RF-025, RF-026; supuesto 2).
+/// 7; historia 1, escenario 6; RF-017, RF-018, RF-021, RF-025, RF-026; supuesto 2). Lo que
+/// corrige la familia (spec 010, que cambia RF-016 y RF-017 de la 005) está en
+/// <see cref="CorreccionPorLaFamiliaPruebas"/>.
 /// </summary>
 [Collection(ColeccionApi.Nombre)]
 public class CorreccionDeIdentidadPruebas
@@ -219,19 +221,5 @@ public class CorreccionDeIdentidadPruebas
 
         Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode);
         Assert.Null(await e.FichaGuardadaAsync(e.Ana.Id));
-    }
-
-    // Historia 1, escenario 6 y RF-017: tampoco llamando directamente a la operación.
-    [Fact]
-    public async Task La_cuenta_del_jugador_recibe_403_y_nada_cambia()
-    {
-        var e = await EscenarioFicha.CrearAsync(_fabrica);
-
-        var respuesta = await e.CuentaDeAna.PutAsync(e.Identidad(e.Ana.Id), Cuerpo(e.Ana, "Otro", "Distinto", "2001-01-01"));
-
-        Assert.Equal(HttpStatusCode.Forbidden, respuesta.StatusCode);
-        Assert.Equal("rol_no_autorizado", await ClienteDePrueba.CodigoAsync(respuesta));
-        var guardado = await e.JugadorGuardadoAsync(e.Ana.Id);
-        Assert.Equal((e.Ana.Nombres, e.Ana.Apellidos, e.Ana.FechaNacimiento), (guardado.Nombres, guardado.Apellidos, guardado.FechaNacimiento));
     }
 }

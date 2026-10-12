@@ -6,7 +6,11 @@ namespace LaPecosa.Dominio.Entidades;
 /// Representa un partido del club para una o varias categorías (spec 009, RF-007 a RF-021).
 /// Su responsabilidad es guardar el rival, la fecha y la hora en hora de Colombia, el lugar, la
 /// condición, el tipo y el torneo, su estado actual, el marcador y quién lo cambió por última vez,
-/// con su nombre copiado en ese momento (§13). De él cuelgan sus categorías y sus convocados.
+/// con su nombre copiado en ese momento (§13). El resultado lo publica la familia de un convocado o
+/// lo registra quien gestiona (§17.3, spec 010): guarda el origen del último cambio y la primera
+/// publicación (cuándo, quién y si fue una familia), que no cambia aunque después se corrija. Las
+/// columnas <c>ResultadoCambiado…</c> siguen siendo el último cambio. De él cuelgan sus categorías y
+/// sus convocados.
 /// No decide quién lo ve: mientras no se juega solo existe para sus convocados, quienes entrenan
 /// alguna de sus categorías y el PRESIDENTE (§17.2), y eso lo deciden las reglas del dominio. No
 /// guarda historial del resultado (§18) y nunca se borra.
@@ -81,6 +85,27 @@ public class Partido : IPerteneceAClub
 
     /// <summary>Nombres y apellidos de quien cambió el resultado, copiados en ese momento (§13).</summary>
     public string? ResultadoCambiadoPorNombre { get; set; }
+
+    /// <summary>
+    /// Quién puso el marcador por última vez. Nulo hasta el resultado. <see cref="OrigenResultado.FAMILIA"/>
+    /// cuando lo publica una familia; <see cref="OrigenResultado.GESTION"/> en cuanto quien entrena o
+    /// el PRESIDENTE lo registra o corrige, y ya no vuelve a FAMILIA.
+    /// </summary>
+    public OrigenResultado? OrigenResultado { get; set; }
+
+    /// <summary>Primera vez que se puso el marcador, en UTC; no cambia después (RF-009).</summary>
+    public DateTime? PublicadoEn { get; set; }
+
+    /// <summary>Cuenta que lo puso primero. Foránea a <see cref="Usuario"/>; pasa a nulo si se elimina.</summary>
+    public Guid? PublicadoPorUsuarioId { get; set; }
+
+    /// <summary>
+    /// Nombre de quien lo puso primero (texto ≤ 161), copiado (§13): el del jugador si fue su familia.
+    /// </summary>
+    public string? PublicadoPorNombre { get; set; }
+
+    /// <summary>Verdadero si la primera publicación fue de una familia.</summary>
+    public bool PublicadoPorFamilia { get; set; }
 
     /// <summary>Fecha y hora de creación, en UTC.</summary>
     public DateTime CreadoEn { get; set; }

@@ -93,6 +93,9 @@ public class ContextoLaPecosa : DbContext
     /// <summary>Convocados de cada partido, con lo que jugaron y la respuesta de su familia.</summary>
     public DbSet<PartidoJugador> PartidosJugador => Set<PartidoJugador>();
 
+    /// <summary>Cartas de los jugadores: dorsal, posición y estadísticas (spec 010).</summary>
+    public DbSet<CartaJugador> CartasJugador => Set<CartaJugador>();
+
     /// <summary>Club de la petición; lo lee el filtro global en cada consulta.</summary>
     private Guid? ClubDeLaPeticion => _contextoClub.ClubId;
 

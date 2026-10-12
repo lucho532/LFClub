@@ -59,6 +59,19 @@ public class RepositorioEstadisticas : IRepositorioEstadisticas
     }
 
     /// <inheritdoc />
+    public async Task<(int Registrados, int Asistidos)> AsistenciaEntreAsync(
+        Guid usuarioRolId, DateOnly desde, DateOnly hasta, CancellationToken cancelacion = default)
+    {
+        var filas = _contexto.AsistenciasEntrenamiento.Where(fila => fila.UsuarioRolId == usuarioRolId
+            && fila.Entrenamiento!.Estado != EstadoEntrenamiento.CANCELADO
+            && fila.Entrenamiento.Fecha >= desde
+            && fila.Entrenamiento.Fecha <= hasta);
+        var registrados = await filas.CountAsync(cancelacion);
+        var asistidos = registrados == 0 ? 0 : await filas.CountAsync(fila => fila.Presente, cancelacion);
+        return (registrados, asistidos);
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<Categoria>> CategoriasConGolesAsync(CancellationToken cancelacion = default)
     {
         var ids = await ConGoles()

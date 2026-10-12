@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using LaPecosa.Dominio.Enumeraciones;
 
 namespace LaPecosa.Aplicacion.DTOs;
@@ -27,7 +28,8 @@ public record PlanillaPartidoDto(
 /// <summary>
 /// Representa a un convocado en la planilla de un partido.
 /// Su responsabilidad es llevar su nombre, el enlace a su ficha si quien mira puede abrirla, la
-/// categoría con la que se le convocó, la respuesta de su familia, si jugó y sus goles.
+/// categoría con la que se le convocó, la respuesta de su familia, si jugó, sus goles y quién lo
+/// indicó.
 /// No lleva datos personales del jugador.
 /// </summary>
 /// <param name="UsuarioRolId">Jugador.</param>
@@ -38,6 +40,7 @@ public record PlanillaPartidoDto(
 /// <param name="Respuesta">Respuesta de su familia, o nula.</param>
 /// <param name="Jugo">Si jugó.</param>
 /// <param name="Goles">Goles que marcó.</param>
+/// <param name="Indicacion">Quién indicó lo suyo y cuándo; ausente si nadie indicó nada (spec 010, RF-009).</param>
 public record ConvocadoDto(
     Guid UsuarioRolId,
     string Nombres,
@@ -46,7 +49,8 @@ public record ConvocadoDto(
     CategoriaDeActividadDto Categoria,
     RespuestaFamilia? Respuesta,
     bool Jugo,
-    int Goles);
+    int Goles,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IndicacionDto? Indicacion = null);
 
 /// <summary>
 /// Representa a un jugador que se puede convocar a un partido próximo.

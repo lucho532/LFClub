@@ -45,7 +45,7 @@ Enmienda 2.0.0 → 2.1.0 (2026-10-07), decidida por el propietario del proyecto:
 - §10: el documento es único por pareja "documento + club"
 - §6.2: cada club recibe su dinero en su propia cuenta de la pasarela
 - §7.4: suspensión y baja de clubes; congelación automática por impago de la plataforma
-- §24: tema claro y oscuro con botón
+- §24: tema claro y oscuro (desde la 4.8.1, el cambio va en el menú del perfil)
 - §20: pruebas nuevas
 - §28: se cierran cinco decisiones y se abren seis de detalle
 
@@ -273,6 +273,15 @@ Enmienda 4.7.0 → 4.8.0 (2026-10-11), decidida por el propietario del proyecto 
   jugador"
 - Principios modificados: ninguno renombrado. Secciones añadidas: ninguna. Eliminadas: ninguna
 - Pendientes: siete decisiones abiertas en la §28. La spec 010 implementa esta versión
+
+Enmienda 4.8.0 → 4.8.1 (2026-10-12), aclaración pedida por el propietario del proyecto:
+- §24: el cambio entre tema claro y oscuro deja de ser un botón suelto en la barra superior y pasa
+  al menú del perfil, siempre a un toque; donde no hay menú de perfil sigue como botón visible. El
+  nombre accesible dice a qué tema cambia. Motivo: no saturar la barra superior, sobre todo en el
+  teléfono
+- §20 y §28: sin cambios. Principios modificados: ninguno. Secciones añadidas y eliminadas:
+  ninguna
+- Pendientes: los de la 4.8.0
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -1814,8 +1823,10 @@ El panel de administración de la plataforma no está en el lienzo; su diseño e
 
 Toda pantalla debe funcionar en teléfono y en escritorio.
 
-Toda la interfaz ofrece tema claro y tema oscuro, con un botón visible para cambiar entre ellos.
-Los colores de cada club deben verse bien en los dos temas. El lienzo solo muestra el tema claro.
+Toda la interfaz ofrece tema claro y tema oscuro. El cambio entre ellos está siempre al alcance
+con un toque: dentro del menú del perfil de la barra superior y, en las pantallas que no tienen
+menú de perfil (inicio de sesión, registro, sala de espera y similares), como un botón visible. Su
+nombre accesible dice con palabras a qué tema cambia. Los colores de cada club deben verse bien en los dos temas. El lienzo solo muestra el tema claro.
 
 En el diseño, las pantallas móviles rotuladas para "acudientes" corresponden a la cuenta del
 jugador.
@@ -1937,4 +1948,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.8.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-11
+**Versión**: 4.8.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12

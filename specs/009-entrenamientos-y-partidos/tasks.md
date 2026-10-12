@@ -344,3 +344,6 @@ Cada paso deja la batería en verde y no rompe lo anterior.
   `RepositorioJugadores` o `FabricaApi` (por el `RelojDePrueba`) y no está claro si es una
   regresión o un cambio previsto, se detiene esa parte y se pregunta (§25).
 - Confirmar el cambio en git al terminar cada tarea o cada historia.
+- [X] T041 Corregir el rival de un partido jugado (RF-042). `PUT /partidos/{id}/rival` (`CorregirRivalDto`, `IServicioPartidos.CorregirRivalAsync`, `IRepositorioPartidos.CambiarRivalAsync`, error `partido_no_jugado`), `frontend/src/privado/partidos/CorregirRival.tsx` en `DetallePartido.tsx`; pruebas `RivalDePartidoJugadoPruebas.cs` y `CorregirRival.test.tsx`
+- [X] T042 Bloque "Falta el resultado" en la lista de partidos (RF-043), `frontend/src/privado/partidos/Partidos.tsx`
+- [X] T043 Texto que explica la casilla de goles de cada jugador en `FormularioResultado.tsx`

@@ -14,6 +14,7 @@ import './compartido/tema/actividades.css';
 import './compartido/tema/imagenes.css';
 import './compartido/tema/calendario.css';
 import './compartido/tema/identidad.css';
+import './compartido/tema/carta.css';
 import './compartido/tema/movil.css';
 
 // Se decide una sola vez, fuera de React: la animación se ve una vez por apertura.

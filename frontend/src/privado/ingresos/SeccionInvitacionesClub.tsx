@@ -31,7 +31,9 @@ interface Props {
 /**
  * Invitaciones enviadas desde el club, que solo ve su presidente: invitar por correo eligiendo el
  * rol con el que entra la persona, ver el rol y el estado de cada una y reenviar o cancelar las
- * pendientes. El rol es obligatorio y no se cambia después: para corregirlo se invita de nuevo.
+ * pendientes. Las ya usadas salen de la lista principal y se ven con "Invitaciones anteriores": siguen
+ * siendo el registro de quién invitó a cada persona y con qué rol. El rol es obligatorio y no se
+ * cambia después: para corregirlo se invita de nuevo.
  */
 export function SeccionInvitacionesClub({ clubId, invitaciones }: Props) {
   const base = `/api/clubes/${clubId}/invitaciones`;
@@ -43,6 +45,9 @@ export function SeccionInvitacionesClub({ clubId, invitaciones }: Props) {
   const [hecho, setHecho] = useState<{ tono: 'info' | 'aviso'; texto: string } | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [porCancelar, setPorCancelar] = useState<InvitacionClubDto | null>(null);
+  const [verAnteriores, setVerAnteriores] = useState(false);
+  const usadas = (invitaciones.datos ?? []).filter((invitacion) => invitacion.estado === 'USADA');
+  const vigentes = (invitaciones.datos ?? []).filter((invitacion) => invitacion.estado !== 'USADA');
 
   /** Ejecuta una acción sobre las invitaciones y recarga la lista, también si la API la rechaza. */
   async function ejecutar(accion: () => Promise<InvitacionClubDto>, alTerminar: (invitacion: InvitacionClubDto) => string) {
@@ -148,6 +153,9 @@ export function SeccionInvitacionesClub({ clubId, invitaciones }: Props) {
     },
   ];
 
+  // Las usadas ya no tienen acciones: solo dicen quién entró, con qué rol y quién lo invitó.
+  const columnasAnteriores = columnas.filter((columna) => columna.titulo !== 'Acciones' && columna.titulo !== 'Vence');
+
   return (
     <Tarjeta titulo="Invitaciones">
       <p className="texto-suave">
@@ -155,7 +163,7 @@ export function SeccionInvitacionesClub({ clubId, invitaciones }: Props) {
         club, que sirve una sola vez y vence a los 7 días; al registrarse entra directamente con ese rol. Para
         cambiar el rol de una invitación pendiente, invita de nuevo ese correo.
       </p>
-      <form className="fila" onSubmit={(evento) => void invitar(evento)} noValidate>
+      <form className="fila fila-con-campos" onSubmit={(evento) => void invitar(evento)} noValidate>
         <Campo
           etiqueta="Correo de la persona"
           type="email"
@@ -191,10 +199,29 @@ export function SeccionInvitacionesClub({ clubId, invitaciones }: Props) {
         <Tabla
           descripcion="Invitaciones enviadas desde el club"
           columnas={columnas}
-          filas={invitaciones.datos}
+          filas={vigentes}
           clave={(invitacion) => invitacion.invitacionId}
-          vacio="Todavía no se ha enviado ninguna invitación."
+          vacio="No hay invitaciones pendientes."
         />
+      )}
+
+      {usadas.length > 0 && (
+        <>
+          <div>
+            <Boton variante="secundario" onClick={() => setVerAnteriores(!verAnteriores)}>
+              {verAnteriores ? 'Ocultar invitaciones anteriores' : `Invitaciones anteriores (${usadas.length})`}
+            </Boton>
+          </div>
+          {verAnteriores && (
+            <Tabla
+              descripcion="Invitaciones ya usadas"
+              columnas={columnasAnteriores}
+              filas={usadas}
+              clave={(invitacion) => invitacion.invitacionId}
+              vacio="No hay invitaciones anteriores."
+            />
+          )}
+        </>
       )}
 
       <DialogoConfirmacion

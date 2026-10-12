@@ -4,6 +4,7 @@
 
 import type { UltimoCambioDto } from './tiposFicha';
 import type { EnlaceFichaDto } from './tiposPersonas';
+import type { IndicacionDto, MiParticipacionDto, OrigenResultado, PublicacionResultadoDto } from './tiposResultadoFamilia';
 
 /** Un entrenamiento sigue en pie o se canceló; cancelado, se puede reactivar si no ha empezado. */
 export type EstadoEntrenamiento = 'PROGRAMADO' | 'CANCELADO';
@@ -32,6 +33,8 @@ export interface PermisosDeActividadDto {
   vePlanilla: boolean;
   /** Es la cuenta de un jugador que todavía puede responder. */
   responde: boolean;
+  /** Cuenta de un convocado a un partido empezado, no cancelado y con su fila sin corregir. */
+  indicaResultado: boolean;
 }
 
 /** Lo que se envía al programar o cambiar un entrenamiento. Fechas `AAAA-MM-DD` y horas `HH:mm`. */
@@ -142,6 +145,11 @@ export interface PartidoDto extends PartidoResumenDto {
   goleadores?: GoleadorDePartidoDto[];
   /** Solo en un partido jugado y para quien ve la planilla. */
   ultimoCambioResultado?: UltimoCambioDto;
+  /** Solo para la cuenta de un convocado a un partido que ya empezó (spec 010). */
+  miParticipacion?: MiParticipacionDto;
+  /** Solo jugado y para quien ve la planilla. */
+  publicacion?: PublicacionResultadoDto;
+  origenResultado?: OrigenResultado;
 }
 
 /** Un convocado en la planilla de un partido. */
@@ -155,6 +163,8 @@ export interface ConvocadoDto {
   respuesta?: RespuestaFamilia | null;
   jugo: boolean;
   goles: number;
+  /** Ausente si nadie indicó nada (spec 010). */
+  indicacion?: IndicacionDto;
 }
 
 /** Un jugador activo de las categorías del partido que todavía no está convocado. */

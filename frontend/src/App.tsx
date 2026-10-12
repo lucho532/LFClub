@@ -21,6 +21,7 @@ import { ConfiguracionClub } from './privado/ConfiguracionClub';
 import { DisposicionClub } from './privado/DisposicionClub';
 import { DetalleEntrenamiento } from './privado/entrenamientos/DetalleEntrenamiento';
 import { FichaJugador } from './privado/ficha/FichaJugador';
+import { PantallaCarta } from './privado/carta/PantallaCarta';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
 import { ListaJugadores } from './privado/jugadores/ListaJugadores';
@@ -71,6 +72,7 @@ export function App({ conArranque = false }: Props) {
                 <Route path="categorias/:categoriaId" element={<DetalleCategoria />} />
                 <Route path="jugadores" element={<ListaJugadores />} />
                 <Route path="jugadores/:usuarioRolId/ficha" element={<FichaJugador />} />
+                <Route path="jugadores/:usuarioRolId/carta" element={<PantallaCarta />} />
                 <Route path="personas/:usuarioRolId" element={<FichaBasica />} />
                 <Route path="calendario" element={<Calendario />} />
                 <Route path="actividades/nueva" element={<FormularioActividad />} />

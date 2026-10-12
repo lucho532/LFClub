@@ -9,7 +9,7 @@ namespace LaPecosa.Pruebas.Integracion.Base;
 /// un cliente con sesión para cada integrante, y escribe entrenamientos, partidos y resultados sin
 /// pasar por la API, para las pruebas que solo los leen.
 /// </summary>
-public class SembradorActividades
+public partial class SembradorActividades
 {
     private readonly FabricaApi _fabrica;
 
@@ -139,7 +139,10 @@ public class SembradorActividades
                     .SetProperty(fila => fila.GolesClub, golesClub)
                     .SetProperty(fila => fila.GolesRival, golesRival)
                     .SetProperty(fila => fila.ResultadoCambiadoEn, DateTime.UtcNow)
-                    .SetProperty(fila => fila.ResultadoCambiadoPorNombre, "Sembrador"));
+                    .SetProperty(fila => fila.ResultadoCambiadoPorNombre, "Sembrador")
+                    .SetProperty(fila => fila.OrigenResultado, OrigenResultado.GESTION)
+                    .SetProperty(fila => fila.PublicadoEn, DateTime.UtcNow)
+                    .SetProperty(fila => fila.PublicadoPorNombre, "Sembrador"));
 
             foreach (var (jugador, goles) in jugaron)
             {

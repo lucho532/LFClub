@@ -68,6 +68,15 @@ public class ControladorPartidos : ControladorBase
     public Task<PartidoDto> Cambiar(Guid partidoId, GuardarPartidoDto datos, CancellationToken cancelacion) =>
         _partidos.CambiarAsync(partidoId, datos, Integrante, cancelacion);
 
+    /// <summary>Corrige el rival de un partido ya jugado, sin tocar su marcador.</summary>
+    [HttpPut("{partidoId:guid}/rival")]
+    [IntegranteDelClub(Rol.PRESIDENTE, Rol.DIRECTIVO, Rol.ENTRENADOR)]
+    [ProducesResponseType<PartidoDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]
+    [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
+    public Task<PartidoDto> CorregirRival(Guid partidoId, CorregirRivalDto datos, CancellationToken cancelacion) =>
+        _partidos.CorregirRivalAsync(partidoId, datos, Integrante, cancelacion);
+
     /// <summary>Cancela un partido próximo.</summary>
     [HttpPost("{partidoId:guid}/cancelacion")]
     [IntegranteDelClub(Rol.PRESIDENTE, Rol.DIRECTIVO, Rol.ENTRENADOR)]

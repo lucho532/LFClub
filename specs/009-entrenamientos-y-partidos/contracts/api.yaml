@@ -483,6 +483,37 @@ paths:
         '404': { $ref: '#/components/responses/NoEncontrado' }
         '409': { $ref: '#/components/responses/EstadoNoPermite' }
 
+  /api/clubes/{clubId}/partidos/{partidoId}/rival:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Corrige el rival de un partido ya jugado (RF-042)
+      description: |
+        Quien lo gestiona (RF-016). Solo en un partido JUGADO: uno PROXIMO se cambia con el formulario
+        completo y uno CANCELADO falla con 409 `actividad_cancelada`; uno que no se ha jugado, con 409
+        `partido_no_jugado`. Un rival vacío lo deja por definir. El marcador y los goles no cambian.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rival: { type: string, nullable: true, maxLength: 120 }
+      responses:
+        '200':
+          description: El partido con su rival corregido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
   /api/clubes/{clubId}/partidos/{partidoId}/mi-respuesta:
     parameters:
       - $ref: '#/components/parameters/clubId'

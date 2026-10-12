@@ -20,7 +20,9 @@ namespace LaPecosa.Dominio.Entidades;
 /// (<see cref="AsistenciaEntrenamiento"/>) y las respuestas de su familia
 /// (<see cref="RespuestaEntrenamiento"/>); al retirarlo se borran sus convocatorias a partidos que no
 /// están jugados y sus respuestas a entrenamientos que no han empezado, y se conserva lo demás
-/// (spec 009, RF-033).
+/// (spec 009, RF-033). De él cuelga también su carta (<see cref="CartaJugador"/>): dorsal, posición
+/// y estadísticas, que se conservan al cambiar de categoría y al retirarse, y se borran en cascada
+/// con el integrante (spec 010).
 /// Una cuenta puede tener varios integrantes con rol JUGADOR en el mismo club: son los hermanos
 /// (§12.1.2). Cada uno es una fila propia, con su documento, su estado de ingreso, su categoría,
 /// su retiro y su ficha; el hermano agregado desde una ficha nace en espera y recuerda desde cuál

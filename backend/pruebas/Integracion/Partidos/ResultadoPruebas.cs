@@ -85,12 +85,14 @@ public class ResultadoPruebas : IDisposable
             Assert.Contains(partido.Id, Actividades.Ids(await Actividades.LeerAsync(await persona.Cliente.GetAsync(e.Ruta("/partidos"))), "partidoId"));
         }
 
-        // Escenario 3.6: la cuenta de un jugador no sabe quién más jugó ni quién fue convocado.
+        // Escenario 3.6: la cuenta de un jugador no sabe quién más jugó ni quién fue convocado. Desde
+        // la spec 010, el convocado J3 recibe lo de su propio jugador ("jugo" una vez, en miParticipacion).
         foreach (var persona in new[] { e.Jn(10), e.Jn(3) })
         {
             var texto = await (await persona.Cliente.GetAsync(ruta)).Content.ReadAsStringAsync();
             Assert.DoesNotContain("convocados", texto);
-            Assert.DoesNotContain("jugo", texto);
+            Assert.True(
+                System.Text.RegularExpressions.Regex.Matches(texto, "\"jugo\"").Count == (persona == e.Jn(3) ? 1 : 0), texto);
             Assert.DoesNotContain("ultimoCambioResultado", texto);
             Assert.DoesNotContain(e.Jn(5).Integrante.Apellidos, texto);
             Assert.DoesNotContain("\"tipo\":\"JUGADOR\"", texto);
@@ -134,6 +136,21 @@ public class ResultadoPruebas : IDisposable
         var j3 = planilla.GetProperty("convocados").EnumerateArray().Single(fila => fila.GetProperty("usuarioRolId").GetGuid() == e.Jn(3).Id);
         Assert.Equal(2014, j3.GetProperty("categoria").GetProperty("anio").GetInt32());
         Assert.Equal(1, j3.GetProperty("goles").GetInt32());
+    }
+
+    // Spec 010: registrar deja el origen GESTION y la primera publicación, que no cambia al corregir.
+    [Fact]
+    public async Task Registrar_deja_origen_de_gestion_y_la_primera_publicacion()
+    {
+        var (e, _, ruta) = await EmpezadoAsync();
+        await Actividades.LeerAsync(await e.E1.Cliente.PutAsync($"{ruta}/resultado", Resultado(1, 0)));
+
+        var corregido = await Actividades.LeerAsync(await e.E2.Cliente.PutAsync($"{ruta}/resultado", Resultado(2, 0)));
+
+        Assert.Equal("GESTION", corregido.GetProperty("origenResultado").GetString());
+        var publicacion = corregido.GetProperty("publicacion");
+        Assert.Equal($"{e.E1.Integrante.Nombres} {e.E1.Integrante.Apellidos}", publicacion.GetProperty("autor").GetString());
+        Assert.False(publicacion.GetProperty("porFamilia").GetBoolean());
     }
 
     [Fact]

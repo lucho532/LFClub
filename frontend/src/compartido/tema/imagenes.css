@@ -58,3 +58,59 @@
 .lapiz-imagen-menu button:focus-visible {
   background: var(--superficie-suave);
 }
+
+/* Fotos grandes que se abren en tamaño completo al tocarlas (`FotoAmpliable`). */
+
+.foto-ampliable {
+  display: inline-flex;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: zoom-in;
+}
+
+/* La foto de perfil de la cuenta en "Mi perfil". */
+.foto-perfil-grande {
+  width: 96px;
+  height: 96px;
+  font-size: 32px;
+}
+
+.visor-foto {
+  max-width: 100vw;
+  max-height: 100vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+
+.visor-foto::backdrop {
+  background: rgb(0 0 0 / 85%);
+}
+
+.visor-foto img {
+  display: block;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.visor-foto-cerrar {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 60%);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}

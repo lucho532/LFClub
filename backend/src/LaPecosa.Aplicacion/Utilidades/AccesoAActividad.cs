@@ -111,7 +111,8 @@ public class AccesoAActividad
         var permisos = new PermisosDeActividadDto(
             ReglaGestionDeActividad.PuedeGestionar(quien.Rol, categorias, quien.CategoriasQueEntrena),
             quien.Rol == Rol.PRESIDENTE || (!quien.EsJugador && entrenaAlguna),
-            miFila is not null && partido.Estado == EstadoPartido.PROXIMO && !empezo);
+            miFila is not null && partido.Estado == EstadoPartido.PROXIMO && !empezo,
+            PartidoVisible.Participa(partido, miFila, empezo) && miFila!.IndicadoPor != OrigenResultado.GESTION);
         return new PartidoVisible(partido, quien, permisos, miFila, empezo);
     }
 
@@ -146,7 +147,7 @@ public record EntrenamientoVisible(
 /// <summary>
 /// Representa un partido que quien pregunta puede ver, con lo que puede hacer con él.
 /// Su responsabilidad es llevarlo junto a quien pregunta, sus permisos, si ya empezó y, solo para
-/// la cuenta de un jugador convocado, su fila.
+/// la cuenta de un jugador convocado, su fila, y decir si esa cuenta participa del resultado.
 /// No lleva los demás convocados.
 /// </summary>
 /// <param name="Partido">El partido con sus categorías.</param>
@@ -163,4 +164,11 @@ public record PartidoVisible(
 {
     /// <summary>Un partido próximo que ya empezó y no tiene resultado.</summary>
     public bool FaltaResultado => Partido.Estado == EstadoPartido.PROXIMO && Empezo;
+
+    /// <summary>
+    /// La cuenta de un convocado a un partido que ya empezó (o ya está jugado) y no está cancelado:
+    /// la que recibe lo de su propio jugador y puede publicar o indicar (spec 010).
+    /// </summary>
+    public static bool Participa(Partido partido, PartidoJugador? miFila, bool empezo) =>
+        miFila is not null && partido.Estado != EstadoPartido.CANCELADO && (empezo || partido.Estado == EstadoPartido.JUGADO);
 }

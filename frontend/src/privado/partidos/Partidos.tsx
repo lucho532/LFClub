@@ -9,8 +9,9 @@ import { useClub } from '../contextoClub';
 import { textoDeMarcador } from './textos';
 
 /**
- * Los partidos que la persona puede ver, en dos secciones: "Próximos" (también los cancelados que
- * todavía tienen fecha por delante, marcados) y "Jugados", con su marcador. Para cada uno, la
+ * Los partidos que la persona puede ver, en secciones: "Falta el resultado" (los que ya empezaron y
+ * nadie ha registrado su marcador; solo se pinta si hay alguno), "Próximos" (también los cancelados
+ * que todavía tienen fecha por delante, marcados) y "Jugados", con su marcador. Para cada uno, la
  * etiqueta con el estado escrito, el rival, la fecha, la hora y si es local o visitante. Los
  * próximos a los que no está convocado no llegan de la API (§17.2).
  */
@@ -19,7 +20,8 @@ export function Partidos() {
   const ruta = `/api/clubes/${club.clubId}/partidos`;
   const carga = useCarga(ruta, () => api.get<PartidoResumenDto[]>(ruta));
   const partidos = carga.datos ?? [];
-  const proximos = partidos.filter((partido) => partido.estado !== 'JUGADO');
+  const sinResultado = partidos.filter((partido) => partido.estado !== 'JUGADO' && partido.faltaResultado);
+  const proximos = partidos.filter((partido) => partido.estado !== 'JUGADO' && !partido.faltaResultado);
   const jugados = partidos.filter((partido) => partido.estado === 'JUGADO');
 
   function lista(deLaSeccion: PartidoResumenDto[], vacia: string) {
@@ -57,6 +59,14 @@ export function Partidos() {
       {carga.datos && partidos.length === 0 && <p className="texto-suave">No hay partidos.</p>}
       {carga.datos && partidos.length > 0 && (
         <>
+          {sinResultado.length > 0 && (
+            <Tarjeta titulo="Falta el resultado">
+              <p className="texto-suave">
+                Estos partidos ya empezaron y todavía nadie ha registrado su marcador.
+              </p>
+              {lista(sinResultado, '')}
+            </Tarjeta>
+          )}
           <Tarjeta titulo="Próximos">{lista(proximos, 'No hay partidos próximos.')}</Tarjeta>
           <Tarjeta titulo="Jugados">{lista(jugados, 'Todavía no hay partidos jugados.')}</Tarjeta>
         </>

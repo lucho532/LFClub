@@ -4,6 +4,7 @@ using LaPecosa.Aplicacion.Servicios;
 using LaPecosa.Aplicacion.Utilidades;
 using LaPecosa.Aplicacion.Validadores;
 using LaPecosa.Dominio.Entidades;
+using LaPecosa.Dominio.Enumeraciones;
 
 namespace LaPecosa.Aplicacion.Implementaciones;
 
@@ -12,10 +13,11 @@ namespace LaPecosa.Aplicacion.Implementaciones;
 /// identidad.
 /// Su responsabilidad es resolver el acceso, validar con las reglas del registro y, con el club
 /// bloqueado, actualizar la misma fila del jugador y sellar el último cambio solo si algo quedó
-/// distinto. Al cambiar el documento impide el número que ya tiene otro integrante del club o que
-/// usa alguna otra cuenta, y traduce la violación del índice único al mismo 409. Al corregir la
-/// fecha de nacimiento ubica al jugador activo que no tiene categoría, con la regla de la 003, y
-/// nunca mueve a quien ya tiene una (RF-025).
+/// distinto. Lo usan el PRESIDENTE y la cuenta del jugador (spec 010, RF-013). Al cambiar el
+/// documento impide el número que ya tiene otro integrante del club o que usa alguna otra cuenta, y traduce la violación del índice único al mismo 409. Al corregir la
+/// fecha de nacimiento, si corrige el PRESIDENTE, ubica al jugador activo que no tiene categoría, con
+/// la regla de la 003, y nunca mueve a quien ya tiene una (RF-025); si corrige la familia, la
+/// categoría no cambia nunca, tenga o no (RF-015 de la 010).
 /// No cambia la cuenta, la contraseña ni las sesiones abiertas; no toca los nombres ya copiados en
 /// una aprobación o un retiro (§13); no exige el responsable aunque el jugador pase a ser menor;
 /// no accede al contexto de Entity Framework ni conoce HTTP.
@@ -139,8 +141,9 @@ public class ServicioIdentidadJugador : IServicioIdentidadJugador
 
                 await _jugadores.CorregirIdentidadAsync(usuarioRolId, nombres, apellidos, fechaNacimiento, cancelacion);
 
-                // Solo se ubica a quien no tiene categoría; a un retirado no se le ubica (RF-025, RF-026).
-                if (actual.EsJugadorDelClub && actual.CategoriaId is null)
+                // Solo el PRESIDENTE ubica a quien no tiene categoría; a un retirado no se le ubica
+                // (RF-025, RF-026 de la 005). Cuando corrige la familia, la categoría no se toca (RF-015).
+                if (UbicaAlCorregir(quienCorrige, actual))
                 {
                     actual.FechaNacimiento = fechaNacimiento;
                     await _ubicador.UbicarAUnoAsync(actual, cancelacion);
@@ -153,6 +156,13 @@ public class ServicioIdentidadJugador : IServicioIdentidadJugador
 
         return await _consulta.ObtenerAsync(usuarioRolId, quienCorrige, cancelacion);
     }
+
+    /// <summary>
+    /// Si al corregir la identidad se ubica al jugador en la categoría de su año: solo cuando corrige
+    /// el PRESIDENTE y el jugador está activo y sin categoría.
+    /// </summary>
+    private static bool UbicaAlCorregir(UsuarioRol quienCorrige, UsuarioRol jugador) =>
+        quienCorrige.Rol == Rol.PRESIDENTE && jugador.EsJugadorDelClub && jugador.CategoriaId is null;
 
     /// <summary>
     /// Lanza el 409 que corresponde si ese número ya lo tiene otro integrante del club, activo o

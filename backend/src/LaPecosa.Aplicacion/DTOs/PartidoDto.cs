@@ -6,8 +6,11 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// <summary>
 /// Representa el detalle de un partido tal como lo recibe quien lo ve (spec 009).
 /// Su responsabilidad es llevar lo del resumen, lo que quien pregunta puede hacer con él y, si está
-/// jugado, sus goleadores para todos y el último cambio del resultado para quien ve la planilla.
-/// No lleva convocados ni quiénes jugaron (RF-012): eso es de la planilla. Lo que no aplica se
+/// jugado, sus goleadores para todos y, para quien ve la planilla, el último cambio del resultado,
+/// quién lo publicó primero y el origen del último cambio. A la cuenta de un convocado le añade lo
+/// de su propio jugador (spec 010).
+/// No lleva convocados ni quiénes jugaron, ni lo indicado por otras familias (RF-012 de la 009,
+/// RF-005 de la 010): eso es de la planilla. Lo que no aplica se
 /// omite del JSON.
 /// </summary>
 /// <param name="PartidoId">Identificador del partido.</param>
@@ -27,6 +30,9 @@ namespace LaPecosa.Aplicacion.DTOs;
 /// <param name="Permisos">Lo que quien pregunta puede hacer con él.</param>
 /// <param name="Goleadores">Sus goleadores, de mayor a menor; solo en un partido jugado.</param>
 /// <param name="UltimoCambioResultado">Quién y cuándo cambió el resultado; solo jugado y para quien ve la planilla.</param>
+/// <param name="MiParticipacion">Lo del jugador de la petición; solo para la cuenta de un convocado a un partido que ya empezó y no está cancelado (spec 010).</param>
+/// <param name="Publicacion">Quién puso el marcador primero; solo jugado y para quien ve la planilla (spec 010).</param>
+/// <param name="OrigenResultado">Quién lo cambió por última vez; solo jugado y para quien ve la planilla (spec 010).</param>
 public record PartidoDto(
     Guid PartidoId,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Rival,
@@ -44,4 +50,7 @@ public record PartidoDto(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] RespuestaFamilia? MiRespuesta,
     PermisosDeActividadDto Permisos,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<GoleadorDePartidoDto>? Goleadores,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] UltimoCambioDto? UltimoCambioResultado);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] UltimoCambioDto? UltimoCambioResultado,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] MiParticipacionDto? MiParticipacion = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] PublicacionResultadoDto? Publicacion = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] OrigenResultado? OrigenResultado = null);
