@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { BotonRecargar } from '../compartido/componentes/BotonRecargar';
 import { BotonTema } from '../compartido/componentes/BotonTema';
 import { useSesion } from '../compartido/sesion/useSesion';
 import { AccesosMiFicha } from './AccesosMiFicha';
@@ -25,7 +26,10 @@ export function MiPerfil() {
       <header className="columna">
         <div className="cabecera">
           <Link to="/">← Volver</Link>
-          <BotonTema />
+          <span className="barra-superior-acciones">
+            <BotonRecargar />
+            <BotonTema />
+          </span>
         </div>
         <h1>Mi perfil</h1>
         <p className="texto-suave">{sesion.correo}</p>

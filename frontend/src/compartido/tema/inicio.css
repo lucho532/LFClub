@@ -66,3 +66,10 @@
 .lista-de-entrenadores li > span:last-child {
   min-width: 0;
 }
+
+/* "Próximos" y "Últimos resultados" dentro de la tarjeta de partidos del inicio. */
+.subtitulo-de-inicio {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--texto-suave);
+}

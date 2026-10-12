@@ -4,9 +4,13 @@ namespace LaPecosa.Dominio.Entidades;
 /// Representa la asignación de un integrante como entrenador de una categoría de su club
 /// (constitución §8 y §12.3).
 /// Su responsabilidad es guardar la pareja integrante y categoría, si la asignación está activa y
-/// qué equipos de esa categoría dirige. Es lo que determina qué categorías ve un ENTRENADOR.
+/// qué equipos de esa categoría dirige. Es lo que determina qué categorías ve un ENTRENADOR y, en
+/// lo deportivo, quién entrena una categoría: sea ENTRENADOR, DIRECTIVO o PRESIDENTE, la asignación
+/// activa le deja programar entrenamientos, convocar, registrar resultados y asistencia, y ver los
+/// partidos próximos de esa categoría (constitución 4.6.0, §8 y §17.2; spec 009).
 /// No cambia el rol del integrante: un PRESIDENTE o un DIRECTIVO asignado conserva su único rol y
-/// su alcance (RF-017a). No se borra al retirarla: solo deja de estar activa (RF-021).
+/// su alcance fuera de lo deportivo (RF-017a). No se borra al retirarla: solo deja de estar activa
+/// (RF-021).
 /// </summary>
 public class AsignacionEntrenadorCategoria : IPerteneceAClub
 {

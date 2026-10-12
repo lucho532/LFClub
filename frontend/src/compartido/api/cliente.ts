@@ -91,6 +91,13 @@ export const api = {
   /** Descarga un archivo que exige sesión (por ejemplo, la foto de perfil). */
   getArchivo: async (ruta: string) => (await enviar('GET', ruta)).blob(),
 
+  /** Un archivo para descargar, con el nombre que da la cabecera `Content-Disposition` (o nulo). */
+  getDescarga: async (ruta: string) => {
+    const respuesta = await enviar('GET', ruta);
+    const nombre = /filename="?([^";]+)"?/.exec(respuesta.headers.get('Content-Disposition') ?? '')?.[1] ?? null;
+    return { contenido: await respuesta.blob(), nombre };
+  },
+
   /** Dirección completa de un recurso público de la API, como el escudo. */
   url: (ruta: string) => `${URL_API}${ruta}`,
 };

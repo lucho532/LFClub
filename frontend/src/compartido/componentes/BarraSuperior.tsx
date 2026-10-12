@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BotonTema } from './BotonTema';
+import { BotonRecargar } from './BotonRecargar';
 
 interface Props {
   /**
@@ -13,15 +13,16 @@ interface Props {
 
 /**
  * Barra superior de las pantallas con sesión: a la izquierda, en el teléfono, la marca; a la
- * derecha, el botón de tema y el perfil de la persona. No conoce el club ni la sesión: solo
- * coloca lo que le pasan.
+ * derecha, el botón de recargar y el perfil de la persona. El cambio de tema está dentro del menú del
+ * perfil (`MenuPerfil`) para no saturar la barra. No conoce el club ni la sesión: solo coloca lo que
+ * le pasan.
  */
 export function BarraSuperior({ marca, children }: Props) {
   return (
     <header className="barra-superior">
       {marca && <div className="barra-superior-marca">{marca}</div>}
       <div className="barra-superior-acciones">
-        <BotonTema />
+        <BotonRecargar />
         {children}
       </div>
     </header>

@@ -19,8 +19,8 @@ interface Props {
 /**
  * Identidad del jugador en la ficha: nombres, apellidos, documento, fecha de nacimiento, categoría
  * y equipos. Se muestra siempre como texto; lo que se puede cambiar de ella se cambia en un diálogo:
- * "Cambiar documento", para quien puede cambiar la ficha, y "Corregir identidad", solo para quien
- * la API dice que puede, que es el presidente. Que no tiene categoría o que está retirado se dice
+ * "Cambiar documento", para quien puede cambiar la ficha, y "Corregir nombre y fecha", solo para
+ * quien la API dice que puede: el presidente y, desde la spec 010, la familia. Que no tiene categoría o que está retirado se dice
  * con texto, no solo con color.
  */
 export function SeccionIdentidad({ ficha, rutaDeLaFicha, alCambiar }: Props) {
@@ -50,7 +50,7 @@ export function SeccionIdentidad({ ficha, rutaDeLaFicha, alCambiar }: Props) {
       )}
       {ficha.permisos.puedeCorregirIdentidad && (
         <Boton variante="secundario" onClick={() => setDialogo('identidad')}>
-          Corregir identidad
+          Corregir nombre y fecha
         </Boton>
       )}
     </span>

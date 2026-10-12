@@ -15,8 +15,9 @@ namespace LaPecosa.Api.Controladores.Club;
 /// DIRECTIVO ve cualquier ficha sin los datos clínicos, también si entrena la categoría, y no
 /// cambia nada; el ENTRENADOR ve, sin los documentos y sin cambiar nada, la de los jugadores
 /// activos de las categorías que entrena; y la cuenta de un jugador ve y cambia la del jugador
-/// con el que continúa, y no la de un hermano mientras no lo elija (RF-030 de la 006), menos los
-/// nombres, los apellidos y la fecha de nacimiento, que solo corrige el PRESIDENTE.
+/// con el que continúa, y no la de un hermano mientras no lo elija (RF-030 de la 006). Los nombres,
+/// los apellidos y la fecha de nacimiento los corrigen el PRESIDENTE y, desde la spec 010, la cuenta
+/// del jugador sobre su propio jugador (RF-013).
 /// No contiene reglas de negocio ni decide quién ve qué: <see cref="IntegranteDelClubAttribute"/>
 /// niega con <c>403</c> al rol que nunca puede hacer la operación, y los servicios responden
 /// <c>404</c> a quien no puede ver esa ficha, igual que si no existiera. No sirve los archivos de
@@ -79,7 +80,7 @@ public class ControladorFichaJugador : ControladorBase
 
     /// <summary>Corrige los nombres, los apellidos y la fecha de nacimiento del jugador.</summary>
     [HttpPut("identidad")]
-    [IntegranteDelClub(Rol.PRESIDENTE)]
+    [IntegranteDelClub(Rol.PRESIDENTE, Rol.JUGADOR)]
     [ProducesResponseType<FichaJugadorDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]
     public Task<FichaJugadorDto> CorregirIdentidad(

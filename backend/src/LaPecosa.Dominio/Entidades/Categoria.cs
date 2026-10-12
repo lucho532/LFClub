@@ -3,8 +3,9 @@ namespace LaPecosa.Dominio.Entidades;
 /// <summary>
 /// Representa una categoría de un club: el grupo de jugadores nacidos en un mismo año
 /// (constitución §11).
-/// Su responsabilidad es guardar el club, el año, si está activa y si alguna vez tuvo jugadores o
-/// entrenadores, que es lo que decide si se puede borrar o solo desactivar (RF-004a).
+/// Su responsabilidad es guardar el club, el año, si está activa y si alguna vez tuvo jugadores,
+/// entrenadores o actividades (entrenamientos o partidos, spec 009), que es lo que decide si se
+/// puede borrar o solo desactivar (RF-004a). Una categoría con actividades no se borra.
 /// No lleva nombre libre, horario, sede ni cupo, no cubre varios años y no guarda un historial de
 /// quién pasó por ella (§11.2, §18).
 /// </summary>
@@ -30,7 +31,7 @@ public class Categoria : IPerteneceAClub
 
     /// <summary>
     /// Obligatorio. Nace en falso; pasa a verdadero la primera vez que entra un jugador o un
-    /// entrenador y no vuelve a falso.
+    /// entrenador o que se le dirige un entrenamiento o un partido, y no vuelve a falso.
     /// </summary>
     public bool Usada { get; set; }
 

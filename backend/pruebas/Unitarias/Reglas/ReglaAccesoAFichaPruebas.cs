@@ -53,16 +53,17 @@ public class ReglaAccesoAFichaPruebas
         }
     }
 
-    // RF-005, RF-016 y RF-017: todo menos corregir nombres, apellidos y fecha de nacimiento.
+    // RF-005 de la 005 y RF-013 de la 010: todo, también corregir nombres, apellidos y fecha de
+    // nacimiento (la 010 cambia RF-016 y RF-017 de la 005).
     [Fact]
-    public void La_cuenta_del_jugador_ve_y_cambia_la_ficha_del_jugador_de_la_peticion_sin_corregir_la_identidad()
+    public void La_cuenta_del_jugador_ve_y_cambia_toda_la_ficha_del_jugador_de_la_peticion()
     {
         foreach (var activo in Ambos)
         {
             foreach (var entrena in Ambos)
             {
                 Assert.Equal(
-                    new AlcanceDeFicha(true, true, true, true, false),
+                    new AlcanceDeFicha(true, true, true, true, true),
                     ReglaAccesoAFicha.Evaluar(Rol.JUGADOR, esElJugadorDeLaPeticion: true, activo, entrena));
             }
         }

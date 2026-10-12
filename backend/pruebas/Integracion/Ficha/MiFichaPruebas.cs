@@ -82,7 +82,8 @@ public class MiFichaPruebas
         });
         Assert.False(ficha.Tiene("ultimoCambio"));
         Assert.True(ficha.GetProperty("permisos").GetProperty("puedeCambiar").GetBoolean());
-        Assert.False(ficha.GetProperty("permisos").GetProperty("puedeCorregirIdentidad").GetBoolean());
+        // Spec 010 (RF-013): la familia también corrige nombres, apellidos y fecha de nacimiento.
+        Assert.True(ficha.GetProperty("permisos").GetProperty("puedeCorregirIdentidad").GetBoolean());
     }
 
     [Fact]

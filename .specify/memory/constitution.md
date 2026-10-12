@@ -45,7 +45,7 @@ Enmienda 2.0.0 → 2.1.0 (2026-10-07), decidida por el propietario del proyecto:
 - §10: el documento es único por pareja "documento + club"
 - §6.2: cada club recibe su dinero en su propia cuenta de la pasarela
 - §7.4: suspensión y baja de clubes; congelación automática por impago de la plataforma
-- §24: tema claro y oscuro con botón
+- §24: tema claro y oscuro (desde la 4.8.1, el cambio va en el menú del perfil)
 - §20: pruebas nuevas
 - §28: se cierran cinco decisiones y se abren seis de detalle
 
@@ -230,6 +230,58 @@ analizar la spec 008:
   §7.1 con §12.6
 - Principios modificados: ninguno renombrado. Secciones añadidas: ninguna. Eliminadas: ninguna
 - Pendientes: siguen abiertas las siete decisiones de la §28. La spec 008 implementa esta versión
+
+Enmienda 4.5.1 → 4.6.0 (2026-10-11), decidida por el propietario del proyecto en la spec 009:
+- §8 (Entrenador): se toma la decisión que estaba aplazada. Un PRESIDENTE o DIRECTIVO asignado a
+  una categoría actúa en ella como entrenador en lo deportivo (entrenamientos, asistencia,
+  convocatorias, partidos próximos, resultados y goles). Evaluaciones, comunicados y pagos en
+  efectivo del DIRECTIVO asignado se decidirán con esas funcionalidades
+- §8 (introducción y Directivo): se remite a esa regla
+- §17.2: la convocatoria la crea quien entrena las categorías del partido o el PRESIDENTE, y los
+  partidos próximos los ven también los PRESIDENTES y DIRECTIVOS asignados a sus categorías; un
+  DIRECTIVO no asignado no los ve
+- §20: prueba ajustada del DIRECTIVO asignado como entrenador
+- Principios modificados: ninguno renombrado. Secciones añadidas: ninguna. Eliminadas: ninguna
+- Pendientes: siguen abiertas las siete decisiones de la §28. La spec 009 implementa esta versión
+
+Enmienda 4.6.0 → 4.7.0 (2026-10-11), decidida por el propietario del proyecto:
+- §8 (Jugador): la cuenta del jugador cambia cualquier dato de la ficha de su jugador, también
+  nombres, apellidos y fecha de nacimiento; el documento sigue la §10 y la categoría no cambia
+- §8 (Jugador) y §17.3 (nueva): la familia de un convocado publica, en un partido ya empezado, el
+  marcador y si su propio jugador jugó y sus goles, sin ver a los demás convocados; vale el primer
+  marcador y después solo lo cambian quien entrena las categorías del partido o el PRESIDENTE
+- §14.2 y §14.3 (nueva): carta del jugador, visible para los mismos que ven su ficha; la exportan
+  como imagen la propia cuenta y el PRESIDENTE, como excepción expresa a que la foto no salga de
+  la plataforma; sus estadísticas las ponen quien entrena la categoría o el PRESIDENTE y nunca se
+  muestran como clasificación
+- §8 (Presidente y Entrenador): funciones nuevas de carta y corrección del resultado
+- §20: pruebas nuevas
+- §28: dos decisiones nuevas (dorsal y posición de la carta; corrección de la familia sobre su
+  propio jugador)
+- Principios modificados: ninguno renombrado. Secciones añadidas: §14.3 y §17.3. Eliminadas:
+  ninguna
+- Pendientes: nueve decisiones abiertas en la §28. Lo implementará una spec nueva (010)
+
+Enmienda 4.7.0 → 4.8.0 (2026-10-11), decidida por el propietario del proyecto en la spec 010:
+- §8 (Jugador), §14.3 y §17.3: se cierran las dos decisiones abiertas en la 4.7.0
+- §14.3 y §8: el dorsal y la posición de la carta los ponen la propia cuenta, sobre su jugador,
+  quien entrena su categoría y el PRESIDENTE; vale el último cambio
+- §17.3 y §8 (Jugador): la familia cambia lo que indicó de su propio jugador (si jugó y sus goles)
+  mientras quien entrena las categorías del partido o el PRESIDENTE no lo hayan corregido
+- §20: pruebas ajustadas
+- §28: se cierran "Dorsal y posición de la carta" y "Corrección de la familia sobre su propio
+  jugador"
+- Principios modificados: ninguno renombrado. Secciones añadidas: ninguna. Eliminadas: ninguna
+- Pendientes: siete decisiones abiertas en la §28. La spec 010 implementa esta versión
+
+Enmienda 4.8.0 → 4.8.1 (2026-10-12), aclaración pedida por el propietario del proyecto:
+- §24: el cambio entre tema claro y oscuro deja de ser un botón suelto en la barra superior y pasa
+  al menú del perfil, siempre a un toque; donde no hay menú de perfil sigue como botón visible. El
+  nombre accesible dice a qué tema cambia. Motivo: no saturar la barra superior, sobre todo en el
+  teléfono
+- §20 y §28: sin cambios. Principios modificados: ninguno. Secciones añadidas y eliminadas:
+  ninguna
+- Pendientes: los de la 4.8.0
 -->
 
 # Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
@@ -685,7 +737,8 @@ entrenador que además tiene un hijo en el club usa dos cuentas:
 la suya, con su documento, como ENTRENADOR, y la del niño, con el documento del niño, como JUGADOR.
 
 Un PRESIDENTE o un DIRECTIVO que además entrena no cambia de rol ni recibe un segundo rol: queda
-asignado a la categoría y conserva su único rol (ver "Entrenador" y §12.3).
+asignado a la categoría, conserva su único rol y en esa categoría actúa como entrenador en lo
+deportivo (ver "Entrenador" y §12.3).
 
 ### Desarrollador
 
@@ -726,6 +779,10 @@ Puede:
 - Crear equipos dentro de una categoría y decidir en qué equipos juega cada jugador (ver §11.3).
 - Retirar del club a un jugador que se fue y reincorporarlo (ver §14.1).
 - Cargar, cambiar y quitar la foto de cualquier jugador de su club (ver §14.2).
+- Poner las estadísticas, el dorsal y la posición de la carta de cualquier jugador de su club y
+  exportar cualquiera de esas cartas como imagen (ver §14.3).
+- Corregir el resultado de cualquier partido de su club, también el publicado por una familia (ver
+  §17.3).
 - Definir el valor de la mensualidad del club y modificar el de jugadores concretos (ver §16.7).
 - Consultar las finanzas completas del club.
 - Registrar, anular y corregir pagos.
@@ -761,6 +818,9 @@ Puede:
 - Consultar las categorías del club, con sus equipos, sus entrenadores y sus jugadores, y la lista
   de jugadores retirados.
 
+Si además entrena, en las categorías que tiene asignadas actúa como entrenador en lo deportivo
+(ver "Entrenador").
+
 Su acceso a finanzas y fichas es de consulta. No puede registrar ni anular pagos, modificar el
 valor de la mensualidad del club ni la de un jugador, enviar invitaciones, aprobar ni rechazar
 ingresos, asignar ni retirar roles, ni buscar usuarios por documento.
@@ -778,9 +838,13 @@ AsignacionEntrenadorCategoria
 ```
 
 También puede quedar asignado a una categoría un PRESIDENTE o un DIRECTIVO que además entrena.
-Conserva su rol como único rol en el club, con el mismo alcance: la asignación ni le da ni le
-quita nada, solo lo muestra como entrenador de esa categoría. Lo que un DIRECTIVO asignado pueda
-hacer como entrenador se decidirá con las funcionalidades de entrenamientos y convocatorias.
+Conserva su rol como único rol en el club. En las categorías que tiene asignadas actúa como
+entrenador en lo deportivo: programa entrenamientos, registra asistencia, crea convocatorias, ve
+los partidos próximos de esas categorías, registra y corrige resultados y goles y pone las
+estadísticas de la carta, igual que un ENTRENADOR en las suyas (ver §14.3, §17.2 y §17.3). Para un PRESIDENTE esto no añade nada, porque su rol ya lo cubre en todo el
+club. Un DIRECTIVO, fuera de sus categorías asignadas, sigue con su acceso de consulta. Lo demás
+que hace un ENTRENADOR (evaluaciones, comunicados, pagos en efectivo) se decidirá para el
+DIRECTIVO asignado con esas funcionalidades.
 
 Cuando la categoría tiene equipos, la asignación indica cuáles dirige (ver §11.3).
 
@@ -790,7 +854,9 @@ Dentro de sus categorías puede:
 - Programar entrenamientos.
 - Registrar asistencia.
 - Crear convocatorias, seleccionando de la lista los jugadores a los que se envían.
-- Registrar resultados, goles y demás eventos del partido.
+- Registrar resultados, goles y demás eventos del partido, y corregir el resultado publicado por
+  una familia (ver §17.3).
+- Poner las estadísticas, el dorsal y la posición de la carta de sus jugadores (ver §14.3).
 - Registrar evaluaciones del jugador.
 - Enviar comunicados a las familias de sus categorías.
 - Consultar el estado de pago de sus jugadores.
@@ -826,11 +892,17 @@ Puede, únicamente sobre su propio jugador:
 - Consultar el estado de cuenta y los recibos.
 - Pagar mensualidades y arbitrajes.
 - Confirmar asistencia a entrenamientos y partidos.
-- Actualizar datos de contacto, médicos y documentos.
+- Cambiar cualquier dato de la ficha de su jugador, también sus nombres, sus apellidos y su fecha
+  de nacimiento, además de los datos de contacto, médicos y documentos. El número y el tipo de
+  documento siguen las reglas de §10. Cambiar la fecha de nacimiento no cambia la categoría: eso
+  sigue siendo del PRESIDENTE (ver §11.2).
 - Cargar, cambiar y quitar la foto de su jugador (ver §14.2).
+- Consultar la carta de su jugador, poner su dorsal y su posición y exportarla como imagen (ver
+  §14.3).
+- Publicar el resultado de un partido ya empezado al que su jugador fue convocado (ver §17.3).
 - Retirar del club a su propio jugador (ver §14.1). No puede reincorporarlo.
 
-No accede a la ficha, los pagos ni los datos de contacto de otros jugadores.
+No accede a la ficha, la carta, los pagos ni los datos de contacto de otros jugadores.
 
 Ve todos los entrenamientos de su categoría, pero solamente los partidos a los que fue convocado
 (ver §17.2).
@@ -1325,12 +1397,33 @@ su dueño. Nadie de otro club ni el DESARROLLADOR obtiene la foto de perfil de o
 - La ven únicamente quienes pueden ver a ese jugador: su propia cuenta, el PRESIDENTE y los
   DIRECTIVOS de su club y los entrenadores de su categoría (ver §7.5). El DESARROLLADOR no la ve.
   Nunca aparece en el sitio público.
+- No sale de la plataforma, con una única excepción expresa: la carta del jugador, que la lleva,
+  puede exportarse como imagen, solo por su propia cuenta y por el PRESIDENTE de su club (ver
+  §14.3). Nadie más exporta ni descarga la foto ni la carta.
 
 Cuando el jugador deja de pertenecer al club, su foto se elimina definitivamente: al retirarlo,
 de cualquiera de las tres formas de §14.1, y al eliminarse su ficha por el cambio de rol de la
 cuenta (ver §12.2). Es una eliminación física justificada y una excepción expresa a la
 conservación de los datos del jugador retirado: la foto de un menor no se guarda cuando ya no está
 en el club. Si se le reincorpora, vuelve sin foto.
+
+### 14.3. Carta del jugador
+
+Cada jugador tiene una carta, al estilo de las cartas de los videojuegos de fútbol, armada con los
+datos de su ficha, su foto (ver §14.2), el escudo y los colores de su club y unas estadísticas.
+
+- La ven exactamente los mismos que ven su ficha (ver §7.5 y §14.2), y nadie más. Nunca aparece
+  en el sitio público ni la ve el DESARROLLADOR.
+- La exportan como imagen únicamente su propia cuenta, la de su jugador, y el PRESIDENTE,
+  cualquiera de su club. Es la excepción expresa de §14.2.
+- Sus estadísticas las ponen únicamente quien entrena la categoría del jugador (ver §8,
+  "Entrenador") y el PRESIDENTE. La familia no las cambia.
+- El dorsal y la posición los ponen la propia cuenta, sobre su jugador, quien entrena su
+  categoría y el PRESIDENTE. Vale el último cambio.
+- Esas estadísticas son una valoración de quien entrena, no datos del partido: no se calculan a
+  partir de lo registrado ni lo alteran (ver §17).
+- Nunca se muestran como clasificación: ni tablas, ni listas ordenadas por ellas, ni
+  comparaciones entre jugadores, ni posiciones.
 
 ## 15. Reglas de negocio en backend
 
@@ -1485,14 +1578,19 @@ la comodidad de mostrar el calendario completo.
 
 #### Convocatoria a partidos
 
-El entrenador crea la convocatoria seleccionando, de la lista de jugadores, a quiénes se les
-envía.
+Quien entrena las categorías del partido, o el PRESIDENTE, crea la convocatoria seleccionando,
+de la lista de jugadores, a quiénes se les envía. Quien entrena una categoría es un ENTRENADOR
+asignado a ella, o un PRESIDENTE o DIRECTIVO asignado a ella (ver §8, "Entrenador").
 
 Un partido próximo y su convocatoria solamente son visibles para:
 
 - Los jugadores convocados a ese partido.
-- Los entrenadores de las categorías involucradas.
+- Quienes entrenan las categorías involucradas, incluidos los PRESIDENTES y DIRECTIVOS asignados
+  a ellas.
 - El presidente.
+
+Un DIRECTIVO que no entrena ninguna de las categorías del partido no lo ve mientras no se haya
+jugado.
 
 Para una cuenta no convocada, ese partido no existe: no aparece en su calendario, ni en listados,
 ni en contadores, ni en mensajes, ni puede consultarse por su identificador.
@@ -1512,6 +1610,23 @@ Una vez jugado, el resultado del partido es público y alimenta las estadística
 goleadores, posiciones).
 
 El backend aplica esta visibilidad. No basta con ocultar los partidos en el frontend.
+
+### 17.3. Resultado publicado por la familia
+
+Además de quien entrena las categorías del partido y del PRESIDENTE, la cuenta de un jugador
+convocado puede publicar el resultado de ese partido, solo cuando ya empezó:
+
+- Publica el marcador del partido.
+- Indica únicamente si su propio jugador jugó y cuántos goles hizo. No ve, ni para publicar, a los
+  demás convocados ni lo que otras familias indicaron de los suyos (ver §17.2).
+
+Vale el primer marcador publicado. Después ninguna familia lo cambia: solo lo cambian quien
+entrena las categorías del partido o el PRESIDENTE, que además pueden corregir todo lo que publicó
+una familia, también lo de su jugador. La corrección se propaga a las estadísticas como cualquier
+otra (ver §17).
+
+La familia puede cambiar lo que indicó de su propio jugador mientras quien entrena las categorías
+del partido o el PRESIDENTE no lo hayan corregido. Después de esa corrección ya no lo cambia.
 
 ## 18. Estados
 
@@ -1618,7 +1733,9 @@ Las pruebas deben validar principalmente:
 - Que un jugador que entra al club queda en la categoría de su año, o sin categoría si no existe,
   y que entra en ella al crearse.
 - Que un jugador nunca está en dos categorías ni en un equipo de otra categoría.
-- Que un PRESIDENTE o un DIRECTIVO asignado como entrenador conserva su único rol y su alcance.
+- Que un PRESIDENTE o un DIRECTIVO asignado como entrenador conserva su único rol, y que un
+  DIRECTIVO asignado actúa como entrenador en lo deportivo solo en sus categorías asignadas y no
+  ve los partidos próximos de las demás.
 - Que un entrenador no accede a una categoría que no tiene asignada y sí ve todos los equipos de
   las suyas.
 - Que una cuenta de jugador solo ve su categoría, sus equipos, sus entrenadores y la ficha básica
@@ -1639,6 +1756,17 @@ Las pruebas deben validar principalmente:
   eliminarse su ficha por cambio de rol, y que al reincorporarlo vuelve sin foto.
 - Que una cuenta no convocada no puede ver ni consultar un partido próximo, y que sí ve todos los
   entrenamientos de su categoría.
+- Que la cuenta de un jugador cambia sus nombres, apellidos y fecha de nacimiento, que ese cambio
+  no le cambia la categoría, y que no cambia los datos de otro jugador.
+- Que solo la cuenta de un convocado publica el resultado de un partido, y solo si ya empezó; que
+  indica únicamente lo de su propio jugador sin recibir la lista de convocados; que vale el primer
+  marcador; que después solo lo cambian quien entrena las categorías del partido o el
+  PRESIDENTE; y que la familia cambia lo de su propio jugador solo mientras nadie lo haya
+  corregido.
+- Que la carta de un jugador la ven solo quienes ven su ficha; que la exportan solo su propia
+  cuenta y el PRESIDENTE de su club; que sus estadísticas las ponen solo quien entrena su categoría
+  y el PRESIDENTE; que el dorsal y la posición los ponen además su propia cuenta; y que ningún endpoint entrega esas estadísticas ordenadas ni comparadas entre
+  jugadores.
 - Que los endpoints públicos no exponen documento, contacto, datos médicos ni pagos.
 - Cálculo de estadísticas deportivas.
 - Transiciones de estados.
@@ -1695,8 +1823,10 @@ El panel de administración de la plataforma no está en el lienzo; su diseño e
 
 Toda pantalla debe funcionar en teléfono y en escritorio.
 
-Toda la interfaz ofrece tema claro y tema oscuro, con un botón visible para cambiar entre ellos.
-Los colores de cada club deben verse bien en los dos temas. El lienzo solo muestra el tema claro.
+Toda la interfaz ofrece tema claro y tema oscuro. El cambio entre ellos está siempre al alcance
+con un toque: dentro del menú del perfil de la barra superior y, en las pantallas que no tienen
+menú de perfil (inicio de sesión, registro, sala de espera y similares), como un botón visible. Su
+nombre accesible dice con palabras a qué tema cambia. Los colores de cada club deben verse bien en los dos temas. El lienzo solo muestra el tema claro.
 
 En el diseño, las pantallas móviles rotuladas para "acudientes" corresponden a la cuenta del
 jugador.
@@ -1818,4 +1948,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.5.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-10
+**Versión**: 4.8.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12

@@ -69,6 +69,9 @@ public class FichaEntreHermanosPruebas
             ["GET ficha"] = await conAna.GetAsync(Ficha(e, luis)),
             ["PUT ficha"] = await conAna.PutAsync(Ficha(e, luis), EscenarioFicha.Cuerpo()),
             ["PUT documento-identidad"] = await conAna.PutAsync($"{Ficha(e, luis)}/documento-identidad", NuevoDocumento()),
+
+            // Desde la spec 010 la familia corrige la identidad de su jugador: la del hermano no existe.
+            ["PUT identidad"] = await conAna.PutAsync($"{Ficha(e, luis)}/identidad", Identidad()),
             ["GET documento"] = await conAna.GetAsync(Documento(e, luis)),
             ["PUT documento"] = await conAna.SubirAsync(Documento(e, luis), SembradorFichas.Jpeg(), "certificado.jpg"),
         };
@@ -79,11 +82,6 @@ public class FichaEntreHermanosPruebas
             Assert.Equal("no_encontrado", await ClienteDePrueba.CodigoAsync(respuesta));
             Assert.Equal(await inexistente.Content.ReadAsStringAsync(), await respuesta.Content.ReadAsStringAsync());
         }
-
-        // Corregir la identidad es solo del PRESIDENTE: a la familia se le niega por el rol, también en la suya.
-        var identidad = await conAna.PutAsync($"{Ficha(e, luis)}/identidad", Identidad());
-        Assert.Equal(HttpStatusCode.Forbidden, identidad.StatusCode);
-        Assert.Equal("rol_no_autorizado", await ClienteDePrueba.CodigoAsync(identidad));
 
         var guardado = await GuardadoAsync(luis.Id);
         Assert.Equal((luis.Nombres, luis.NumeroDocumento, luis.FechaNacimiento), (guardado.Nombres, guardado.NumeroDocumento, guardado.FechaNacimiento));
@@ -108,11 +106,11 @@ public class FichaEntreHermanosPruebas
         var identidad = await conLuis.PutAsync($"{Ficha(e, luis)}/identidad", Identidad());
 
         Assert.All(
-            new[] { lectura, cambio, documento, apertura, subida },
+            new[] { lectura, cambio, documento, apertura, subida, identidad },
             respuesta => Assert.Equal(HttpStatusCode.OK, respuesta.StatusCode));
         Assert.Equal(luis.Id, (await lectura.JsonAsync()).GetProperty("usuarioRolId").GetGuid());
         Assert.True((await lectura.JsonAsync()).GetProperty("permisos").GetProperty("puedeCambiar").GetBoolean());
-        Assert.Equal(HttpStatusCode.Forbidden, identidad.StatusCode);
+        Assert.True((await lectura.JsonAsync()).GetProperty("permisos").GetProperty("puedeCorregirIdentidad").GetBoolean());
 
         // Y con Luis elegido, la de Ana es la que no existe.
         Assert.Equal(HttpStatusCode.NotFound, (await conLuis.GetAsync(Ficha(e, e.Ana))).StatusCode);

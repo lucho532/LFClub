@@ -1,0 +1,472 @@
+openapi: 3.1.0
+info:
+  title: La Pecosa - API de la funcionalidad 010 (ficha, resultado y carta por la familia)
+  version: 0.10.0
+  description: |
+    Contrato de lo que esta funcionalidad añade o cambia respecto de los contratos de la 001 a la
+    009. Lo que no aparece aquí sigue igual. Añade 5 endpoints, todos bajo `/api/clubes/{clubId}`:
+    el contrato completo pasa de 94 a 99, y los de club de 70 a 75. Vuelve a describir, marcados
+    "CAMBIA", tres endpoints que ya existen; no se cuentan dos veces.
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - `/api/clubes/{clubId}/**` exige un integrante del usuario en ese club. Sin él, también el
+      DESARROLLADOR, responde 404 `no_encontrado`.
+    - Tras decidir quién hace la petición (cabecera `X-Jugador-Elegido` de la 006) se aplica lo de
+      siempre: 403 `club_suspendido`, `club_dado_de_baja`, `ingreso_en_espera`,
+      `integrante_retirado` o `rol_no_autorizado`. Un jugador retirado no llega a ningún endpoint
+      del club (§14.1).
+    - Una ficha o una carta que no existe, que es de otro club o que quien pregunta no puede ver
+      responde 404 `no_encontrado`, sin distinguir los casos (§7.5).
+    - Una cuenta de jugador nunca recibe convocados, quiénes jugaron, lo indicado por otras
+      familias ni quién publicó el resultado: esas partes se omiten del JSON, no van vacías.
+    - Ningún endpoint entrega estadísticas o valoraciones de carta de más de un jugador, ni
+      ordenadas, ni comparadas (RF-025).
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Partidos
+  - name: Ficha
+  - name: Carta
+
+paths:
+  # ------------------------------------------------------------------ Resultado por la familia
+  /api/clubes/{clubId}/partidos/{partidoId}/resultado/mi-jugador:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. La familia de un convocado publica el resultado o indica lo de su jugador
+      description: |
+        Solo JUGADOR (403 a los demás roles), sobre el jugador de la petición. Si no está
+        convocado: 404, también si el partido ya está jugado (escenario 1.3).
+
+        - Partido sin marcador: `golesClub` y `golesRival` obligatorios (400 `falta_marcador`);
+          se publica el marcador y lo del jugador, y el partido queda JUGADO (RF-001, RF-002).
+        - Partido con marcador: no se envía marcador (409 `marcador_ya_publicado`, aunque sea
+          igual); se guarda solo lo del jugador (RF-003, RF-004).
+        - Fila del jugador ya corregida por quien entrena o el PRESIDENTE: 409
+          `indicacion_corregida` (RF-012).
+        - Partido cancelado: 409 `actividad_cancelada`. Sin empezar: 409 `partido_sin_empezar`.
+        - 400 `goles_de_quien_no_jugo`, o `goles_superan_marcador` sin nombrar a nadie (RF-006).
+
+        La respuesta es el detalle del partido como lo ve la familia, con `miParticipacion`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ResultadoDeFamiliaDto' }
+      responses:
+        '200':
+          description: El partido, como lo ve la familia
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    get:
+      tags: [Partidos]
+      summary: CAMBIA. El detalle suma la participación propia y la publicación
+      description: |
+        Igual que en la 009, con tres partes nuevas: `miParticipacion` (cuenta de un convocado a
+        un partido que ya empezó y no está cancelado), `publicacion` y `origenResultado` (solo en
+        un partido jugado y para quien ve la planilla), y `permisos.indicaResultado`.
+      responses:
+        '200':
+          description: El partido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    get:
+      tags: [Partidos]
+      summary: CAMBIA. Cada convocado suma quién indicó lo suyo y cuándo
+      description: |
+        Igual que en la 009 (nunca para una cuenta de jugador). `ConvocadoDto` suma `indicacion`
+        (RF-009).
+      responses:
+        '200':
+          description: La planilla
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  # ------------------------------------------------------------------ Ficha
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/ficha/identidad:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    put:
+      tags: [Ficha]
+      summary: CAMBIA. También la cuenta del jugador corrige nombres, apellidos y fecha de nacimiento
+      description: |
+        PRESIDENTE y, desde ahora, JUGADOR sobre el jugador de la petición (RF-013). DIRECTIVO y
+        ENTRENADOR: 403. Otro jugador: 404. Nombres y apellidos no vacíos, fecha no futura: 400
+        con el motivo (RF-014). Cuando corrige la familia, la categoría no cambia nunca; cuando
+        corrige el PRESIDENTE, sigue la regla de la 005 (RF-015). Sella el último cambio (RF-017).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CorregirIdentidadDto' }
+      responses:
+        '200':
+          description: La ficha actualizada (el `FichaJugadorDto` de la 005)
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  # ------------------------------------------------------------------ Carta
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/carta:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Carta]
+      summary: NUEVO. La carta de un jugador
+      description: |
+        La ven exactamente quienes ven su ficha (RF-020); los demás, 404. Sin `Cache-Control`
+        compartido (`private, no-store`).
+      responses:
+        '200':
+          description: La carta
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CartaDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/carta/estadisticas:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    put:
+      tags: [Carta]
+      summary: NUEVO. Pone, cambia o borra las seis estadísticas
+      description: |
+        PRESIDENTE, y ENTRENADOR o DIRECTIVO asignados a la categoría activa del jugador (RF-021).
+        JUGADOR: 403. Quien ve la carta pero no la entrena: 403 `no_entrena_categoria`. Quien no
+        la ve: 404. Jugador retirado: 409 `jugador_retirado`. Las seis enteras de 1 a 99, o las
+        seis nulas para dejarla sin números; mezcladas, fuera de rango o no enteras: 400
+        `datos_invalidos` (RF-022).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EstadisticasCartaDto' }
+      responses:
+        '200':
+          description: La carta actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CartaDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/carta/dorsal-y-posicion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    put:
+      tags: [Carta]
+      summary: NUEVO. Pone o cambia el dorsal y la posición
+      description: |
+        PRESIDENTE; ENTRENADOR o DIRECTIVO asignados a la categoría activa del jugador; y JUGADOR
+        sobre el jugador de la petición (RF-027). Quien ve la carta pero no puede cambiarlos: 403
+        `no_entrena_categoria`. Quien no la ve: 404. Jugador retirado: 409 `jugador_retirado`.
+        Dorsal entero de 1 a 99 o nulo; posición de la lista o nula: si no, 400
+        `datos_invalidos`. Vale el último cambio.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DorsalYPosicionDto' }
+      responses:
+        '200':
+          description: La carta actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CartaDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/carta/imagen:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Carta]
+      summary: NUEVO. La carta como imagen PNG para descargar
+      description: |
+        Solo la cuenta del jugador sobre su jugador y el PRESIDENTE sobre cualquier jugador de su
+        club, también retirado (RF-029). DIRECTIVO y ENTRENADOR: 403 `rol_no_autorizado`, aunque
+        vean la carta (RF-031). Otro jugador, otro club o DESARROLLADOR: 404. PNG de 750 × 1050 px
+        con lo mismo que la carta en pantalla y nada más (RF-030, [carta.md](carta.md)).
+        `Content-Disposition: attachment; filename="carta-<apellidos>-<nombres>.png"`,
+        `Cache-Control: private, no-store`.
+      responses:
+        '200':
+          description: La imagen
+          content:
+            image/png:
+              schema: { type: string, format: binary }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+
+  parameters:
+    clubId:
+      name: clubId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    partidoId:
+      name: partidoId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    usuarioRolId:
+      name: usuarioRolId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    Validacion:
+      description: Datos inválidos (`datos_invalidos`, `falta_marcador`, `goles_de_quien_no_jugo`, `goles_superan_marcador`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    SinSesion:
+      description: Sin sesión
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoAutorizado:
+      description: Rol que nunca puede hacerlo (`rol_no_autorizado`), o `no_entrena_categoria`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoEncontrado:
+      description: No existe, es de otro club o quien pregunta no puede verlo (`no_encontrado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    EstadoNoPermite:
+      description: |
+        `actividad_cancelada`, `partido_sin_empezar`, `marcador_ya_publicado`,
+        `indicacion_corregida` o `jugador_retirado`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [titulo, estado, codigo]
+      properties:
+        titulo: { type: string }
+        estado: { type: integer }
+        codigo: { type: string }
+        errores:
+          type: object
+          additionalProperties: { type: array, items: { type: string } }
+
+    OrigenResultado:
+      type: string
+      enum: [FAMILIA, GESTION]
+      description: FAMILIA, la cuenta de un convocado; GESTION, quien entrena o el PRESIDENTE
+
+    PosicionJugador:
+      type: string
+      enum: [PORTERO, DEFENSA, MEDIOCAMPISTA, DELANTERO]
+
+    RarezaCarta:
+      type: string
+      enum: [BRONCE, PLATA, ORO]
+
+    ResultadoDeFamiliaDto:
+      type: object
+      required: [jugo, goles]
+      properties:
+        golesClub: { type: [integer, 'null'], minimum: 0, maximum: 99, description: Solo si el partido no tiene marcador }
+        golesRival: { type: [integer, 'null'], minimum: 0, maximum: 99, description: Solo si el partido no tiene marcador }
+        jugo: { type: boolean }
+        goles: { type: integer, minimum: 0, maximum: 99, description: 0 si no jugó }
+
+    MiParticipacionDto:
+      type: object
+      description: Solo lo del jugador de la petición; nunca de otro convocado
+      required: [jugo, goles, puedeCambiar]
+      properties:
+        jugo: { type: boolean }
+        goles: { type: integer }
+        indicadoPor: { $ref: '#/components/schemas/OrigenResultado' }
+        puedeCambiar: { type: boolean, description: Falso si quien entrena ya corrigió lo de su jugador }
+
+    PublicacionResultadoDto:
+      type: object
+      description: Quién puso el marcador por primera vez. Solo para quien ve la planilla
+      required: [fecha, autor, porFamilia]
+      properties:
+        fecha: { type: string, format: date-time }
+        autor: { type: string, description: Nombre copiado; el del jugador si fue su familia }
+        porFamilia: { type: boolean }
+
+    IndicacionDto:
+      type: object
+      required: [origen, autor, fecha]
+      properties:
+        origen: { $ref: '#/components/schemas/OrigenResultado' }
+        autor: { type: string }
+        fecha: { type: string, format: date-time }
+
+    PermisosDeActividadDto:
+      type: object
+      description: CAMBIA. Suma `indicaResultado`
+      required: [gestiona, vePlanilla, responde, indicaResultado]
+      properties:
+        gestiona: { type: boolean }
+        vePlanilla: { type: boolean }
+        responde: { type: boolean }
+        indicaResultado:
+          type: boolean
+          description: Cuenta de un convocado; partido empezado, no cancelado, y su fila sin corregir
+
+    PartidoDto:
+      description: |
+        CAMBIA. El `PartidoDto` de la 009 con tres propiedades opcionales más. Aquí solo se
+        describen las nuevas; las demás siguen igual.
+      type: object
+      properties:
+        permisos: { $ref: '#/components/schemas/PermisosDeActividadDto' }
+        miParticipacion: { $ref: '#/components/schemas/MiParticipacionDto' }
+        publicacion: { $ref: '#/components/schemas/PublicacionResultadoDto' }
+        origenResultado:
+          $ref: '#/components/schemas/OrigenResultado'
+          description: Solo jugado y para quien ve la planilla. FAMILIA = "Publicado por una familia"; GESTION = "Corregido por quien entrena" si la publicó una familia, o "Registrado por quien entrena"
+
+    ConvocadoDto:
+      description: CAMBIA. El de la 009 con `indicacion`, ausente si nadie indicó nada
+      type: object
+      properties:
+        indicacion: { $ref: '#/components/schemas/IndicacionDto' }
+
+    PlanillaPartidoDto:
+      description: El de la 009; sus convocados usan el `ConvocadoDto` de arriba
+      type: object
+      properties:
+        convocados:
+          type: array
+          items: { $ref: '#/components/schemas/ConvocadoDto' }
+
+    CorregirIdentidadDto:
+      type: object
+      required: [nombres, apellidos, fechaNacimiento]
+      properties:
+        nombres: { type: string }
+        apellidos: { type: string }
+        fechaNacimiento: { type: string, format: date }
+
+    EstadisticasCartaDto:
+      type: object
+      description: Las seis enteras de 1 a 99, o las seis nulas
+      properties:
+        ritmo: { type: [integer, 'null'], minimum: 1, maximum: 99 }
+        tiro: { type: [integer, 'null'], minimum: 1, maximum: 99 }
+        pase: { type: [integer, 'null'], minimum: 1, maximum: 99 }
+        regate: { type: [integer, 'null'], minimum: 1, maximum: 99 }
+        defensa: { type: [integer, 'null'], minimum: 1, maximum: 99 }
+        fisico: { type: [integer, 'null'], minimum: 1, maximum: 99 }
+
+    ValoresCartaDto:
+      type: object
+      required: [ritmo, tiro, pase, regate, defensa, fisico]
+      properties:
+        ritmo: { type: integer }
+        tiro: { type: integer }
+        pase: { type: integer }
+        regate: { type: integer }
+        defensa: { type: integer }
+        fisico: { type: integer }
+
+    DorsalYPosicionDto:
+      type: object
+      properties:
+        dorsal: { type: [integer, 'null'], minimum: 1, maximum: 99 }
+        posicion:
+          oneOf:
+            - $ref: '#/components/schemas/PosicionJugador'
+            - type: 'null'
+
+    PermisosDeCartaDto:
+      type: object
+      required: [cambiaEstadisticas, cambiaDorsalYPosicion, exporta]
+      properties:
+        cambiaEstadisticas: { type: boolean }
+        cambiaDorsalYPosicion: { type: boolean }
+        exporta: { type: boolean }
+
+    UltimoCambioDto:
+      description: El de la 005 (fecha, autor, porLaCuentaDelJugador, autorFicha)
+      type: object
+
+    CartaDto:
+      type: object
+      description: |
+        La carta de un solo jugador. Escudo y colores no van aquí: son los de la identidad del
+        club (spec 007). Lo que no hay se omite.
+      required: [usuarioRolId, nombres, apellidos, rareza, permisos]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        fotoActualizadaEn:
+          type: string
+          format: date-time
+          description: Ausente si no tiene foto (figura genérica). La foto se pide al endpoint de la 007
+        dorsal: { type: integer }
+        posicion: { $ref: '#/components/schemas/PosicionJugador' }
+        estadisticas: { $ref: '#/components/schemas/ValoresCartaDto' }
+        valoracion: { type: integer, description: Promedio redondeado; ausente sin estadísticas }
+        rareza: { $ref: '#/components/schemas/RarezaCarta' }
+        permisos: { $ref: '#/components/schemas/PermisosDeCartaDto' }
+        ultimoCambioEstadisticas:
+          $ref: '#/components/schemas/UltimoCambioDto'
+          description: Solo si permisos.cambiaEstadisticas (RF-028)

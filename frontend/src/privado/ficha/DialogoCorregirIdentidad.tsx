@@ -4,6 +4,7 @@ import { ErrorApi, mensajeDe } from '../../compartido/api/errores';
 import type { CorregirIdentidadDto, FichaJugadorDto } from '../../compartido/api/tiposFicha';
 import { Campo } from '../../compartido/componentes/Campo';
 import { DialogoConfirmacion } from '../../compartido/componentes/DialogoConfirmacion';
+import { useClub } from '../contextoClub';
 
 interface Props {
   ficha: FichaJugadorDto;
@@ -15,9 +16,10 @@ interface Props {
 }
 
 /**
- * Diálogo con el que el presidente corrige los nombres, los apellidos y la fecha de nacimiento de
- * un jugador cuando se registraron mal. La fecha no puede ser futura. Corregirla no cambia de
- * categoría a quien ya tiene una; a quien no tiene, la API lo ubica en la del año nuevo si existe.
+ * Diálogo con el que el presidente o la familia del jugador (spec 010) corrigen sus nombres, sus
+ * apellidos y su fecha de nacimiento. La fecha no puede ser futura. Corregirla no cambia de
+ * categoría a quien ya tiene una; a quien no tiene, la API lo ubica en la del año nuevo si existe y
+ * corrige el presidente. Si corrige la familia, la categoría no cambia nunca.
  */
 export function DialogoCorregirIdentidad({ ficha, rutaDeLaFicha, alGuardar, alCancelar }: Props) {
   const [datos, setDatos] = useState<CorregirIdentidadDto>({
@@ -28,6 +30,8 @@ export function DialogoCorregirIdentidad({ ficha, rutaDeLaFicha, alGuardar, alCa
   const [errores, setErrores] = useState<Record<string, string[]>>({});
   const [error, setError] = useState<string>();
   const [enviando, setEnviando] = useState(false);
+  // La familia corrige sin que cambie la categoría (spec 010, RF-015).
+  const porLaFamilia = useClub().club.miRol === 'JUGADOR';
   // El día de hoy en UTC, que es con el que compara la API.
   const hoy = new Date().toISOString().slice(0, 10);
 
@@ -66,7 +70,9 @@ export function DialogoCorregirIdentidad({ ficha, rutaDeLaFicha, alGuardar, alCa
       alCancelar={alCancelar}
     >
       <p className="texto-suave">
-        {ficha.categoriaAnio !== null
+        {porLaFamilia
+          ? 'Corregir la fecha de nacimiento no cambia su categoría.'
+          : ficha.categoriaAnio !== null
           ? `Si cambias el año de nacimiento, sigue en la categoría ${ficha.categoriaAnio}.`
           : ficha.retirado
             ? 'Está retirado: corregir la fecha no lo ubica en ninguna categoría.'

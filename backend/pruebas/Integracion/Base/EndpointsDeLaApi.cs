@@ -88,7 +88,8 @@ public static partial class EndpointsDeLaApi
         return resultado;
     }
 
-    private static List<string> RutasDeLosContratos()
+    /// <summary>Las rutas de los <c>api.yaml</c> de todas las specs, en orden.</summary>
+    public static List<string> RutasDeLosContratos()
     {
         var carpeta = new DirectoryInfo(AppContext.BaseDirectory);
         while (carpeta is not null && !Directory.Exists(Path.Combine(carpeta.FullName, "specs")))

@@ -1,0 +1,244 @@
+/* Entrenamientos, partidos y calendario (spec 009). Todo estado se lee como texto; el color solo acompaña. */
+
+.etiquetas-actividad {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.etiqueta-tipo {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.tipo-entreno {
+  color: var(--info-texto);
+}
+
+.tipo-partido {
+  color: var(--texto);
+}
+
+/* Categorías y opciones como botones que se encienden: el estado también va en texto o en aria-pressed. */
+.boton-conmutable {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boton-conmutable.encendido {
+  border-color: var(--color-club-principal);
+  background: var(--color-club-principal);
+  color: var(--color-club-principal-texto);
+}
+
+.boton-conmutable:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.tarjeta-actividad {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie);
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-actividad-titulo {
+  font-weight: 700;
+}
+
+.lista-actividades {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
+}
+
+.marcador {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.casillas-convocatoria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 6px 14px;
+}
+
+.casillas-convocatoria .casilla {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.filas-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fila-resultado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Nombre e indicación de un convocado, uno debajo del otro (spec 010). */
+.columna-compacta {
+  display: grid;
+  min-width: 0;
+}
+
+.goles-de-jugador {
+  width: 72px;
+  min-height: 40px;
+  padding: 6px 8px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 8px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+}
+
+.lista-asistencia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-asistencia li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  min-width: 0;
+}
+
+.lista-asistencia li > .columna {
+  gap: 2px;
+  min-width: 0;
+}
+
+.resumen-respuestas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 12px;
+}
+
+.resumen-respuestas h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.botones-respuesta {
+  gap: 6px;
+}
+
+.estadisticas-fila h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.lista-goleadores {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-goleadores li {
+  display: grid;
+  grid-template-columns: 2.5em minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+/* "Confirma asistencia": casilla verde con chulo y casilla roja con X, en una línea. */
+.botones-respuesta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.botones-respuesta-linea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.respuesta-casilla {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.respuesta-si {
+  background: var(--exito-fondo);
+  color: var(--exito-texto);
+}
+
+.respuesta-no {
+  background: var(--error-fondo);
+  color: var(--error-texto);
+}
+
+/* La opción elegida, rellena de su color. */
+.respuesta-si.encendido {
+  border-color: var(--exito-texto);
+  background: var(--exito-texto);
+  color: var(--exito-fondo);
+}
+
+.respuesta-no.encendido {
+  border-color: var(--error-texto);
+  background: var(--error-texto);
+  color: var(--error-fondo);
+}
+
+.respuesta-casilla:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.respuesta-casilla.encendido:disabled {
+  opacity: 1;
+}

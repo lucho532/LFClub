@@ -1,0 +1,1029 @@
+openapi: 3.1.0
+info:
+  title: La Pecosa - API de la funcionalidad 009 (entrenamientos, partidos y estadísticas)
+  version: 0.9.0
+  description: |
+    Contrato de lo que esta funcionalidad añade respecto de los contratos de la 001 a la 008. Lo
+    que no aparece aquí sigue igual. Añade 22 endpoints, todos bajo `/api/clubes/{clubId}`: el
+    contrato completo pasa de 72 a 94, y los de club de 48 a 70. No cambia ninguna respuesta
+    existente.
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - `/api/clubes/{clubId}/**` exige un integrante del usuario en ese club. Sin él, también el
+      DESARROLLADOR, responde 404 `no_encontrado`.
+    - Tras decidir quién hace la petición (cabecera `X-Jugador-Elegido` de la 006) se aplica lo de
+      siempre: 403 `club_suspendido`, `club_dado_de_baja`, `ingreso_en_espera`,
+      `integrante_retirado` o `rol_no_autorizado`.
+    - Un entrenamiento o un partido que no existe, que es de otro club o que quien pregunta no puede
+      ver responde 404 `no_encontrado`, sin distinguir los casos (RF-011). Para una cuenta no
+      convocada, un partido próximo no existe.
+    - Quien ve una actividad pero no la gestiona (no entrena todas sus categorías y no es
+      PRESIDENTE) recibe 403 `no_gestiona_actividad` al intentar cambiarla (escenario 2.7).
+    - Fechas `YYYY-MM-DD` y horas `HH:mm`, en hora de Colombia (research §2).
+    - Una cuenta de jugador nunca recibe convocados, quiénes jugaron, ni respuestas o asistencias
+      de otros jugadores: esas partes se omiten del JSON, no van vacías (RF-012, RF-024).
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Calendario
+  - name: Entrenamientos
+  - name: Partidos
+  - name: Estadisticas
+
+paths:
+  # ------------------------------------------------------------------ Calendario
+
+  /api/clubes/{clubId}/calendario:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Calendario]
+      summary: NUEVO. Entrenamientos y partidos que quien pregunta puede ver en un rango
+      description: |
+        Cualquier rol. Rango de hasta 62 días, ambos incluidos. Aplica la visibilidad de research §4:
+        los partidos próximos o cancelados solo si quien pregunta está convocado, entrena alguna de
+        sus categorías o es PRESIDENTE.
+      parameters:
+        - { name: desde, in: query, required: true, schema: { type: string, format: date } }
+        - { name: hasta, in: query, required: true, schema: { type: string, format: date } }
+      responses:
+        '200':
+          description: Actividades del rango, por fecha y hora
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CalendarioDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  # ------------------------------------------------------------------ Entrenamientos
+
+  /api/clubes/{clubId}/entrenamientos:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    post:
+      tags: [Entrenamientos]
+      summary: NUEVO. Programa un entrenamiento para una o varias categorías
+      description: |
+        PRESIDENTE, DIRECTIVO o ENTRENADOR (los demás, 403 `rol_no_autorizado`). Quien no es
+        PRESIDENTE debe entrenar todas las categorías elegidas (RF-002); si no, 403
+        `no_gestiona_actividad`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarEntrenamientoDto' }
+      responses:
+        '201':
+          description: Programado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409':
+          description: '`categoria_inactiva`: una de las categorías no está activa o no es del club'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  /api/clubes/{clubId}/entrenamientos/proximos:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Entrenamientos]
+      summary: NUEVO. Hasta 5 entrenamientos visibles que no han terminado, para el inicio
+      description: Cualquier rol (RF-006). Incluye los cancelados, marcados (RF-004).
+      responses:
+        '200':
+          description: Próximos entrenamientos; vacía si no hay
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EntrenamientoResumenDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    get:
+      tags: [Entrenamientos]
+      summary: NUEVO. Detalle de un entrenamiento
+      description: |
+        Cualquier rol que lo ve (RF-003). La cuenta de un jugador recibe además su propia respuesta
+        y su propia asistencia (escenario 4.5).
+      responses:
+        '200':
+          description: El entrenamiento
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Entrenamientos]
+      summary: NUEVO. Cambia fecha, horas, lugar y nota de un entrenamiento programado
+      description: |
+        Quien lo gestiona (RF-002). Las categorías del cuerpo deben ser las mismas que tiene
+        (research §16.1); si no, 409 `categorias_no_cambian`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarEntrenamientoDto' }
+      responses:
+        '200':
+          description: Cambiado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/cancelacion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    post:
+      tags: [Entrenamientos]
+      summary: NUEVO. Cancela un entrenamiento programado
+      description: |
+        Quien lo gestiona. Se puede deshacer con `DELETE` mientras no haya empezado (RF-038). Ya
+        cancelado, 409 `actividad_cancelada`.
+      responses:
+        '200':
+          description: Cancelado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+    delete:
+      tags: [Entrenamientos]
+      summary: NUEVO. Reactiva un entrenamiento cancelado
+      description: |
+        Quien lo gestiona, mientras no haya empezado y sus categorías sigan activas (RF-038).
+        Vuelve a PROGRAMADO con sus categorías y las respuestas como estaban. Si no
+        está cancelado, 409 `actividad_no_cancelada`; si ya empezó, `actividad_empezada`; con una
+        categoría desactivada, `categoria_inactiva`.
+      responses:
+        '200':
+          description: Reactivado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    get:
+      tags: [Entrenamientos]
+      summary: NUEVO. Planilla del entrenamiento con respuestas y asistencia
+      description: |
+        PRESIDENTE y quien entrena alguna de sus categorías; los demás que lo ven, 403
+        `no_gestiona_actividad`; la cuenta de un jugador, 403 `rol_no_autorizado`. Quien entrena
+        solo algunas de sus categorías recibe solo los jugadores de esas (escenario 4.2).
+      responses:
+        '200':
+          description: La planilla
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaEntrenamientoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/asistencia:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    put:
+      tags: [Entrenamientos]
+      summary: NUEVO. Registra o corrige la asistencia de los jugadores enviados
+      description: |
+        PRESIDENTE y quien entrena alguna de sus categorías, solo para los jugadores que puede
+        marcar (RF-022). Entrenamiento programado cuya fecha ya llegó; si no, 409
+        `entrenamiento_futuro` o `actividad_cancelada`. Un jugador fuera de su alcance, 409
+        `jugador_fuera_de_la_actividad`. Las filas no enviadas no cambian.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistrarAsistenciaDto' }
+      responses:
+        '200':
+          description: La planilla actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaEntrenamientoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/mi-respuesta:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    put:
+      tags: [Entrenamientos]
+      summary: NUEVO. La familia dice si su jugador asistirá
+      description: |
+        Solo JUGADOR, sobre el jugador de la petición, en un entrenamiento de su categoría (RF-023).
+        Programado y sin empezar; si no, 409 `actividad_empezada` o `actividad_cancelada`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ResponderDto' }
+      responses:
+        '200':
+          description: Guardada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  # ------------------------------------------------------------------ Partidos
+
+  /api/clubes/{clubId}/partidos:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Partidos]
+      summary: NUEVO. Partidos que quien pregunta puede ver
+      description: |
+        Cualquier rol. Los jugados, de todo el club; los próximos y cancelados, solo los visibles
+        (RF-010, RF-019). Próximos por fecha ascendente; jugados y cancelados, descendente.
+      parameters:
+        - { name: estado, in: query, required: false, schema: { $ref: '#/components/schemas/EstadoPartido' } }
+        - { name: categoriaId, in: query, required: false, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Partidos visibles
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PartidoResumenDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    post:
+      tags: [Partidos]
+      summary: NUEVO. Crea un partido próximo, sin convocados
+      description: |
+        PRESIDENTE, DIRECTIVO o ENTRENADOR; quien no es PRESIDENTE debe entrenar todas sus
+        categorías (RF-008). Torneo sin nombre: 400 (escenario 2.10).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarPartidoDto' }
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409':
+          description: '`categoria_inactiva`'
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    get:
+      tags: [Partidos]
+      summary: NUEVO. Detalle de un partido
+      description: |
+        Quien lo ve. Jugado: rival, fecha, condición, tipo, torneo, marcador y goleadores del club
+        para todos (RF-019). La cuenta de un jugador recibe además su propia respuesta.
+      responses:
+        '200':
+          description: El partido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Cambia los datos de un partido próximo
+      description: |
+        Quien lo gestiona. Solo en PROXIMO (research §16.2); las categorías no cambian (§16.1).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarPartidoDto' }
+      responses:
+        '200':
+          description: Cambiado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/cancelacion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    post:
+      tags: [Partidos]
+      summary: NUEVO. Cancela un partido próximo
+      description: |
+        Quien lo gestiona. Un partido jugado no se cancela (RF-021): 409 `partido_jugado`. Se puede
+        deshacer con `DELETE` mientras no haya empezado (RF-038).
+      responses:
+        '200':
+          description: Cancelado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+    delete:
+      tags: [Partidos]
+      summary: NUEVO. Reactiva un partido cancelado
+      description: |
+        Quien lo gestiona, mientras no haya empezado y sus categorías sigan activas (RF-038).
+        Vuelve a PROXIMO con sus categorías, su convocatoria y las respuestas como estaban. Si no
+        está cancelado, 409 `actividad_no_cancelada`; si ya empezó, `actividad_empezada`; con una
+        categoría desactivada, `categoria_inactiva`.
+      responses:
+        '200':
+          description: Reactivado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    get:
+      tags: [Partidos]
+      summary: NUEVO. Planilla del partido con convocados, respuestas y quiénes jugaron
+      description: |
+        PRESIDENTE y quien entrena alguna de sus categorías (RF-010). La cuenta de un jugador, 403
+        `rol_no_autorizado` (RF-012); un DIRECTIVO que no entrena ninguna, el 404 del partido
+        próximo o 403 `no_gestiona_actividad` si está jugado.
+      responses:
+        '200':
+          description: La planilla
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/convocatoria:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Deja la convocatoria exactamente con esos jugadores
+      description: |
+        Quien lo gestiona, en un partido PROXIMO. Cada jugador debe ser activo y de una de sus
+        categorías (RF-009): si no, 409 `jugador_fuera_de_la_actividad`. Los que salen pierden su
+        fila y su respuesta, sin rastro (RF-013).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarConvocatoriaDto' }
+      responses:
+        '200':
+          description: La planilla actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/resultado:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Registra o corrige el resultado
+      description: |
+        Quien lo gestiona (RF-016). Partido PROXIMO que ya empezó, o JUGADO; si no, 409
+        `partido_sin_empezar` o `actividad_cancelada`. Deja el partido JUGADO y guarda quién y
+        cuándo (RF-020). Rechazos de RF-017 con 400: `goles_de_quien_no_jugo`,
+        `goles_superan_marcador`, `jugador_no_convocado`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistrarResultadoDto' }
+      responses:
+        '200':
+          description: El partido jugado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/rival:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. Corrige el rival de un partido ya jugado (RF-042)
+      description: |
+        Quien lo gestiona (RF-016). Solo en un partido JUGADO: uno PROXIMO se cambia con el formulario
+        completo y uno CANCELADO falla con 409 `actividad_cancelada`; uno que no se ha jugado, con 409
+        `partido_no_jugado`. Un rival vacío lo deja por definir. El marcador y los goles no cambian.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rival: { type: string, nullable: true, maxLength: 120 }
+      responses:
+        '200':
+          description: El partido con su rival corregido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/mi-respuesta:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Partidos]
+      summary: NUEVO. La familia del convocado dice si asistirá
+      description: |
+        Solo JUGADOR, sobre el jugador de la petición, convocado a un partido PROXIMO sin empezar
+        (RF-023). No convocado: 404, como si no existiera.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ResponderDto' }
+      responses:
+        '200':
+          description: Guardada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartidoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/EstadoNoPermite' }
+
+  # ------------------------------------------------------------------ Estadísticas
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/estadisticas:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Estadisticas]
+      summary: NUEVO. Estadísticas del jugador, en total y por categoría
+      description: Quien puede ver su ficha (`AccesoAFicha` de la 005); los demás, 404 (RF-028).
+      responses:
+        '200':
+          description: Las estadísticas; en cero si no hay registros
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EstadisticasJugadorDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/goleadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Estadisticas]
+      summary: NUEVO. Goleadores del club por categoría
+      description: |
+        Cualquier rol (RF-029). Con `categoriaId`, los goleadores de esa categoría, contando los
+        goles marcados con ella aunque el jugador ya esté en otra (escenario 6.4) e incluyendo
+        retirados (6.5). Sin él, solo las categorías que tienen goles, para elegir.
+      parameters:
+        - { name: categoriaId, in: query, required: false, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Los goleadores
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GoleadoresDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    clubId:
+      name: clubId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    usuarioRolId:
+      name: usuarioRolId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    entrenamientoId:
+      name: entrenamientoId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    partidoId:
+      name: partidoId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    SinSesion:
+      description: Sin sesión o sesión no válida
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoAutorizado:
+      description: |
+        Los 403 de la pertenencia al club, `rol_no_autorizado` y `no_gestiona_actividad`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoEncontrado:
+      description: '`no_encontrado`: no existe, es de otro club o quien pregunta no puede verlo'
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    Validacion:
+      description: '`datos_invalidos` con `errores` por campo'
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    EstadoNoPermite:
+      description: |
+        `actividad_cancelada`, `actividad_no_cancelada`, `actividad_empezada`, `entrenamiento_futuro`,
+        `partido_sin_empezar`, `partido_jugado`, `categoria_inactiva`, `categorias_no_cambian` o
+        `jugador_fuera_de_la_actividad`
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [codigo, title, status]
+      properties:
+        codigo: { type: string }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        errores:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+    EstadoEntrenamiento:
+      type: string
+      enum: [PROGRAMADO, CANCELADO]
+    EstadoPartido:
+      type: string
+      enum: [PROXIMO, CANCELADO, JUGADO]
+    CondicionPartido:
+      type: string
+      enum: [LOCAL, VISITANTE]
+    TipoPartido:
+      type: string
+      enum: [AMISTOSO, TORNEO]
+    RespuestaFamilia:
+      type: string
+      enum: [ASISTIRA, NO_ASISTIRA]
+
+    Hora:
+      type: string
+      pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+
+    CategoriaDeActividadDto:
+      type: object
+      additionalProperties: false
+      required: [categoriaId, anio]
+      properties:
+        categoriaId: { type: string, format: uuid }
+        anio: { type: integer }
+
+    EnlaceFichaDto:
+      description: El de la spec 008; `null` donde quien mira no puede abrir la ficha
+      type: object
+      required: [tipo, usuarioRolId]
+      properties:
+        tipo: { type: string, enum: [JUGADOR, BASICA] }
+        usuarioRolId: { type: string, format: uuid }
+
+    UltimoCambioDto:
+      description: El de la spec 008
+      type: object
+      required: [fecha, autor, porLaCuentaDelJugador]
+      properties:
+        fecha: { type: string, format: date-time }
+        autor: { type: string }
+        porLaCuentaDelJugador: { type: boolean, description: Siempre falso aquí }
+        autorFicha:
+          oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+
+    PermisosDeActividadDto:
+      type: object
+      additionalProperties: false
+      required: [gestiona, vePlanilla, responde]
+      properties:
+        gestiona: { type: boolean, description: Puede cambiar, cancelar, reactivar, convocar y registrar el resultado }
+        vePlanilla: { type: boolean, description: Puede pedir `.../jugadores` }
+        responde: { type: boolean, description: Es la cuenta de un jugador que todavía puede responder }
+
+    # ---------------------------------------------------------------- Entrenamientos
+
+    GuardarEntrenamientoDto:
+      type: object
+      additionalProperties: false
+      required: [fecha, horaInicio, horaFin, lugar, categoriaIds]
+      properties:
+        fecha: { type: string, format: date }
+        horaInicio: { $ref: '#/components/schemas/Hora' }
+        horaFin: { $ref: '#/components/schemas/Hora', description: Posterior a horaInicio }
+        lugar: { type: string, minLength: 1, maxLength: 120 }
+        nota: { type: [string, 'null'], maxLength: 500 }
+        categoriaIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, format: uuid }
+
+    EntrenamientoResumenDto:
+      type: object
+      additionalProperties: false
+      required: [entrenamientoId, fecha, horaInicio, horaFin, lugar, estado, categorias]
+      properties:
+        entrenamientoId: { type: string, format: uuid }
+        fecha: { type: string, format: date }
+        horaInicio: { $ref: '#/components/schemas/Hora' }
+        horaFin: { $ref: '#/components/schemas/Hora' }
+        lugar: { type: string }
+        estado: { $ref: '#/components/schemas/EstadoEntrenamiento' }
+        categorias:
+          type: array
+          items: { $ref: '#/components/schemas/CategoriaDeActividadDto' }
+        miRespuesta:
+          description: Solo para la cuenta de un jugador; ausente si no respondió
+          allOf: [{ $ref: '#/components/schemas/RespuestaFamilia' }]
+
+    EntrenamientoDto:
+      allOf:
+        - $ref: '#/components/schemas/EntrenamientoResumenDto'
+        - type: object
+          required: [permisos]
+          properties:
+            nota: { type: [string, 'null'] }
+            permisos: { $ref: '#/components/schemas/PermisosDeActividadDto' }
+            miAsistencia:
+              type: boolean
+              description: Solo para la cuenta de un jugador con asistencia registrada; presente o ausente
+
+    RegistrarAsistenciaDto:
+      type: object
+      additionalProperties: false
+      required: [jugadores]
+      properties:
+        jugadores:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            additionalProperties: false
+            required: [usuarioRolId, presente]
+            properties:
+              usuarioRolId: { type: string, format: uuid }
+              presente: { type: boolean }
+
+    PlanillaEntrenamientoDto:
+      type: object
+      additionalProperties: false
+      required: [entrenamientoId, sinResponder, asistiran, noAsistiran, jugadores]
+      properties:
+        entrenamientoId: { type: string, format: uuid }
+        asistiran: { type: integer }
+        noAsistiran: { type: integer }
+        sinResponder: { type: integer }
+        jugadores:
+          type: array
+          description: Por categoría y apellidos
+          items:
+            type: object
+            additionalProperties: false
+            required: [usuarioRolId, nombres, apellidos, categoria, marcable]
+            properties:
+              usuarioRolId: { type: string, format: uuid }
+              nombres: { type: string }
+              apellidos: { type: string }
+              enlace:
+                oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+              categoria: { $ref: '#/components/schemas/CategoriaDeActividadDto' }
+              respuesta:
+                oneOf: [{ $ref: '#/components/schemas/RespuestaFamilia' }, { type: 'null' }]
+              presente:
+                type: [boolean, 'null']
+                description: null si nadie registró su asistencia
+              marcable: { type: boolean }
+
+    # ---------------------------------------------------------------- Partidos
+
+    GuardarPartidoDto:
+      type: object
+      additionalProperties: false
+      required: [fecha, hora, lugar, condicion, tipo, categoriaIds]
+      properties:
+        rival:
+          type: [string, 'null']
+          maxLength: 120
+          description: Opcional; vacío o ausente si el rival está por definir
+        fecha: { type: string, format: date }
+        hora: { $ref: '#/components/schemas/Hora' }
+        lugar: { type: string, minLength: 1, maxLength: 120 }
+        condicion: { $ref: '#/components/schemas/CondicionPartido' }
+        tipo: { $ref: '#/components/schemas/TipoPartido' }
+        nombreTorneo:
+          type: [string, 'null']
+          maxLength: 120
+          description: Obligatorio si tipo es TORNEO; se ignora en un amistoso
+        categoriaIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, format: uuid }
+
+    GoleadorDePartidoDto:
+      type: object
+      additionalProperties: false
+      required: [nombres, apellidos, goles]
+      properties:
+        nombres: { type: string }
+        apellidos: { type: string }
+        goles: { type: integer, minimum: 1 }
+        enlace:
+          oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+
+    PartidoResumenDto:
+      type: object
+      additionalProperties: false
+      required: [partidoId, fecha, hora, lugar, condicion, tipo, estado, faltaResultado, categorias]
+      properties:
+        partidoId: { type: string, format: uuid }
+        rival:
+          type: string
+          description: Ausente si está por definir; la pantalla muestra "Por definir"
+        fecha: { type: string, format: date }
+        hora: { $ref: '#/components/schemas/Hora' }
+        lugar: { type: string }
+        condicion: { $ref: '#/components/schemas/CondicionPartido' }
+        tipo: { $ref: '#/components/schemas/TipoPartido' }
+        nombreTorneo: { type: [string, 'null'] }
+        estado: { $ref: '#/components/schemas/EstadoPartido' }
+        faltaResultado: { type: boolean, description: PROXIMO que ya empezó }
+        golesClub: { type: [integer, 'null'] }
+        golesRival: { type: [integer, 'null'] }
+        categorias:
+          type: array
+          items: { $ref: '#/components/schemas/CategoriaDeActividadDto' }
+        miRespuesta:
+          description: Solo para la cuenta de un jugador convocado que respondió
+          allOf: [{ $ref: '#/components/schemas/RespuestaFamilia' }]
+
+    PartidoDto:
+      allOf:
+        - $ref: '#/components/schemas/PartidoResumenDto'
+        - type: object
+          required: [permisos]
+          properties:
+            permisos: { $ref: '#/components/schemas/PermisosDeActividadDto' }
+            goleadores:
+              type: array
+              description: Solo en un partido JUGADO, para todos
+              items: { $ref: '#/components/schemas/GoleadorDePartidoDto' }
+            ultimoCambioResultado:
+              description: Solo en un partido JUGADO y para quien ve la planilla
+              allOf: [{ $ref: '#/components/schemas/UltimoCambioDto' }]
+
+    GuardarConvocatoriaDto:
+      type: object
+      additionalProperties: false
+      required: [usuarioRolIds]
+      properties:
+        usuarioRolIds:
+          type: array
+          uniqueItems: true
+          description: Puede ir vacía (caso límite de la spec)
+          items: { type: string, format: uuid }
+
+    RegistrarResultadoDto:
+      type: object
+      additionalProperties: false
+      required: [golesClub, golesRival, jugadores]
+      properties:
+        golesClub: { type: integer, minimum: 0, maximum: 99 }
+        golesRival: { type: integer, minimum: 0, maximum: 99 }
+        jugadores:
+          type: array
+          description: Cada convocado; los que no se envían quedan como que no jugaron y sin goles
+          items:
+            type: object
+            additionalProperties: false
+            required: [usuarioRolId, jugo, goles]
+            properties:
+              usuarioRolId: { type: string, format: uuid }
+              jugo: { type: boolean }
+              goles: { type: integer, minimum: 0, maximum: 99 }
+
+    PlanillaPartidoDto:
+      type: object
+      additionalProperties: false
+      required: [partidoId, asistiran, noAsistiran, sinResponder, convocados, convocables]
+      properties:
+        partidoId: { type: string, format: uuid }
+        asistiran: { type: integer }
+        noAsistiran: { type: integer }
+        sinResponder: { type: integer }
+        convocados:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [usuarioRolId, nombres, apellidos, categoria, jugo, goles]
+            properties:
+              usuarioRolId: { type: string, format: uuid }
+              nombres: { type: string }
+              apellidos: { type: string }
+              enlace:
+                oneOf: [{ $ref: '#/components/schemas/EnlaceFichaDto' }, { type: 'null' }]
+              categoria:
+                description: La copiada al convocarlo
+                allOf: [{ $ref: '#/components/schemas/CategoriaDeActividadDto' }]
+              respuesta:
+                oneOf: [{ $ref: '#/components/schemas/RespuestaFamilia' }, { type: 'null' }]
+              jugo: { type: boolean }
+              goles: { type: integer }
+        convocables:
+          type: array
+          description: Jugadores activos de sus categorías que no están convocados; vacía si no está PROXIMO
+          items:
+            type: object
+            additionalProperties: false
+            required: [usuarioRolId, nombres, apellidos, categoria]
+            properties:
+              usuarioRolId: { type: string, format: uuid }
+              nombres: { type: string }
+              apellidos: { type: string }
+              categoria: { $ref: '#/components/schemas/CategoriaDeActividadDto' }
+
+    # ---------------------------------------------------------------- Comunes
+
+    ResponderDto:
+      type: object
+      additionalProperties: false
+      required: [respuesta]
+      properties:
+        respuesta: { $ref: '#/components/schemas/RespuestaFamilia' }
+
+    CalendarioDto:
+      type: object
+      additionalProperties: false
+      required: [desde, hasta, entrenamientos, partidos]
+      properties:
+        desde: { type: string, format: date }
+        hasta: { type: string, format: date }
+        entrenamientos:
+          type: array
+          items: { $ref: '#/components/schemas/EntrenamientoResumenDto' }
+        partidos:
+          type: array
+          items: { $ref: '#/components/schemas/PartidoResumenDto' }
+
+    # ---------------------------------------------------------------- Estadísticas
+
+    CifrasDto:
+      type: object
+      additionalProperties: false
+      required: [partidosJugados, goles, entrenamientosRegistrados, entrenamientosAsistidos, porcentajeAsistencia]
+      properties:
+        partidosJugados: { type: integer }
+        goles: { type: integer }
+        entrenamientosRegistrados: { type: integer }
+        entrenamientosAsistidos: { type: integer }
+        porcentajeAsistencia: { type: integer, minimum: 0, maximum: 100, description: 0 si no hay registros }
+
+    EstadisticasJugadorDto:
+      type: object
+      additionalProperties: false
+      required: [usuarioRolId, total, porCategoria]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        total: { $ref: '#/components/schemas/CifrasDto' }
+        porCategoria:
+          type: array
+          description: Por año descendente; vacía si no hay registros
+          items:
+            allOf:
+              - $ref: '#/components/schemas/CifrasDto'
+              - type: object
+                required: [categoria]
+                properties:
+                  categoria: { $ref: '#/components/schemas/CategoriaDeActividadDto' }
+
+    GoleadoresDto:
+      type: object
+      additionalProperties: false
+      required: [categoriasConGoles, goleadores]
+      properties:
+        categoriasConGoles:
+          type: array
+          description: Categorías con al menos un gol registrado, por año descendente
+          items: { $ref: '#/components/schemas/CategoriaDeActividadDto' }
+        categoria:
+          description: La elegida; ausente sin `categoriaId`
+          allOf: [{ $ref: '#/components/schemas/CategoriaDeActividadDto' }]
+        goleadores:
+          type: array
+          description: De mayor a menor; vacía sin `categoriaId`. Solo nombre, goles y enlace (RF-029)
+          items: { $ref: '#/components/schemas/GoleadorDePartidoDto' }

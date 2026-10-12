@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { FotoAmpliable } from '../../compartido/componentes/FotoAmpliable';
 import { inicialesDe } from '../../compartido/componentes/Avatar';
 import { useEnPantalla, useFotoJugador } from './fotosJugador';
 
@@ -11,8 +12,9 @@ interface Props {
 }
 
 /**
- * Foto propia de un jugador o, si no tiene, si todavía no llegó o si falla, sus iniciales. Solo
- * dibuja: cargarla, cambiarla y quitarla está en la ficha. Sin foto no hace ninguna petición.
+ * Foto propia de un jugador o, si no tiene, si todavía no llegó o si falla, sus iniciales. La
+ * grande se abre en tamaño completo al tocarla. Solo dibuja: cargarla, cambiarla y quitarla está en
+ * la ficha. Sin foto no hace ninguna petición.
  */
 export function FotoJugador({ clubId, jugador, tamano, perezosa = false }: Props) {
   const caja = useRef<HTMLSpanElement>(null);
@@ -21,12 +23,23 @@ export function FotoJugador({ clubId, jugador, tamano, perezosa = false }: Props
   const [fallida, setFallida] = useState<string | null>(null);
   const clase = `distintivo foto-jugador-${tamano}`;
 
+  if (foto && foto !== fallida && tamano === 'grande') {
+    return (
+      <FotoAmpliable
+        className={clase}
+        src={foto}
+        alt={`Foto de ${jugador.nombres} ${jugador.apellidos}`}
+        onError={() => setFallida(foto)}
+      />
+    );
+  }
+
   if (foto && foto !== fallida) {
     return (
       <img
         className={clase}
         src={foto}
-        alt={tamano === 'grande' ? `Foto de ${jugador.nombres} ${jugador.apellidos}` : ''}
+        alt=""
         onError={() => setFallida(foto)}
       />
     );

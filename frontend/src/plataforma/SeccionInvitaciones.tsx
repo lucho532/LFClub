@@ -68,7 +68,7 @@ export function SeccionInvitaciones({ club, recargar }: PropsSeccion) {
           </div>
           {corrigiendo === invitacion.invitacionId ? (
             <form
-              className="fila"
+              className="fila fila-con-campos"
               onSubmit={(evento) => {
                 evento.preventDefault();
                 void reenviar(invitacion, correoCorregido);

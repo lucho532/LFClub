@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ClubDeSesionDto } from '../compartido/api/tiposSesion';
 import { Aviso } from '../compartido/componentes/Aviso';
 import { Boton } from '../compartido/componentes/Boton';
+import { BotonRecargar } from '../compartido/componentes/BotonRecargar';
 import { BotonTema } from '../compartido/componentes/BotonTema';
 import { useSesion } from '../compartido/sesion/useSesion';
 import { Escudo, IdentidadClub } from '../compartido/tema/IdentidadClub';
@@ -33,7 +34,10 @@ export function AvisoRetirado({ club }: { club: ClubDeSesionDto }) {
       <header className="columna">
         <div className="cabecera">
           <Escudo identidad={club.identidad} nombre={club.nombre} />
-          <BotonTema />
+          <span className="barra-superior-acciones">
+            <BotonRecargar />
+            <BotonTema />
+          </span>
         </div>
         <h1>{club.nombre}</h1>
       </header>

@@ -12,7 +12,10 @@ namespace LaPecosa.Dominio.Reglas;
 /// <param name="VeDatosClinicos">Recibe el grupo sanguíneo, las alergias, las enfermedades, los medicamentos y las observaciones.</param>
 /// <param name="VeDocumentos">Recibe el estado de los documentos pedidos y puede abrir sus archivos.</param>
 /// <param name="Cambia">Puede cambiar el contacto, la salud y el documento de identidad, y subir archivos.</param>
-/// <param name="CorrigeIdentidad">Puede corregir los nombres, los apellidos y la fecha de nacimiento.</param>
+/// <param name="CorrigeIdentidad">
+/// Puede corregir los nombres, los apellidos y la fecha de nacimiento: el PRESIDENTE y, desde la spec
+/// 010, la cuenta del jugador sobre su propio jugador.
+/// </param>
 public sealed record AlcanceDeFicha(
     bool Ve,
     bool VeDatosClinicos,

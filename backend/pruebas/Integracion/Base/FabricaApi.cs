@@ -23,7 +23,13 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 
     public CorreoEnMemoria Correo { get; } = new();
 
+    public RelojDePrueba Reloj { get; } = new();
+
+    public SembradorActividades Actividades => new(this);
+
     public Sembrador Sembrador => new(this);
+
+    public SembradorCartas Cartas => new(this);
 
     public SembradorCategorias Categorias => new(this);
 
@@ -73,6 +79,8 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
         {
             servicios.RemoveAll<IServicioCorreo>();
             servicios.AddSingleton<IServicioCorreo>(Correo);
+            servicios.RemoveAll<IReloj>();
+            servicios.AddSingleton<IReloj>(Reloj);
         });
     }
 }

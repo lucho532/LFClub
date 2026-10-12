@@ -28,7 +28,9 @@ public class SoloPresidentePruebas
     /// que desde la 006 hace también su propia cuenta y se prueba en
     /// <c>Categorias/RetiroJugadorPruebas</c> y <c>Hermanos/FamiliaRetiraPruebas</c>. Y la foto del
     /// jugador (007), que como la ficha cambia también la familia y se prueba en
-    /// <c>Jugadores/FotoJugadorPruebas</c>.
+    /// <c>Jugadores/FotoJugadorPruebas</c>. Y la carta del jugador (010), cuyo dorsal cambian también la
+    /// familia y quien entrena, y se prueba en <c>Carta/DorsalYPosicionPruebas</c> y
+    /// <c>Carta/EstadisticasCartaPruebas</c>.
     /// </summary>
     private List<Endpoint> DeEscritura => EndpointsDeLaApi.DeLaApi(_fabrica)
         .Where(endpoint => endpoint.Metodo != "GET"
@@ -36,6 +38,7 @@ public class SoloPresidentePruebas
             && !endpoint.Ruta.EndsWith("/foto", StringComparison.Ordinal)
             && !endpoint.Ruta.EndsWith("/hermanos", StringComparison.Ordinal)
             && !endpoint.Ruta.EndsWith("/retiro", StringComparison.Ordinal)
+            && !endpoint.Ruta.Contains("/carta", StringComparison.Ordinal)
             && (endpoint.Ruta.StartsWith("/api/clubes/{clubId}/categorias", StringComparison.Ordinal)
                 || endpoint.Ruta.StartsWith("/api/clubes/{clubId}/jugadores", StringComparison.Ordinal)))
         .ToList();
