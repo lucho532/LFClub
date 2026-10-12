@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Plataforma;
+namespace LFClub.Pruebas.Integracion.Plataforma;
 
 /// <summary>El DESARROLLADOR edita los datos de cualquier club (RF-010).</summary>
 [Collection(ColeccionApi.Nombre)]

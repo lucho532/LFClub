@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Categorias;
+namespace LFClub.Pruebas.Integracion.Categorias;
 
 /// <summary>
 /// El PRESIDENTE indica qué equipos de una categoría dirige cada entrenador asignado a ella

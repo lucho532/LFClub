@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Carta;
+namespace LFClub.Pruebas.Integracion.Carta;
 
 /// <summary>
 /// La carta la ven exactamente quienes ven la ficha, con los permisos de research §8; lo que no hay

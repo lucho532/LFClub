@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Ingresos;
+namespace LFClub.Pruebas.Integracion.Ingresos;
 
 /// <summary>
 /// Solo el PRESIDENTE aprueba un ingreso en espera, y al aprobar no se elige rol: la persona queda

@@ -12,7 +12,7 @@ invita por correo a registrarse; configura el escudo y los colores de cada club 
 suspenderlos, darlos de baja o eliminarlos. Cada integrante ve la aplicación con la identidad de
 su club y, si pertenece a varios, elige cuál ver. Toda la interfaz tiene tema claro y oscuro."
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 3.6.0, en especial §7, §8, §10, §12.1, §12.4, §12.5 y §24.
 

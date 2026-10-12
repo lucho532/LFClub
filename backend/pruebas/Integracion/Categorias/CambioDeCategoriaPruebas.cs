@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Categorias;
+namespace LFClub.Pruebas.Integracion.Categorias;
 
 /// <summary>
 /// El PRESIDENTE ubica a un jugador sin categoría o lo pasa a otra, y un jugador nunca está en dos

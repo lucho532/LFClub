@@ -1,9 +1,9 @@
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Crea jugadores con su año de nacimiento, categorías, equipos, asignaciones y retiros

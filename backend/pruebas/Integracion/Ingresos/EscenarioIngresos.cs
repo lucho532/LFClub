@@ -1,10 +1,10 @@
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Ingresos;
+namespace LFClub.Pruebas.Integracion.Ingresos;
 
 /// <summary>
 /// Ayudas comunes a las pruebas de invitaciones, registro, aprobación, rechazo y consulta de

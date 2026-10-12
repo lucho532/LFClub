@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: La Pecosa - API de la funcionalidad 005 (ficha del jugador)
+  title: LFClub - API de la funcionalidad 005 (ficha del jugador)
   version: 0.5.0
   description: |
     Contrato de lo que esta funcionalidad añade o cambia respecto de los contratos de la 001 a la

@@ -1,10 +1,10 @@
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
-using static LaPecosa.Pruebas.Integracion.Personas.LecturaDePersonas;
+using static LFClub.Pruebas.Integracion.Personas.LecturaDePersonas;
 
-namespace LaPecosa.Pruebas.Integracion.Personas;
+namespace LFClub.Pruebas.Integracion.Personas;
 
 /// <summary>
 /// Los nombres copiados en el último cambio, los retiros y los ingresos llevan a la ficha de la

@@ -29,7 +29,7 @@ invitaciones.
 ## Pruebas automatizadas
 
 ```powershell
-dotnet test backend/LaPecosa.sln    # unitarias e integración (la integración necesita Docker)
+dotnet test backend/LFClub.sln    # unitarias e integración (la integración necesita Docker)
 npm --prefix frontend test
 ```
 
@@ -107,7 +107,7 @@ Cada paso indica qué historia de la spec valida.
 ### 3. La sala de espera, solo para jugadores y sin elegir rol (historia 3)
 
 Ninguna pantalla deja ya a nadie en espera, así que la persona en espera se prepara a mano. Con
-`docker compose exec bd psql -U lapecosa lapecosa`, pasar a `EN_ESPERA` a un jugador recién
+`docker compose exec bd psql -U lfclub lfclub`, pasar a `EN_ESPERA` a un jugador recién
 registrado del Club A nacido en 2014:
 
 ```sql

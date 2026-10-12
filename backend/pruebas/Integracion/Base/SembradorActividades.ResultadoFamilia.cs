@@ -1,8 +1,8 @@
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>Las ayudas de la spec 010: lo que publica la familia y convocar a un partido existente.</summary>
 public partial class SembradorActividades

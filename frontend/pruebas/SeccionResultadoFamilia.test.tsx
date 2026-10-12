@@ -39,7 +39,7 @@ describe('SeccionResultadoFamilia', () => {
   const pintar = (partido: PartidoDto) =>
     act(() =>
       raiz.render(
-        <SeccionResultadoFamilia clubId="club" nombreClub="La Pecosa" partido={partido} alCambiar={() => {}} recargar={() => {}} />,
+        <SeccionResultadoFamilia clubId="club" nombreClub="LFClub" partido={partido} alCambiar={() => {}} recargar={() => {}} />,
       ),
     );
 
@@ -62,7 +62,7 @@ describe('SeccionResultadoFamilia', () => {
       miParticipacion: { jugo: true, goles: 1, indicadoPor: 'FAMILIA', puedeCambiar: true },
     });
 
-    expect(contenedor.textContent).toContain('La Pecosa 2 - 1 Equipo C');
+    expect(contenedor.textContent).toContain('LFClub 2 - 1 Equipo C');
     expect(etiquetas()).toEqual(['Sí', 'No', 'Goles de tu jugador']);
     expect((contenedor.querySelector('input[type="number"]') as HTMLInputElement).value).toBe('1');
     expect(contenedor.textContent).toContain('Guardar lo de mi jugador');

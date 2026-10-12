@@ -18,7 +18,7 @@ de su club desde 'Datos del club', con el mismo aviso de contraste del panel del
 DESARROLLADOR los sigue cambiando desde su panel. Esto sustituye el escenario 2 de la historia 4 de
 la spec 001."
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.4.0, en especial §7.1, §7.2, §7.5, §8, §11.2, §11.3, §12.2,
 §12.3, §14.1, §14.2, §15, §20 y §24.

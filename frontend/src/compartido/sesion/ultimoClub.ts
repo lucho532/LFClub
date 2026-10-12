@@ -1,6 +1,6 @@
 import type { ClubDeSesionDto } from '../api/tipos';
 
-const CLAVE = 'lapecosa.ultimoClub';
+const CLAVE = 'lfclub.ultimoClub';
 
 /** Recuerda en el dispositivo el último club elegido. */
 export function guardarUltimoClub(clubId: string): void {

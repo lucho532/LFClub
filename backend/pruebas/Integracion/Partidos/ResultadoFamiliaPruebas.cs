@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Partidos.EscenarioResultadoFamilia;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Partidos.EscenarioResultadoFamilia;
 
-namespace LaPecosa.Pruebas.Integracion.Partidos;
+namespace LFClub.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// La familia de un convocado publica el resultado y lo de su jugador (spec 010, historia 1,

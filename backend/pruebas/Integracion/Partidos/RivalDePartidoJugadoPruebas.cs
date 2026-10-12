@@ -1,7 +1,7 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Partidos;
+namespace LFClub.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// Corregir el rival de un partido ya jugado: solo quien gestiona el partido lo hace, el marcador y

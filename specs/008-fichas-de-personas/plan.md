@@ -119,11 +119,11 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Enumeraciones/     + TipoFicha.cs                       # JUGADOR, BASICA
 │   ├── Reglas/            + ReglaEnlaceDeFicha.cs              # a qué ficha lleva un nombre
 │   └── Entidades/         ~ FotoPerfil.cs, Usuario.cs, UsuarioRol.cs (solo documentación)
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + FichaBasicaDto, CategoriaDeFichaBasicaDto, EnlaceFichaDto,
 │   │                        DatosPropiosDto, CambiarDatosPropiosDto
 │   │                      ~ EntrenadorParaFamiliaDto, UltimoCambioDto, JugadorRetiradoDto,
@@ -139,11 +139,11 @@ backend/src/
 │   │                      ~ MapperCategorias, MapperFicha, MapperIngresos
 │   ├── Utilidades/        + ResolutorDeEnlaces                 # una consulta por lista
 │   └── Validadores/       + ValidadorDatosPropios              # reutiliza ValidadorIdentidad
-├── LaPecosa.Infraestructura/
+├── LFClub.Infraestructura/
 │   └── Repositorios/      + RepositorioFichaBasica, RepositorioEnlaces
 │                          ~ RepositorioFotosPerfil, Plataforma/RepositorioPertenencias,
 │                            RepositorioCategorias (UsuarioId y foto de entrenadores para la familia)
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/
         ├── Club/          + ControladorPersonas                # ficha básica y su foto

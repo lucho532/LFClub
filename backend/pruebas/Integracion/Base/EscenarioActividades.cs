@@ -1,6 +1,6 @@
-using LaPecosa.Dominio.Entidades;
+using LFClub.Dominio.Entidades;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>Un integrante del escenario con su cuenta y su cliente con sesión.</summary>
 public record Persona(Usuario Cuenta, UsuarioRol Integrante, ClienteDePrueba Cliente)

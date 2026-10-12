@@ -13,7 +13,7 @@ modelo en [data-model.md](data-model.md).
 - SDK de .NET 10 y Node 22 (solo para ejecutar las pruebas fuera de Docker).
 - La puesta en marcha es la de la [guía de la 001](../001-base-multiclub/quickstart.md), pero en un
   proyecto de Compose aparte para no enviar correos reales ni tocar los datos de desarrollo:
-  `docker compose -p la-pecosa-validacion -f docker-compose.yml -f <override>` con
+  `docker compose -p lfclub-validacion -f docker-compose.yml -f <override>` con
   `Brevo__Llave` vacía. Aplicación en <http://localhost:5173>, API en <http://localhost:8080>. Sin
   llave de Brevo, los enlaces de los correos salen en el registro de la API (`Correo para …`).
 - Esta funcionalidad tiene una migración (`FotosDeJugadores`), que la API aplica al arrancar. No
@@ -123,7 +123,7 @@ Con el token de cada persona (`Authorization: Bearer …`) y, para la cuenta de 
 ## Batería de pruebas
 
 ```powershell
-dotnet test backend/LaPecosa.sln
+dotnet test backend/LFClub.sln
 npm --prefix frontend test
 ./scripts/verificar-tamano.ps1
 ```
@@ -131,5 +131,5 @@ npm --prefix frontend test
 Todo en verde, incluidas las pruebas de la 001 a la 006. La prueba del contrato cuenta 68
 endpoints, y la de aislamiento recorre 46 de club.
 
-Al terminar: `docker compose -p la-pecosa-validacion down -v` y borrar el contenedor que mantenía
+Al terminar: `docker compose -p lfclub-validacion down -v` y borrar el contenedor que mantenía
 Docker despierto, si se creó.

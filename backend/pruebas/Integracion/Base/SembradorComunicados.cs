@@ -1,8 +1,8 @@
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Escribe directamente en la base lo que necesitan las pruebas de la spec 011: comunicados con sus

@@ -126,7 +126,7 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/         + Entrenamiento, EntrenamientoCategoria, AsistenciaEntrenamiento,
 │   │                        RespuestaEntrenamiento, Partido, PartidoCategoria, PartidoJugador
 │   │                      ~ Categoria, UsuarioRol, AsignacionEntrenadorCategoria (documentación)
@@ -136,7 +136,7 @@ backend/src/
 │                            ReglaVisibilidadDeEntrenamiento, ReglaVisibilidadDePartido,
 │                            ReglaTransicionPartido, ReglaResultadoDePartido,
 │                            ReglaMomentoDeActividad, CalculoDeAsistencia
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + GuardarEntrenamientoDto, EntrenamientoResumenDto, EntrenamientoDto,
 │   │                        PlanillaEntrenamientoDto, RegistrarAsistenciaDto, GuardarPartidoDto,
 │   │                        PartidoResumenDto, PartidoDto, PlanillaPartidoDto,
@@ -157,8 +157,8 @@ backend/src/
 │   ├── Utilidades/        + HoraDeColombia, AccesoAActividad (lee, aplica la visibilidad y da
 │   │                        los permisos, como AccesoAFicha), ErroresDeActividades
 │   └── Validadores/       + ValidadorEntrenamiento, ValidadorPartido, ValidadorRangoCalendario
-├── LaPecosa.Infraestructura/
-│   ├── Datos/             ~ ContextoLaPecosa (siete DbSet)
+├── LFClub.Infraestructura/
+│   ├── Datos/             ~ ContextoLFClub (siete DbSet)
 │   │   ├── Configuraciones/ + una por entidad nueva
 │   │   └── Migraciones/   + EntrenamientosYPartidos
 │   └── Repositorios/      + RepositorioEntrenamientos, RepositorioPartidos,
@@ -166,7 +166,7 @@ backend/src/
 │                            RepositorioConvocatoria (planilla, convocables y cambios de la
 │                            convocatoria, separados de RepositorioPartidos por tamaño, §2.3)
 │                          ~ RepositorioJugadores, Plataforma/RepositorioRetiroEntreClubes (RF-033)
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/Club/ + ControladorCalendario, ControladorEntrenamientos,
                              ControladorAsistencia, ControladorPartidos, ControladorConvocatoria,

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BalonPecosa } from './BalonPecosa';
+import { BalonLFClub } from './BalonLFClub';
 
 /** Lo que dura la animación completa, con la salida incluida (ver arranque.css). */
 const DURACION_MS = 2100;
@@ -15,7 +15,7 @@ interface Props {
 /**
  * Animación de arranque de la aplicación Android: continúa la pantalla de arranque nativa, con el
  * mismo fondo y el balón en el mismo sitio. El balón bota dos veces mientras sus paneles giran,
- * aparece "La Pecosa" y todo se desvanece sobre la aplicación, que ya se está cargando debajo.
+ * aparece "LFClub" y todo se desvanece sobre la aplicación, que ya se está cargando debajo.
  * Respeta la preferencia de movimiento reducido. No bloquea nada: solo tapa durante dos segundos.
  */
 export function ArranqueAnimado({ alTerminar }: Props) {
@@ -32,10 +32,10 @@ export function ArranqueAnimado({ alTerminar }: Props) {
   return (
     <div className="arranque" aria-hidden="true">
       <div className="arranque-escena">
-        <BalonPecosa tamano={160} className="arranque-balon" />
+        <BalonLFClub tamano={160} className="arranque-balon" />
         <span className="arranque-sombra" />
       </div>
-      <p className="arranque-nombre">La Pecosa</p>
+      <p className="arranque-nombre">LFClub</p>
     </div>
   );
 }

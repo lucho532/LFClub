@@ -134,7 +134,7 @@ estructura es la de la 001.
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/
 │   │   ├── ~ Invitacion.cs                  # solo documentación: el rol lo elige el PRESIDENTE
 │   │   └── ~ UsuarioRol.cs                  # solo documentación: quien entra con invitación nace aprobado
@@ -142,7 +142,7 @@ backend/src/
 │       ├── + ReglaInvitacionDelClub.cs      # qué roles admite una invitación del club
 │       ├── ~ ReglaIngresoPorInvitacion.cs   # siempre aprobado; EsDelClub y PideResponsable
 │       └── - ReglaAprobacionIngreso.cs      # ya no decide nada (research §6)
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              ~ InvitarAlClubDto (gana Rol), InvitacionClubDto (gana Rol),
 │   │                        InvitacionVigenteDto (PideResponsable por PasaPorSalaDeEspera; gana
 │   │                        FaltaResponsable, RF-026),
@@ -157,10 +157,10 @@ backend/src/
 │   ├── Mappers/           ~ MapperIngresos
 │   ├── Validadores/       ~ ValidadorRegistro   # recibe el rol de la invitación
 │   └── Utilidades/        ~ ErroresDeInvitacion # rol_no_invitable
-├── LaPecosa.Infraestructura/
+├── LFClub.Infraestructura/
 │   ├── Correo/            ~ PlantillasCorreo    # nombra el rol en toda invitación
 │   └── Repositorios/      ~ RepositorioIngresos
-└── LaPecosa.Api/
+└── LFClub.Api/
     └── Controladores/
         ├── Club/          ~ ControladorInvitacionesClub (solo PRESIDENTE),
         │                    ControladorIngresos (solo PRESIDENTE; cuerpo de aprobar opcional)

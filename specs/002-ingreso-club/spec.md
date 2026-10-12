@@ -10,7 +10,7 @@
 correo desde el club, registro por el enlace, sala de espera y aprobación del ingreso por el
 PRESIDENTE o un DIRECTIVO"
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 3.7.0, en especial §7.1, §7.3, §8, §10, §12.1, §12.1.1, §12.2
 y §14.

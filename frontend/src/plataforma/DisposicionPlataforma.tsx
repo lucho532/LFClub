@@ -24,7 +24,7 @@ export function DisposicionPlataforma() {
       <aside className="lateral">
         <div className="lateral-marca">
           <span>
-            La Pecosa
+            LFClub
             <br />
             <small>Administración</small>
           </span>
@@ -36,7 +36,7 @@ export function DisposicionPlataforma() {
         </nav>
       </aside>
       <div className="contenido">
-        <BarraSuperior marca={<span>La Pecosa</span>}>
+        <BarraSuperior marca={<span>LFClub</span>}>
           <MenuPerfil
             nombre={correo}
             detalle="Desarrollador"

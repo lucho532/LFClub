@@ -1,10 +1,10 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Plataforma;
+namespace LFClub.Pruebas.Integracion.Plataforma;
 
 /// <summary>
 /// Eliminar un club borra toda su información y no afecta a ningún otro club (constitución §20,

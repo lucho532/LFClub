@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Partidos;
+namespace LFClub.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// La convocatoria: quien gestiona el partido elige convocados entre los jugadores activos de sus

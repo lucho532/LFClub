@@ -2,13 +2,13 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Infraestructura.Datos;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Dominio.Entidades;
+using LFClub.Infraestructura.Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Cliente HTTP de las pruebas: inicia sesión, envía peticiones con el token y, si se le indica,

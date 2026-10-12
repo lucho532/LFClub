@@ -1,5 +1,5 @@
 """
-Genera el balón de La Pecosa en todos los sitios donde se dibuja, desde una sola geometría.
+Genera el balón de LFClub en todos los sitios donde se dibuja, desde una sola geometría.
 
 Escribe:
 - frontend/src/arranque/geometriaBalon.ts: los trazos para la animación de arranque de la web.
@@ -133,7 +133,7 @@ ANIMADO = '''<?xml version="1.0" encoding="utf-8"?>
 
 
 def typescript(g):
-    return f'''// Geometría del balón de La Pecosa en un lienzo de 108 x 108, la misma que dibujan los recursos de
+    return f'''// Geometría del balón de LFClub en un lienzo de 108 x 108, la misma que dibujan los recursos de
 // Android (drawable/balon_icono.xml y drawable/balon_arranque.xml). Generado por
 // scripts/generar-balon.py: si cambia el dibujo, se regeneran los dos lados a la vez.
 
@@ -208,9 +208,9 @@ def main():
     g = geometria()
     escribir(os.path.join(FRONTEND, 'src', 'arranque', 'geometriaBalon.ts'), typescript(g))
     escribir(os.path.join(RES, 'drawable', 'balon_icono.xml'),
-             vector(g, 108, 'Balón de La Pecosa: primer plano del icono, dentro de la zona segura.'))
+             vector(g, 108, 'Balón de LFClub: primer plano del icono, dentro de la zona segura.'))
     escribir(os.path.join(RES, 'drawable', 'balon_arranque.xml'),
-             vector(g, 288, 'Balón de La Pecosa: pantalla de arranque, dentro del círculo de 192 dp.'))
+             vector(g, 288, 'Balón de LFClub: pantalla de arranque, dentro del círculo de 192 dp.'))
     escribir(os.path.join(RES, 'drawable', 'balon_arranque_animado.xml'), ANIMADO)
     iconos_png(g)
     favicon(g)

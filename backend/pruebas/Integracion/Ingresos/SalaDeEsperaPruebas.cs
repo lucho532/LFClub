@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Aislamiento;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Aislamiento;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Ingresos;
+namespace LFClub.Pruebas.Integracion.Ingresos;
 
 /// <summary>
 /// Una cuenta en espera no accede a ninguna información del club (constitución §20, RF-016,

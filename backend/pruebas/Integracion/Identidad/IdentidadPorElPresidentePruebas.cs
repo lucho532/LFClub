@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Identidad;
+namespace LFClub.Pruebas.Integracion.Identidad;
 
 /// <summary>
 /// El PRESIDENTE cambia el escudo y los colores de su club con las mismas reglas que el panel, y

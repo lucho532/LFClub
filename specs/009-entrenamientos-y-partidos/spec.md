@@ -10,7 +10,7 @@
 funcionalidades faltantes para abrir una nueva spec." Entre las pendientes, el propietario eligió
 entrenamientos y partidos.
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.6.0, en especial §1, §7.1, §7.5, §8, §11.1, §11.2, §11.3,
 §13, §14, §14.1, §15, §17, §17.2, §20 y §24.

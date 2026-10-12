@@ -1,12 +1,12 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Plataforma;
+namespace LFClub.Pruebas.Integracion.Plataforma;
 
 /// <summary>
 /// La invitación del presidente desde el panel: el DESARROLLADOR la reenvía o corrige su correo

@@ -9,7 +9,7 @@
 **Entrada**: Descripción del propietario del proyecto: "Especificar la funcionalidad 010 (ficha
 entera editable por la familia, resultado publicado por la familia y carta del jugador)".
 
-**Plataforma**: La Pecosa
+**Plataforma**: LFClub
 
 **Constitución aplicable**: versión 4.8.0, en especial §7.1, §7.2, §7.5, §8 (Presidente,
 Entrenador y Jugador), §10, §11.2, §13, §14.1, §14.2, §14.3, §15, §17, §17.2, §17.3, §20, §24,

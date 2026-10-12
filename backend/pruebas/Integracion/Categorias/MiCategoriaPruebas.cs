@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Categorias;
+namespace LFClub.Pruebas.Integracion.Categorias;
 
 /// <summary>
 /// Una cuenta de jugador solo ve su categoría, sus equipos y el nombre de sus entrenadores
@@ -62,7 +62,7 @@ public class MiCategoriaPruebas
         {
             e.IntegranteDirectivo.Id.ToString(), categoria.Id.ToString(),
             equipoA.Id.ToString(), e.IntegranteEntrenador.NumeroDocumento, companero.Apellidos, desactivado.Nombre,
-            "\"rol\"", "PRESIDENTE", "equipoId", "correo", "celular", "documento", "@lapecosa.test", "3001234567",
+            "\"rol\"", "PRESIDENTE", "equipoId", "correo", "celular", "documento", "@lfclub.test", "3001234567",
         };
         Assert.All(ajenos, texto => Assert.DoesNotContain(texto, json, StringComparison.OrdinalIgnoreCase));
     }

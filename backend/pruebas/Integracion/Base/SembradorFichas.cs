@@ -1,8 +1,8 @@
 using System.Text;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Crea fichas y documentos de jugadores directamente en la base de datos, con datos reconocibles,

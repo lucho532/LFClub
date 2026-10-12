@@ -1,10 +1,10 @@
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Crea clubes, cuentas e integrantes directamente en la base de datos. Todos los nombres, correos
@@ -26,7 +26,7 @@ public class Sembrador
     public static string Unico(string prefijo = "") =>
         $"{prefijo}{Interlocked.Increment(ref _contador)}{Guid.NewGuid():N}"[..(prefijo.Length + 12)];
 
-    public static string CorreoUnico() => $"{Unico("persona")}@lapecosa.test";
+    public static string CorreoUnico() => $"{Unico("persona")}@lfclub.test";
 
     public async Task<Club> CrearClubAsync(string? nombre = null, EstadoClub estado = EstadoClub.ACTIVO)
     {

@@ -86,7 +86,7 @@ categorías.
 ## 4. Visibilidad: dos reglas puras y un único 404
 
 **Decisión**: `ReglaVisibilidadDeEntrenamiento` y `ReglaVisibilidadDePartido`, en
-`LaPecosa.Dominio/Reglas`, reciben ya resueltos el rol, el estado y los hechos de la persona
+`LFClub.Dominio/Reglas`, reciben ya resueltos el rol, el estado y los hechos de la persona
 (si entrena alguna de sus categorías, si es su categoría, si está convocado) y devuelven si la ve.
 
 | Quién | Entrenamiento (RF-003) | Partido próximo o cancelado (RF-010, RF-014) | Partido jugado (RF-019) |
@@ -284,7 +284,7 @@ todos" y "Ninguno", y el aviso "Solo los jugadores que selecciones verán este p
 
 - `DisposicionClub.tsx` (216 líneas) no recibe las tres entradas nuevas del menú: el menú pasa a
   `MenuDelClub.tsx`, y la disposición baja.
-- `ContextoLaPecosa.cs` (99) gana siete `DbSet`; queda en unas 125.
+- `ContextoLFClub.cs` (99) gana siete `DbSet`; queda en unas 125.
 - Los tipos nuevos del frontend van en `tiposActividades.ts` y `tiposEstadisticas.ts`; `tipos.ts`
   no crece.
 - Los servicios se dividen por responsabilidad desde el principio (consulta, gestión, convocatoria,

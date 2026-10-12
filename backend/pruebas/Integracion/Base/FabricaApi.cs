@@ -1,5 +1,5 @@
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Infraestructura.Datos;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Infraestructura.Datos;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.PostgreSql;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Arranca la API real contra un PostgreSQL 17 en un contenedor, con las migraciones aplicadas y
@@ -15,10 +15,10 @@ namespace LaPecosa.Pruebas.Integracion.Base;
 /// </summary>
 public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    public const string CorreoDesarrollador = "desarrollador@lapecosa.test";
+    public const string CorreoDesarrollador = "desarrollador@lfclub.test";
 
     private readonly PostgreSqlContainer _baseDatos = new PostgreSqlBuilder("postgres:17")
-        .WithDatabase("lapecosa")
+        .WithDatabase("lfclub")
         .Build();
 
     public CorreoEnMemoria Correo { get; } = new();
@@ -61,16 +61,16 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
     public ClienteDePrueba CrearClienteDePrueba() => new(this, CreateClient());
 
     /// <summary>Ejecuta una operación con el contexto de datos, fuera de cualquier petición.</summary>
-    public async Task<T> ConContextoAsync<T>(Func<ContextoLaPecosa, Task<T>> operacion)
+    public async Task<T> ConContextoAsync<T>(Func<ContextoLFClub, Task<T>> operacion)
     {
         await using var ambito = Services.CreateAsyncScope();
-        return await operacion(ambito.ServiceProvider.GetRequiredService<ContextoLaPecosa>());
+        return await operacion(ambito.ServiceProvider.GetRequiredService<ContextoLFClub>());
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
-        builder.UseSetting("ConnectionStrings:LaPecosa", _baseDatos.GetConnectionString());
+        builder.UseSetting("ConnectionStrings:LFClub", _baseDatos.GetConnectionString());
         builder.UseSetting("Plataforma:CorreoDesarrollador", CorreoDesarrollador);
         builder.UseSetting("Sesion:ClaveFirma", "clave-de-firma-solo-para-las-pruebas-de-integracion");
         builder.UseSetting("Sesion:DiasVigencia", "7");

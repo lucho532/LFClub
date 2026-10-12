@@ -132,7 +132,7 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/
 │   │   ├── + FichaJugador.cs
 │   │   ├── + DocumentoJugador.cs
@@ -144,7 +144,7 @@ backend/src/
 │   └── Reglas/
 │       ├── + ReglaAccesoAFicha.cs           # quién ve y quién cambia
 │       └── + AlcanceDeFicha.cs              # el resultado: cinco indicadores
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + FichaJugadorDto, ContactoDeFichaDto, ContactoEmergenciaDto,
 │   │                        SeguridadSocialDto, DatosClinicosDto, DocumentoDeFichaDto,
 │   │                        UltimoCambioDto, PermisosDeFichaDto, ActualizarFichaDto,
@@ -166,14 +166,14 @@ backend/src/
 │   └── Utilidades/        + AccesoAFicha           # lee al jugador y aplica la regla; 404 si no la ve
 │                          + ErroresDeFicha
 │                          ~ LectorDeCategorias     # añade el estado de documentación si corresponde
-├── LaPecosa.Infraestructura/
+├── LFClub.Infraestructura/
 │   ├── Datos/
-│   │   ├── ~ ContextoLaPecosa.cs            # dos DbSet
+│   │   ├── ~ ContextoLFClub.cs            # dos DbSet
 │   │   ├── Configuraciones/  + ConfiguracionFichaJugador, ConfiguracionDocumentoJugador
 │   │   └── Migraciones/      + FichaDelJugador (generada)
 │   └── Repositorios/      + RepositorioFichas, RepositorioDocumentosJugador
 │                          ~ RepositorioJugadores
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/
         ├── ~ ArchivoCargado.cs              # segundo límite de petición, para los documentos

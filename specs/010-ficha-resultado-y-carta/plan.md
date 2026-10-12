@@ -31,7 +31,7 @@ frontend. Sin cambios respecto de la 001.
 
 **Dependencias principales**: las de la 001 (ASP.NET Core 10, Entity Framework Core 10 con Npgsql,
 JWT, React 19, React Router, Vite). **Se añade una**: SkiaSharp (MIT) con
-`SkiaSharp.NativeAssets.Linux.NoDependencies` para el contenedor, solo en `LaPecosa.Infraestructura`
+`SkiaSharp.NativeAssets.Linux.NoDependencies` para el contenedor, solo en `LFClub.Infraestructura`
 (research §11). Se incluye la fuente Barlow Condensed (OFL) como recurso. El frontend no añade
 ninguna.
 
@@ -137,7 +137,7 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/         + CartaJugador
 │   │                      ~ Partido, PartidoJugador (columnas), UsuarioRol (documentación)
 │   ├── Enumeraciones/     + OrigenResultado, PosicionJugador, RarezaCarta
@@ -145,7 +145,7 @@ backend/src/
 │                            ReglaAccesoACarta, AlcanceDeCarta, ReglaValoracionDeCarta,
 │                            ReglaRarezaDeCarta, ReglaEstadisticasDeCarta
 │                          ~ ReglaAccesoAFicha y AlcanceDeFicha (la familia corrige la identidad)
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + ResultadoDeFamiliaDto, MiParticipacionDto, PublicacionResultadoDto,
 │   │                        IndicacionDto, CartaDto, ValoresCartaDto, EstadisticasCartaDto,
 │   │                        DorsalYPosicionDto, PermisosDeCartaDto
@@ -161,14 +161,14 @@ backend/src/
 │   │                        ServicioConsultaPartidos (participación propia y publicación)
 │   ├── Mappers/           + MapperCarta; ~ MapperPartidos
 │   └── Utilidades/        + AccesoACarta, ErroresDeCarta; ~ ErroresDeActividades, AccesoAActividad
-├── LaPecosa.Infraestructura/
-│   ├── Datos/             ~ ContextoLaPecosa (DbSet de cartas)
+├── LFClub.Infraestructura/
+│   ├── Datos/             ~ ContextoLFClub (DbSet de cartas)
 │   │   ├── Configuraciones/ + ConfiguracionCartaJugador; ~ las de Partido y PartidoJugador
 │   │   └── Migraciones/   + FichaResultadoYCarta
 │   ├── Imagenes/          + GeneradorImagenCarta, PlanoCarta, ContrasteDeColor
 │   │   └── Fuentes/       + BarlowCondensed-Bold.ttf, BarlowCondensed-ExtraBold.ttf (recurso)
 │   └── Repositorios/      + RepositorioCartas; ~ RepositorioConvocatoria, RepositorioEstadisticas
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/Club/ + ControladorCarta, ControladorResultadoFamilia
                            ~ ControladorFichaJugador (identidad también para JUGADOR)

@@ -1,9 +1,9 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Personas.LecturaDePersonas;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Personas.LecturaDePersonas;
 
-namespace LaPecosa.Pruebas.Integracion.Personas;
+namespace LFClub.Pruebas.Integracion.Personas;
 
 /// <summary>
 /// La ficha básica de un PRESIDENTE, DIRECTIVO o ENTRENADOR: su contenido exacto, sin datos
@@ -127,6 +127,6 @@ public class FichaBasicaPruebas
         await NoEncontradoAsync(await cliente.GetAsync(c.Foto(c.P.Integrante)));
     }
 
-    private Task<ClienteDePrueba> ClienteAsync(LaPecosa.Dominio.Entidades.Usuario cuenta, Guid? elegido = null) =>
+    private Task<ClienteDePrueba> ClienteAsync(LFClub.Dominio.Entidades.Usuario cuenta, Guid? elegido = null) =>
         _fabrica.CrearClienteDePrueba().ElegirJugador(elegido).ConSesionDeAsync(cuenta);
 }

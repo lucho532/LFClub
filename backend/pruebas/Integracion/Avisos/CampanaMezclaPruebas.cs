@@ -1,12 +1,12 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Comunicados;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Comunicados;
 
-namespace LaPecosa.Pruebas.Integracion.Avisos;
+namespace LFClub.Pruebas.Integracion.Avisos;
 
 /// <summary>
 /// La campana unificada: comunicados y avisos mezclados del más reciente al más antiguo, un solo

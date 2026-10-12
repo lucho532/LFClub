@@ -14,7 +14,7 @@ de la carta en [contracts/carta.md](contracts/carta.md) y el modelo en
 - SDK de .NET 10 y Node 22 (solo para ejecutar las pruebas fuera de Docker).
 - La puesta en marcha es la de la [guía de la 001](../001-base-multiclub/quickstart.md), en un
   proyecto de Compose aparte para no enviar correos reales ni tocar los datos de desarrollo:
-  `docker compose -p la-pecosa-validacion -f docker-compose.yml -f <override>` con
+  `docker compose -p lfclub-validacion -f docker-compose.yml -f <override>` con
   `Brevo__Llave` vacía. Aplicación en <http://localhost:5173>, API en <http://localhost:8080>.
 - La migración `FichaResultadoYCarta` se aplica sola al arrancar la API.
 - Las horas son de Colombia. "Un partido que ya empezó" es uno de hoy con una hora que ya pasó, o
@@ -111,7 +111,7 @@ hermanos, J2 en la 2015), K1 en la 2015, M1 en la 2016; club B con PB. Además:
 ## Pruebas automáticas
 
 ```text
-dotnet test backend/LaPecosa.sln
+dotnet test backend/LFClub.sln
 npm --prefix frontend test
 npm --prefix frontend run lint
 npm --prefix frontend run build
@@ -122,4 +122,4 @@ endpoints de club y un contrato de 99.
 
 ## Limpieza
 
-`docker compose -p la-pecosa-validacion down -v` y borrar el contenedor mínimo si se creó.
+`docker compose -p lfclub-validacion down -v` y borrar el contenedor mínimo si se creó.

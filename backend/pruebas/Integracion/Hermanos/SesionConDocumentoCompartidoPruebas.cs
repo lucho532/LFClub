@@ -1,13 +1,13 @@
 using System.Net;
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LaPecosa.Pruebas.Integracion.Hermanos;
+namespace LFClub.Pruebas.Integracion.Hermanos;
 
 /// <summary>
 /// Con un documento en dos cuentas, entrar con él abre la del jugador activo; si no hay, la del que

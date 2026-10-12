@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Plataforma;
+namespace LFClub.Pruebas.Integracion.Plataforma;
 
 /// <summary>Solo el DESARROLLADOR accede al panel de administración (constitución §20, RF-003).</summary>
 [Collection(ColeccionApi.Nombre)]

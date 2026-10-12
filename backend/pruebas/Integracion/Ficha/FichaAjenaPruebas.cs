@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Ficha;
+namespace LFClub.Pruebas.Integracion.Ficha;
 
 /// <summary>
 /// Una cuenta de jugador no obtiene ni cambia nada de otro jugador, solo los jugadores tienen ficha

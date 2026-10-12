@@ -1,8 +1,8 @@
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
-using static LaPecosa.Pruebas.Integracion.Jugadores.ListaJugadoresPruebas;
+using static LFClub.Pruebas.Integracion.Jugadores.ListaJugadoresPruebas;
 
-namespace LaPecosa.Pruebas.Integracion.Jugadores;
+namespace LFClub.Pruebas.Integracion.Jugadores;
 
 /// <summary>
 /// Un ENTRENADOR solo ve en la lista "Jugadores" a los de las categorías activas que entrena,

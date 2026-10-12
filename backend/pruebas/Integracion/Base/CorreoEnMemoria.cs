@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>
 /// Sustituye el servicio de correo en las pruebas: guarda lo enviado para poder leer los tokens de

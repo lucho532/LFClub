@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Cuenta;
+namespace LFClub.Pruebas.Integracion.Cuenta;
 
 /// <summary>
 /// No es posible registrarse sin una invitación válida, y la cuenta queda en el club de la
@@ -117,7 +117,7 @@ public class RegistroConInvitacionPruebas
         var (invitacion, token) = await _fabrica.Sembrador.CrearInvitacionAsync(club);
         var documento = Sembrador.Unico("doc");
         var cuerpo = JsonSerializer.Deserialize<JsonElement>(
-            $"{{\"token\":\"{token}\",\"correo\":\"intruso@lapecosa.test\",\"esDesarrollador\":true,\"rol\":\"JUGADOR\"," +
+            $"{{\"token\":\"{token}\",\"correo\":\"intruso@lfclub.test\",\"esDesarrollador\":true,\"rol\":\"JUGADOR\"," +
             $"\"clubId\":\"{Guid.NewGuid()}\",\"nombres\":\"Ana\",\"apellidos\":\"Pérez\",\"tipoDocumento\":\"CEDULA_CIUDADANIA\"," +
             $"\"numeroDocumento\":\"{documento}\",\"fechaNacimiento\":\"1990-01-01\",\"celular\":\"3001234567\",\"contrasena\":\"mi-contrasena-propia\"}}");
 
@@ -129,7 +129,7 @@ public class RegistroConInvitacionPruebas
         Assert.Equal(invitacion.Correo, cuenta.CorreoNormalizado);
         Assert.False(cuenta.EsDesarrollador);
         Assert.Equal(Rol.PRESIDENTE, integrante.Rol);
-        Assert.False(await _fabrica.ConContextoAsync(contexto => contexto.Usuarios.AnyAsync(u => u.CorreoNormalizado == "intruso@lapecosa.test")));
+        Assert.False(await _fabrica.ConContextoAsync(contexto => contexto.Usuarios.AnyAsync(u => u.CorreoNormalizado == "intruso@lfclub.test")));
         Assert.Equal(1, await _fabrica.ConContextoAsync(contexto => contexto.Usuarios.CountAsync(u => u.EsDesarrollador)));
     }
 

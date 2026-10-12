@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Ingresos;
+namespace LFClub.Pruebas.Integracion.Ingresos;
 
 /// <summary>
 /// El registro pide el nombre del padre, madre o responsable solamente con una invitación de

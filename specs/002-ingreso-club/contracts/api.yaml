@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: La Pecosa - API de la funcionalidad 002 (ingreso de personas al club)
+  title: LFClub - API de la funcionalidad 002 (ingreso de personas al club)
   version: 0.2.0
   description: |
     Contrato de lo que esta funcionalidad añade o cambia respecto de

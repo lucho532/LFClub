@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Comunicados.EscenarioComunicados;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Comunicados.EscenarioComunicados;
 
-namespace LaPecosa.Pruebas.Integracion.Comunicados;
+namespace LFClub.Pruebas.Integracion.Comunicados;
 
 /// <summary>
 /// Lo que ve el equipo del club en "Comunicados publicados": el PRESIDENTE y el DIRECTIVO, todo; el
@@ -78,7 +78,7 @@ public class PublicadosPruebas
                 e.Club.Presidente.Integrante,
                 $"Comunicado {i}",
                 "Texto",
-                LaPecosa.Dominio.Enumeraciones.AlcanceComunicado.CLUB,
+                LFClub.Dominio.Enumeraciones.AlcanceComunicado.CLUB,
                 destinatarios: [e.Club.Dani.Integrante]);
             creados.Add(comunicado.Id);
         }

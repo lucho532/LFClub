@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 
 /** Clave del almacenamiento de la sesión que dice que la animación ya se vio en esta apertura. */
-export const CLAVE_ARRANQUE = 'lapecosa.arranqueVisto';
+export const CLAVE_ARRANQUE = 'lfclub.arranqueVisto';
 
 type Almacen = Pick<Storage, 'getItem' | 'setItem'>;
 

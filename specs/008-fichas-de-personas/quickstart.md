@@ -13,7 +13,7 @@ modelo en [data-model.md](data-model.md).
 - SDK de .NET 10 y Node 22 (solo para ejecutar las pruebas fuera de Docker).
 - La puesta en marcha es la de la [guía de la 001](../001-base-multiclub/quickstart.md), en un
   proyecto de Compose aparte para no enviar correos reales ni tocar los datos de desarrollo:
-  `docker compose -p la-pecosa-validacion -f docker-compose.yml -f <override>` con
+  `docker compose -p lfclub-validacion -f docker-compose.yml -f <override>` con
   `Brevo__Llave` vacía. Aplicación en <http://localhost:5173>, API en <http://localhost:8080>.
 - Esta funcionalidad **no tiene migración**.
 - Una imagen PNG o JPEG de menos de 1 MB para las fotos de perfil.
@@ -121,7 +121,7 @@ Con el token de cada cuenta (`Authorization: Bearer …`):
 ## Pruebas automatizadas
 
 ```text
-dotnet test backend/LaPecosa.sln
+dotnet test backend/LFClub.sln
 cd frontend && npm test
 ```
 

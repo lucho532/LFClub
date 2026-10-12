@@ -1,9 +1,9 @@
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Comunicados;
+namespace LFClub.Pruebas.Integracion.Comunicados;
 
 /// <summary>
 /// El club de "Datos de partida" de la 007 (presidente, un directivo que entrena la 2015, E1 con la

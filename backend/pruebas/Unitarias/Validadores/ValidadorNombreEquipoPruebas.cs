@@ -1,7 +1,7 @@
-using LaPecosa.Aplicacion.Utilidades;
-using LaPecosa.Aplicacion.Validadores;
+using LFClub.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Validadores;
 
-namespace LaPecosa.Pruebas.Unitarias.Validadores;
+namespace LFClub.Pruebas.Unitarias.Validadores;
 
 public class ValidadorNombreEquipoPruebas
 {

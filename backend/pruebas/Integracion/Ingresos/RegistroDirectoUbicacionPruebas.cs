@@ -1,10 +1,10 @@
 using System.Net;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Ingresos;
+namespace LFClub.Pruebas.Integracion.Ingresos;
 
 /// <summary>
 /// Quien entra con una invitación de JUGADOR queda, al registrarse, en la categoría activa de su

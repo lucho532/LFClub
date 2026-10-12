@@ -1,10 +1,10 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Hermanos;
+namespace LFClub.Pruebas.Integracion.Hermanos;
 
 /// <summary>
 /// La reincorporación se niega mientras el documento del jugador esté aprobado y activo con otra

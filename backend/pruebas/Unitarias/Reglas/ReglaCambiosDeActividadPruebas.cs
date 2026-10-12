@@ -1,6 +1,6 @@
-using LaPecosa.Dominio.Reglas;
+using LFClub.Dominio.Reglas;
 
-namespace LaPecosa.Pruebas.Unitarias.Reglas;
+namespace LFClub.Pruebas.Unitarias.Reglas;
 
 public class ReglaCambiosDeActividadPruebas
 {

@@ -1,10 +1,10 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
 
-namespace LaPecosa.Pruebas.Integracion.Ficha;
+namespace LFClub.Pruebas.Integracion.Ficha;
 
 /// <summary>
 /// Una persona que es jugador en dos clubes tiene una ficha en cada uno: la salud, el contacto de

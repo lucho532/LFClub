@@ -1,6 +1,6 @@
-using LaPecosa.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Utilidades;
 
-namespace LaPecosa.Pruebas.Unitarias.Utilidades;
+namespace LFClub.Pruebas.Unitarias.Utilidades;
 
 public class GeneradorTokensPruebas
 {

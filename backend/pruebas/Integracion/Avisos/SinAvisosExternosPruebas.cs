@@ -1,9 +1,9 @@
-using LaPecosa.Aplicacion.Implementaciones;
-using LaPecosa.Aplicacion.Interfaces;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Aplicacion.Implementaciones;
+using LFClub.Aplicacion.Interfaces;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LaPecosa.Pruebas.Integracion.Avisos;
+namespace LFClub.Pruebas.Integracion.Avisos;
 
 /// <summary>
 /// Ningún aviso de actividad sale de la aplicación: ni correo ni ningún otro envío (spec 012,

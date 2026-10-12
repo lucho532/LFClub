@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Inicio;
+namespace LFClub.Pruebas.Integracion.Inicio;
 
 /// <summary>
 /// El resumen del inicio del PRESIDENTE y de los DIRECTIVOS cuenta exactamente lo que el club tiene

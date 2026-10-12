@@ -25,7 +25,7 @@ Con los pasos 1 a 3 de la guía de la 001, dejar creados:
 ## Pruebas automatizadas
 
 ```powershell
-dotnet test backend/LaPecosa.sln    # unitarias e integración (la integración necesita Docker)
+dotnet test backend/LFClub.sln    # unitarias e integración (la integración necesita Docker)
 npm --prefix frontend test
 ```
 

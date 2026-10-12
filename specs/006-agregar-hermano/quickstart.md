@@ -41,7 +41,7 @@ Para el bloque 5 (RF-034 a RF-040), además:
 ## Pruebas automatizadas
 
 ```powershell
-dotnet test backend/LaPecosa.sln    # unitarias e integración (la integración necesita Docker)
+dotnet test backend/LFClub.sln    # unitarias e integración (la integración necesita Docker)
 npm --prefix frontend test
 ```
 

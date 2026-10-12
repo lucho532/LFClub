@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Balón de La Pecosa: pantalla de arranque, dentro del círculo de 192 dp. Generado por scripts/generar-balon.py. -->
+<!-- Balón de LFClub: pantalla de arranque, dentro del círculo de 192 dp. Generado por scripts/generar-balon.py. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="288dp"
     android:height="288dp"

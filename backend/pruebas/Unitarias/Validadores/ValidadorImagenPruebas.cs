@@ -1,7 +1,7 @@
 using System.Text;
-using LaPecosa.Aplicacion.Validadores;
+using LFClub.Aplicacion.Validadores;
 
-namespace LaPecosa.Pruebas.Unitarias.Validadores;
+namespace LFClub.Pruebas.Unitarias.Validadores;
 
 public class ValidadorImagenPruebas
 {

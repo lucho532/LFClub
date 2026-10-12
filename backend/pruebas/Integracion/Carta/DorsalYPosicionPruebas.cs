@@ -1,9 +1,9 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
-using static LaPecosa.Pruebas.Integracion.Carta.ConsultaCartaPruebas;
+using static LFClub.Pruebas.Integracion.Carta.ConsultaCartaPruebas;
 
-namespace LaPecosa.Pruebas.Integracion.Carta;
+namespace LFClub.Pruebas.Integracion.Carta;
 
 /// <summary>
 /// Dorsal y posición: los cambian la familia, quien entrena la categoría y el PRESIDENTE; vale el

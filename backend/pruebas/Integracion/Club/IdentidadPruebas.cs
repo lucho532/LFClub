@@ -1,8 +1,8 @@
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Clubes;
+namespace LFClub.Pruebas.Integracion.Clubes;
 
 /// <summary>Cada club se ve con su propia identidad (constitución §7.2, RF-023).</summary>
 [Collection(ColeccionApi.Nombre)]

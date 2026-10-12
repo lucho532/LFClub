@@ -1,7 +1,7 @@
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Unitarias.Entidades;
+namespace LFClub.Pruebas.Unitarias.Entidades;
 
 public class InvitacionPruebas
 {

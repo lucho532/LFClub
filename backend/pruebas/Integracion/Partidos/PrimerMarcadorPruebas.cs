@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Partidos.EscenarioResultadoFamilia;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Partidos.EscenarioResultadoFamilia;
 
-namespace LaPecosa.Pruebas.Integracion.Partidos;
+namespace LFClub.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// "Vale el primero" con peticiones simultáneas: el bloqueo del club deja un solo marcador y una

@@ -1,6 +1,6 @@
-using LaPecosa.Aplicacion.Utilidades;
+using LFClub.Aplicacion.Utilidades;
 
-namespace LaPecosa.Pruebas.Unitarias.Utilidades;
+namespace LFClub.Pruebas.Unitarias.Utilidades;
 
 /// <remarks>
 /// Hallazgo (2026-10-12): en .NET 10 <see cref="Guid.CompareTo(Guid)"/> coincide con el orden de

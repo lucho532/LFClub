@@ -1,10 +1,10 @@
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Personas.LecturaDePersonas;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Personas.LecturaDePersonas;
 
-namespace LaPecosa.Pruebas.Integracion.Personas;
+namespace LFClub.Pruebas.Integracion.Personas;
 
 /// <summary>
 /// En los ingresos aprobados, la persona lleva a su ficha de hoy y quien aprobó, a su ficha básica

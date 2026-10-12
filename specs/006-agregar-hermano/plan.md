@@ -133,14 +133,14 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/
 │   │   └── ~ UsuarioRol.cs                  # AgregadoDesdeUsuarioRolId y su navegación
 │   └── Reglas/
 │       ├── + ReglaJugadorDeLaSesion.cs      # cuál integrante hace la petición
 │       ├── + JugadorDeLaPeticion.cs         # el resultado: integrante, no encontrado o sin elegir
 │       └── ~ ReglaAccesoAFicha.cs           # solo el nombre del parámetro: "es el de la petición"
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + AgregarHermanoDto, JugadorDeSesionDto
 │   │                      ~ ClubDeSesionDto (UsuarioRolId, Jugadores),
 │   │                        IngresoEnEsperaDto (HermanoDe)
@@ -155,13 +155,13 @@ backend/src/
 │   ├── Validadores/       + ValidadorHermano          # ValidadorIdentidad más el responsable
 │   └── Utilidades/        ~ AccesoAFicha              # compara con el jugador de la petición
 │                          + ErroresDeSesion           # jugador_sin_elegir
-├── LaPecosa.Infraestructura/
+├── LFClub.Infraestructura/
 │   ├── Datos/
 │   │   ├── Configuraciones/  ~ ConfiguracionUsuarioRol
 │   │   └── Migraciones/      + HermanosDeLaCuenta (generada)
 │   ├── Repositorios/      ~ RepositorioPertenencias, RepositorioIngresos (incluye el origen)
 │   └── Seguridad/         ~ EmisorTokenSesion, OpcionesSesion (reclamación `jugadores`)
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Autorizacion/      ~ IntegranteDelClubAttribute   # lee la cabecera y aplica la regla
     │                      ~ ValidadorSesion              # deja la limitación en la petición
     ├── Configuracion/     ~ ConfiguracionSeguridad (CORS admite la cabecera),
@@ -392,10 +392,10 @@ acotado a un número de documento, que es lo que permite la cuarta excepción de
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/Reglas/
+├── LFClub.Dominio/Reglas/
 │   ├── + ReglaDocumentoCompartido.cs    # ¿se admite?, ¿a quién retira?, ¿qué cuenta abre?
 │   └── + DocumentoEnOtraCuenta.cs       # el resultado: SinBaja, ConBaja o NoAdmitido
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + HermanoAgregadoDto            # JugadorDeSesionDto más retiraDeOtroClub
 │   │                      ~ IngresoEnEsperaDto (RetiraDeOtroClub)
 │   ├── Interfaces/        + IRepositorioRetiroEntreClubes # bloquear clubes en orden; retirar
@@ -405,10 +405,10 @@ backend/src/
 │   │                        ServicioConsultaIngresos, ServicioSesion, ServicioIdentidadJugador
 │   ├── Mappers/           ~ MapperIngresos, MapperSesion
 │   └── Utilidades/        ~ ErroresDeFicha                # solo la documentación del 409
-├── LaPecosa.Infraestructura/Repositorios/Plataforma/
+├── LFClub.Infraestructura/Repositorios/Plataforma/
 │   ├── + RepositorioRetiroEntreClubes.cs
 │   └── ~ RepositorioPertenencias.cs
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ registro del repositorio nuevo
     └── Controladores/Club/ ~ ControladorHermanos           # tipo de la respuesta
 
@@ -588,15 +588,15 @@ primer incremento. La puerta sigue pasando.
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/Reglas/
+├── LFClub.Dominio/Reglas/
 │   ├── + ReglaQuienRetira.cs            # PRESIDENTE a cualquiera; JUGADOR solo al de la petición
 │   └── ~ ReglaDocumentoCompartido.cs    # ¿hay otra cuenta activa con ese número?
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── Servicios/         ~ IServicioRetiroJugador     # documentación: también retira la familia
 │   ├── Implementaciones/  ~ ServicioRetiroJugador      # la regla al retirar; bloqueo y
 │   │                                                   # comprobación al reincorporar
 │   └── Utilidades/        ~ ErroresDeCategorias        # documento_activo_en_otro_club
-└── LaPecosa.Api/Controladores/Club/
+└── LFClub.Api/Controladores/Club/
     └── ~ ControladorJugadores.cs        # retiro: [PRESIDENTE, JUGADOR]; documentación
 
 backend/pruebas/

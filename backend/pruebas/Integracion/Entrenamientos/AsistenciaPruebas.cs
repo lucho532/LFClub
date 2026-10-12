@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Entrenamientos;
+namespace LFClub.Pruebas.Integracion.Entrenamientos;
 
 /// <summary>
 /// La asistencia: quien entrena marca solo a los de sus categorías, el PRESIDENTE a todos, desde el

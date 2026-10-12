@@ -57,7 +57,7 @@ funcionalidad tiene 7 entidades, 25 operaciones de API y 10 pantallas.
 | §2.2 Vocabulario | Club, Presidente, Desarrollador, Directivo, Entrenador, Jugador; sin sinónimos | Cumple |
 | §2.3 Máximo 250 líneas | Controladores y servicios divididos por caso de uso; una tarea lo verifica con un script | Cumple |
 | §3 Documentación XML | Exigida en cada clase; forma parte de la definición de terminado | Cumple |
-| §4 Arquitectura por capas | Cuatro proyectos `LaPecosa.*` y `backend/pruebas`; `frontend/` separado | Cumple, con la nota 1 |
+| §4 Arquitectura por capas | Cuatro proyectos `LFClub.*` y `backend/pruebas`; `frontend/` separado | Cumple, con la nota 1 |
 | §5 Flujo de dependencias | Controlador → IServicio → IRepositorio → EF Core; entidad → mapper → DTO | Cumple |
 | §6 Tecnologías base | Solo las listadas, más las de la tabla de seguimiento | Cumple, con las notas 3 y 4 |
 | §7.1 Aislamiento entre clubes | Filtro global por `ClubId`, falla cerrado, con prueba que vigila el modelo. Las tres excepciones de §7.1 viven en `Repositorios/Plataforma/` | Cumple |
@@ -105,9 +105,9 @@ specs/001-base-multiclub/
 
 ```text
 backend/
-├── LaPecosa.sln
+├── LFClub.sln
 ├── src/
-│   ├── LaPecosa.Api/
+│   ├── LFClub.Api/
 │   │   ├── Controladores/
 │   │   │   ├── Plataforma/        # clubes, identidad, estado, invitaciones, presidentes
 │   │   │   ├── Club/              # club elegido y su configuración
@@ -116,7 +116,7 @@ backend/
 │   │   ├── Autorizacion/          # solo DESARROLLADOR; integrante del club de la ruta
 │   │   ├── Errores/               # traducción de errores a problem+json
 │   │   └── Program.cs
-│   ├── LaPecosa.Aplicacion/
+│   ├── LFClub.Aplicacion/
 │   │   ├── DTOs/
 │   │   ├── Interfaces/            # IServicio*, IRepositorio*, IServicioCorreo, IHashContrasena,
 │   │   │                          # IContextoClub, IUnidadDeTrabajo, IReloj
@@ -125,20 +125,20 @@ backend/
 │   │   ├── Mappers/
 │   │   ├── Validadores/
 │   │   └── Utilidades/            # normalización de correo, nombre y documento; tokens
-│   ├── LaPecosa.Dominio/
+│   ├── LFClub.Dominio/
 │   │   ├── Entidades/             # Club, EscudoClub, Usuario, FotoPerfil, UsuarioRol,
 │   │   │                          # Invitacion, SolicitudRecuperacion, IPerteneceAClub
 │   │   ├── Enumeraciones/
 │   │   └── Reglas/                # transiciones de estado, último presidente, acceso por estado
-│   └── LaPecosa.Infraestructura/
+│   └── LFClub.Infraestructura/
 │       ├── Datos/                 # contexto, configuraciones, migraciones, cuenta inicial
 │       ├── Repositorios/
 │       │   └── Plataforma/        # los únicos que cruzan clubes
 │       ├── Correo/                # Brevo y la variante de desarrollo
 │       └── Seguridad/             # hash de contraseñas y emisión de tokens
 └── pruebas/
-    ├── Unitarias/                 # LaPecosa.Pruebas.Unitarias
-    └── Integracion/               # LaPecosa.Pruebas.Integracion
+    ├── Unitarias/                 # LFClub.Pruebas.Unitarias
+    └── Integracion/               # LFClub.Pruebas.Integracion
 
 frontend/
 ├── index.html                     # aplica el tema antes de pintar

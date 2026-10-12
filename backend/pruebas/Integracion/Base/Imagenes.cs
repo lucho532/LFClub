@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace LaPecosa.Pruebas.Integracion.Base;
+namespace LFClub.Pruebas.Integracion.Base;
 
 /// <summary>Archivos de prueba para el escudo y la foto de perfil: basta la firma binaria.</summary>
 public static class Imagenes

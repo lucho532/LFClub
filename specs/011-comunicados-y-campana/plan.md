@@ -117,13 +117,13 @@ Solo se listan los archivos nuevos (`+`) y los que cambian (`~`). La estructura 
 
 ```text
 backend/src/
-├── LaPecosa.Dominio/
+├── LFClub.Dominio/
 │   ├── Entidades/         + Comunicado, ComunicadoDestino, ComunicadoDestinatario
 │   │                      ~ UsuarioRol, Categoria, Equipo (documentación)
 │   ├── Enumeraciones/     + AlcanceComunicado
 │   └── Reglas/            + ReglaAudienciaDeComunicado, ReglaRetiroDeComunicado,
 │                            ReglaVisibilidadDeComunicadosPublicados
-├── LaPecosa.Aplicacion/
+├── LFClub.Aplicacion/
 │   ├── DTOs/              + PublicarComunicadoDto, ComunicadoPublicadoDto, ComunicadoRecibidoDto,
 │   │                        AutorDeComunicadoDto, DestinoDeComunicadoDto, RetiroDeComunicadoDto,
 │   │                        PaginaDePublicadosDto, PaginaDeRecibidosDto, ContadorDeComunicadosDto
@@ -134,13 +134,13 @@ backend/src/
 │   ├── Mappers/           + MapperComunicados
 │   ├── Validadores/       + ValidadorPublicarComunicado
 │   └── Utilidades/        + ErroresDeComunicados
-├── LaPecosa.Infraestructura/
-│   ├── Datos/             ~ ContextoLaPecosa (tres DbSet)
+├── LFClub.Infraestructura/
+│   ├── Datos/             ~ ContextoLFClub (tres DbSet)
 │   │   ├── Configuraciones/ + ConfiguracionComunicado, ConfiguracionComunicadoDestino,
 │   │   │                      ConfiguracionComunicadoDestinatario
 │   │   └── Migraciones/   + ComunicadosYCampana
 │   └── Repositorios/      + RepositorioComunicados
-└── LaPecosa.Api/
+└── LFClub.Api/
     ├── Configuracion/     ~ RegistroDeCasosDeUso, RegistroDeServicios
     └── Controladores/Club/ + ControladorComunicados, ControladorComunicadosRecibidos
 

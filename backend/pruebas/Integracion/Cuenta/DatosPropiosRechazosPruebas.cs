@@ -1,11 +1,11 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Entidades;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
-using static LaPecosa.Pruebas.Integracion.Personas.LecturaDePersonas;
+using static LFClub.Pruebas.Integracion.Personas.LecturaDePersonas;
 
-namespace LaPecosa.Pruebas.Integracion.Cuenta;
+namespace LFClub.Pruebas.Integracion.Cuenta;
 
 /// <summary>
 /// Los datos propios se validan con las reglas del registro: si algo falla, cada campo dice por

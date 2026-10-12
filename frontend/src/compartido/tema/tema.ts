@@ -4,7 +4,7 @@ import type { Tema } from './contraste';
  * Clave del almacenamiento local donde vive la elección de tema. El script de index.html usa la
  * misma para aplicar el tema antes de pintar.
  */
-export const CLAVE_TEMA = 'lapecosa.tema';
+export const CLAVE_TEMA = 'lfclub.tema';
 
 function esTema(valor: unknown): valor is Tema {
   return valor === 'claro' || valor === 'oscuro';

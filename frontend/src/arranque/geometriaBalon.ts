@@ -1,4 +1,4 @@
-// Geometría del balón de La Pecosa en un lienzo de 108 x 108, la misma que dibujan los recursos de
+// Geometría del balón de LFClub en un lienzo de 108 x 108, la misma que dibujan los recursos de
 // Android (drawable/balon_icono.xml y drawable/balon_arranque.xml). Generado por
 // scripts/generar-balon.py: si cambia el dibujo, se regeneran los dos lados a la vez.
 

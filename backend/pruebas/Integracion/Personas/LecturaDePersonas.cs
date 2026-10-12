@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Personas;
+namespace LFClub.Pruebas.Integracion.Personas;
 
 /// <summary>Lecturas y comprobaciones comunes de las pruebas de fichas básicas y enlaces.</summary>
 public static class LecturaDePersonas

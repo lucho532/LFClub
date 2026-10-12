@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Partidos;
+namespace LFClub.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// Un DIRECTIVO asignado a una categoría actúa como su entrenador en lo deportivo, y solo en ella;

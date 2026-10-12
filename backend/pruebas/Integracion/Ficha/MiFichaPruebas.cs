@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
 
-namespace LaPecosa.Pruebas.Integracion.Ficha;
+namespace LFClub.Pruebas.Integracion.Ficha;
 
 /// <summary>
 /// La familia consulta y mantiene la ficha de su jugador (historia 1, escenarios 1 a 6 y 10;
@@ -228,7 +228,7 @@ public class MiFichaPruebas
         cuerpo["fechaNacimiento"] = "2001-01-01";
         cuerpo["tipoDocumento"] = "CEDULA_CIUDADANIA";
         cuerpo["numeroDocumento"] = "999999";
-        cuerpo["correo"] = "otro@lapecosa.test";
+        cuerpo["correo"] = "otro@lfclub.test";
 
         var respuesta = await e.CuentaDeAna.PutAsync(e.Ficha(e.Ana.Id), cuerpo);
 

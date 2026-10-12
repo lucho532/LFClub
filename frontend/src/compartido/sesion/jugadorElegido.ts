@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import type { ClubDeSesionDto, JugadorDeSesionDto } from '../api/tiposSesion';
 
-const PREFIJO = 'lapecosa.jugadorElegido.';
+const PREFIJO = 'lfclub.jugadorElegido.';
 
 /** Cabecera con la que cada petición del club dice con cuál jugador continúa la familia. */
 export const CABECERA_JUGADOR_ELEGIDO = 'X-Jugador-Elegido';

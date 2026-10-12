@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.RegularExpressions;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Partidos.EscenarioResultadoFamilia;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Partidos.EscenarioResultadoFamilia;
 
-namespace LaPecosa.Pruebas.Integracion.Partidos;
+namespace LFClub.Pruebas.Integracion.Partidos;
 
 /// <summary>
 /// Lo que la familia nunca recibe: ni convocados, ni quiénes jugaron, ni lo indicado por otras

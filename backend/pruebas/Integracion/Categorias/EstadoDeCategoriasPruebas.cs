@@ -1,8 +1,8 @@
 using System.Net;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Categorias;
+namespace LFClub.Pruebas.Integracion.Categorias;
 
 /// <summary>
 /// Desactivar, reactivar y borrar una categoría (constitución §14; RF-004 a RF-007; historia 1,

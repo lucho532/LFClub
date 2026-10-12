@@ -1,11 +1,11 @@
 using System.Net;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Hermanos;
+namespace LFClub.Pruebas.Integracion.Hermanos;
 
 /// <summary>
 /// La cuenta de un jugador lo retira del club con la operación de retiro de la 003, solo al jugador

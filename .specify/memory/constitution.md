@@ -316,22 +316,29 @@ Enmienda 4.9.0 → 4.10.0 (2026-10-12), decidida por el propietario del proyecto
   ninguna
 - Pendientes: las siete decisiones de la §28. La spec 012 implementa esta versión; el aviso con la
   aplicación cerrada sigue para una spec posterior
+
+Enmienda 4.10.0 → 4.10.1 (2026-10-12), decidida por el propietario del proyecto:
+- Título y §1: el proyecto pasa de llamarse La Pecosa a llamarse LFClub; se cambian todas sus formas
+  (LaPecosa → LFClub, la-pecosa y lapecosa → lfclub). No cambia ninguna regla de negocio
+- §4 y estructura del repositorio: los proyectos del backend pasan de LaPecosa.* a LFClub.*
+- Pendientes: renombrar la carpeta del proyecto y el repositorio, que se hace al final
+
 -->
 
-# Constitución del Proyecto — La Pecosa, plataforma multiclub de escuelas de fútbol
+# Constitución del Proyecto — LFClub, plataforma multiclub de escuelas de fútbol
 
 ## 1. Propósito
 
-Este proyecto se llama **La Pecosa**. Es una plataforma web y móvil para escuelas y clubes de
+Este proyecto se llama **LFClub**. Es una plataforma web y móvil para escuelas y clubes de
 fútbol. Valfor F.C. no es el nombre del proyecto: es uno de sus clientes, el primero.
 
-El nombre visible para las personas es "La Pecosa". En todo lugar donde un espacio o una
+El nombre visible para las personas es "LFClub". En todo lugar donde un espacio o una
 mayúscula pueda dar problemas se usa una de estas dos formas, y ninguna otra:
 
-- `LaPecosa`: proyectos, espacios de nombres y clases del backend (por ejemplo `LaPecosa.Api`).
-- `la-pecosa`: carpeta del proyecto, repositorio, paquetes del frontend, imágenes de Docker y
+- `LFClub`: proyectos, espacios de nombres y clases del backend (por ejemplo `LFClub.Api`).
+- `lfclub`: carpeta del proyecto, repositorio, paquetes del frontend, imágenes de Docker y
   direcciones web. Donde no se admita el guion (identificador de la aplicación Android, nombre de
-  la base de datos) se usa `lapecosa`.
+  la base de datos) se usa `lfclub`.
 
 Es multiclub: una
 misma instalación atiende a varios clubes, cada uno con sus propios datos, su escudo y sus colores
@@ -500,10 +507,10 @@ Estructura principal:
 ```text
 backend/
 ├── src/
-│   ├── LaPecosa.Api/
+│   ├── LFClub.Api/
 │   │   └── Controladores/
 │   │
-│   ├── LaPecosa.Aplicacion/
+│   ├── LFClub.Aplicacion/
 │   │   ├── DTOs/
 │   │   ├── Interfaces/
 │   │   ├── Servicios/
@@ -512,12 +519,12 @@ backend/
 │   │   ├── Validadores/
 │   │   └── Utilidades/
 │   │
-│   ├── LaPecosa.Dominio/
+│   ├── LFClub.Dominio/
 │   │   ├── Entidades/
 │   │   ├── Enumeraciones/
 │   │   └── Reglas/
 │   │
-│   └── LaPecosa.Infraestructura/
+│   └── LFClub.Infraestructura/
 │       ├── Datos/
 │       ├── Repositorios/
 │       ├── Pagos/
@@ -532,8 +539,8 @@ frontend/
 └── privado/
 ```
 
-`LaPecosa.Infraestructura/Pagos` contiene la integración con la pasarela de pago y
-`LaPecosa.Infraestructura/Correo` la integración con el servicio de correo. Ambas quedan detrás de
+`LFClub.Infraestructura/Pagos` contiene la integración con la pasarela de pago y
+`LFClub.Infraestructura/Correo` la integración con el servicio de correo. Ambas quedan detrás de
 interfaces definidas en Aplicacion.
 
 `frontend/` contiene la aplicación React: el sitio público y la zona privada.
@@ -2041,4 +2048,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.10.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12
+**Versión**: 4.10.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12

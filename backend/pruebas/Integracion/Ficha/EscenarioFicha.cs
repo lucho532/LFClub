@@ -1,12 +1,12 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
-using LaPecosa.Pruebas.Integracion.Categorias;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Categorias;
 using Microsoft.EntityFrameworkCore;
 
-namespace LaPecosa.Pruebas.Integracion.Ficha;
+namespace LFClub.Pruebas.Integracion.Ficha;
 
 /// <summary>
 /// El club de <see cref="EscenarioCategorias"/> con cuatro jugadores más: Ana, en la categoría

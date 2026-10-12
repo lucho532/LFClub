@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Pruebas.Integracion.Base;
-using static LaPecosa.Pruebas.Integracion.Personas.LecturaDePersonas;
+using LFClub.Pruebas.Integracion.Base;
+using static LFClub.Pruebas.Integracion.Personas.LecturaDePersonas;
 
-namespace LaPecosa.Pruebas.Integracion.Personas;
+namespace LFClub.Pruebas.Integracion.Personas;
 
 /// <summary>
 /// "Mi categoría" lleva de cada entrenador su identificador y la versión de su foto, para que la

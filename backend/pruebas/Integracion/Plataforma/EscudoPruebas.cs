@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Dominio.Enumeraciones;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Dominio.Enumeraciones;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Plataforma;
+namespace LFClub.Pruebas.Integracion.Plataforma;
 
 /// <summary>
 /// Escudo del club: desde el panel lo carga solo el DESARROLLADOR, y se obtiene sin sesión (RF-008,

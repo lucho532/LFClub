@@ -1,8 +1,8 @@
-using LaPecosa.Aplicacion.Mappers;
-using LaPecosa.Dominio.Entidades;
-using LaPecosa.Dominio.Enumeraciones;
+using LFClub.Aplicacion.Mappers;
+using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 
-namespace LaPecosa.Pruebas.Unitarias.Utilidades;
+namespace LFClub.Pruebas.Unitarias.Utilidades;
 
 /// <summary>
 /// Orden de la lista "Jugadores" (spec 007, RF-002 y RF-005): grupos por año de menor a mayor,

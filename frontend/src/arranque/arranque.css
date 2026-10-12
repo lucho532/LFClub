@@ -1,6 +1,6 @@
 /*
  * Animación de arranque de la aplicación Android (ArranqueAnimado.tsx). Usa los colores fijos de
- * La Pecosa y no los del club: todavía no se sabe qué club se va a abrir. El fondo es el mismo de la
+ * LFClub y no los del club: todavía no se sabe qué club se va a abrir. El fondo es el mismo de la
  * pantalla de arranque nativa (values/colores_arranque.xml) y el balón mide lo mismo (160 px), para
  * que el paso de una a otra no se note.
  */

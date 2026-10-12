@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using LaPecosa.Pruebas.Integracion.Base;
+using LFClub.Pruebas.Integracion.Base;
 
-namespace LaPecosa.Pruebas.Integracion.Estadisticas;
+namespace LFClub.Pruebas.Integracion.Estadisticas;
 
 /// <summary>
 /// Los goleadores por categoría: los goles cuentan para la categoría con la que se marcaron,
