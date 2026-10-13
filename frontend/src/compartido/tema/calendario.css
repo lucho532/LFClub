@@ -124,7 +124,7 @@
   font-size: 13px;
 }
 
-/* Los días de un entrenamiento nuevo: cada fecha con su botón "Quitar" al lado. */
+/* Los días de un entrenamiento nuevo: la semana en siete casillas; las marcadas se publican. */
 .selector-fechas {
   margin: 0;
   padding: 0;
@@ -137,6 +137,41 @@
   font-weight: 600;
 }
 
-.selector-fechas-dia {
-  align-items: flex-end;
+.casillas-semana {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.casilla-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.casilla-dia.marcada {
+  border-width: 2px;
+  background: var(--superficie-suave);
+  font-weight: 700;
+}
+
+.casilla-dia:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.casilla-dia:has(input:focus-visible) {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+}
+
+.casilla-dia-numero {
+  font-size: 20px;
+  font-weight: 800;
 }

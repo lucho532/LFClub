@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { IconoLapiz } from './Iconos';
+import { reducirImagen } from './reducirImagen';
 
 const FORMATOS = 'image/png,image/jpeg,image/webp';
 
@@ -18,7 +19,7 @@ interface Props {
 /**
  * Un lápiz pequeño dentro del círculo de una foto o un escudo, en lugar del campo de archivo con su
  * texto. Sin imagen, o si no se puede quitar, abre el selector de archivos; con imagen que se puede
- * quitar, ofrece "Cambiar" y "Quitar". Los formatos admitidos (PNG, JPEG o WebP de hasta 1 MB) van
+ * quitar, ofrece "Cambiar" y "Quitar". Los formatos admitidos (PNG, JPEG o WebP) van
  * en la descripción del lápiz; si la API rechaza un archivo, quien lo usa muestra el motivo. No
  * envía nada: avisa con `alElegir` y `alQuitar`.
  */
@@ -48,11 +49,12 @@ export function LapizDeImagen({ children, que, tieneImagen, ocupado, alElegir, a
     };
   }, [menu]);
 
-  function elegido(evento: ChangeEvent<HTMLInputElement>) {
+  async function elegido(evento: ChangeEvent<HTMLInputElement>) {
     const archivo = evento.target.files?.[0];
     evento.target.value = '';
     if (archivo) {
-      alElegir(archivo);
+      // Una foto de celular pesa varios MB: se reduce aquí para que quepa en el 1 MB de la API.
+      alElegir(await reducirImagen(archivo));
     }
   }
 
@@ -63,7 +65,7 @@ export function LapizDeImagen({ children, que, tieneImagen, ocupado, alElegir, a
         type="button"
         className="lapiz-imagen-boton"
         aria-label={conMenu ? `Editar ${que}` : accion}
-        title={`${conMenu ? `Editar ${que}` : accion}: PNG, JPEG o WebP de hasta 1 MB`}
+        title={`${conMenu ? `Editar ${que}` : accion}: PNG, JPEG o WebP; si pesa mucho, se reduce sola`}
         aria-haspopup={conMenu ? 'menu' : undefined}
         aria-expanded={conMenu ? menu : undefined}
         aria-busy={ocupado}
@@ -96,7 +98,7 @@ export function LapizDeImagen({ children, que, tieneImagen, ocupado, alElegir, a
           </button>
         </div>
       )}
-      <input ref={selector} type="file" accept={FORMATOS} onChange={elegido} hidden />
+      <input ref={selector} type="file" accept={FORMATOS} onChange={(evento) => void elegido(evento)} hidden />
     </div>
   );
 }
