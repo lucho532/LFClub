@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 
+// Firma de publicación: las credenciales viven fuera del repositorio, en el archivo que indica la
+// variable LFCLUB_KEYSTORE_PROPERTIES (storeFile, storePassword, keyAlias, keyPassword). Sin ella,
+// el bundle de release queda sin firmar.
+def propiedadesDeFirma = new Properties()
+def archivoDeFirma = System.getenv('LFCLUB_KEYSTORE_PROPERTIES')
+if (archivoDeFirma && file(archivoDeFirma).exists()) {
+    file(archivoDeFirma).withInputStream { propiedadesDeFirma.load(it) }
+}
+
 android {
     namespace = "com.lfclub.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +25,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (propiedadesDeFirma.containsKey('storeFile')) {
+                storeFile file(propiedadesDeFirma['storeFile'])
+                storePassword propiedadesDeFirma['storePassword']
+                keyAlias propiedadesDeFirma['keyAlias']
+                keyPassword propiedadesDeFirma['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (propiedadesDeFirma.containsKey('storeFile')) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
