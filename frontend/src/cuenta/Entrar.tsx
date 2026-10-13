@@ -70,6 +70,7 @@ export function Entrar() {
           Entrar
         </Boton>
         <Link to="/recuperar">Olvidé mi contraseña</Link>
+        <Link to="/privacidad">Política de privacidad</Link>
       </form>
     </DisposicionCuenta>
   );
