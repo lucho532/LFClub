@@ -88,6 +88,9 @@ export function FormularioRegistro({ token, invitacion }: Props) {
     }
   }
 
+  // Cuando la invitación es de jugador, el formulario describe al futbolista y no a quien lo registra.
+  const deJugador = invitacion.pideResponsable ? ' del jugador' : '';
+
   return (
     <form className="columna" onSubmit={enviar} noValidate>
       {error && <Aviso tono="error">{error}</Aviso>}
@@ -96,10 +99,13 @@ export function FormularioRegistro({ token, invitacion }: Props) {
           Escribe los datos y el documento del jugador, no los de su familia; el correo es el de su acudiente.
         </Aviso>
       )}
-      <Campo etiqueta="Correo" valor={invitacion.correo} readOnly ayuda="Es el correo de la invitación." />
+      <Campo etiqueta={invitacion.pideResponsable ? 'Correo del acudiente' : 'Correo'}
+        valor={invitacion.correo}
+        readOnly
+        ayuda="Es el correo de la invitación." />
       <div className="rejilla">
         <Campo
-          etiqueta="Nombres"
+          etiqueta={`Nombres${deJugador}`}
           valor={datos.nombres}
           alCambiar={cambiar('nombres')}
           error={errorDe('nombres')}
@@ -107,7 +113,7 @@ export function FormularioRegistro({ token, invitacion }: Props) {
           maxLength={80}
         />
         <Campo
-          etiqueta="Apellidos"
+          etiqueta={`Apellidos${deJugador}`}
           valor={datos.apellidos}
           alCambiar={cambiar('apellidos')}
           error={errorDe('apellidos')}
@@ -117,14 +123,14 @@ export function FormularioRegistro({ token, invitacion }: Props) {
       </div>
       <div className="rejilla">
         <Campo
-          etiqueta="Tipo de documento"
+          etiqueta={`Tipo de documento${deJugador}`}
           valor={datos.tipoDocumento}
           alCambiar={cambiar('tipoDocumento')}
           error={errorDe('tipoDocumento')}
           opciones={TIPOS_DOCUMENTO}
         />
         <Campo
-          etiqueta="Número de documento"
+          etiqueta={`Número de documento${deJugador}`}
           valor={datos.numeroDocumento}
           alCambiar={cambiar('numeroDocumento')}
           error={errorDe('numeroDocumento')}
@@ -134,7 +140,7 @@ export function FormularioRegistro({ token, invitacion }: Props) {
       </div>
       <div className="rejilla">
         <Campo
-          etiqueta="Fecha de nacimiento"
+          etiqueta={`Fecha de nacimiento${deJugador}`}
           type="date"
           valor={datos.fechaNacimiento}
           alCambiar={cambiar('fechaNacimiento')}
@@ -142,7 +148,7 @@ export function FormularioRegistro({ token, invitacion }: Props) {
           autoComplete="bday"
         />
         <Campo
-          etiqueta="Celular"
+          etiqueta={invitacion.pideResponsable ? 'Celular de contacto' : 'Celular'}
           type="tel"
           valor={datos.celular}
           alCambiar={cambiar('celular')}
