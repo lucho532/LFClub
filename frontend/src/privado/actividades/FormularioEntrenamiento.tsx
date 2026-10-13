@@ -7,6 +7,7 @@ import { Boton } from '../../compartido/componentes/Boton';
 import { Campo } from '../../compartido/componentes/Campo';
 import { diaDeLaSemana, hoyEnColombia } from '../../compartido/fechas';
 import { SelectorCategorias } from './SelectorCategorias';
+import { SelectorEquipos } from './SelectorEquipos';
 import { SelectorFechas } from './SelectorFechas';
 import type { CategoriaGestionable } from './useCategoriasGestionables';
 
@@ -32,6 +33,7 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
   const [elegidas, setElegidas] = useState<string[]>(
     entrenamiento?.categorias.map((categoria) => categoria.categoriaId) ?? [],
   );
+  const [equiposElegidos, setEquiposElegidos] = useState<string[]>([]);
   const [fechas, setFechas] = useState<string[]>([entrenamiento?.fecha ?? hoyEnColombia()]);
   const [horaInicio, setHoraInicio] = useState(entrenamiento?.horaInicio ?? '16:00');
   const [horaFin, setHoraFin] = useState(entrenamiento?.horaFin ?? '17:30');
@@ -41,6 +43,11 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
   const [enviando, setEnviando] = useState(false);
   const [programados, setProgramados] = useState(0);
   const errorDe = (campo: string) => (fallo instanceof ErrorApi ? fallo.errorDe(campo) : undefined);
+  const categoriasElegidas = categorias.filter((categoria) => elegidas.includes(categoria.categoriaId));
+  // Un equipo solo cuenta si su categoría sigue elegida: al apagar una categoría se sueltan los suyos.
+  const equiposDeLasElegidas = equiposElegidos.filter((equipoId) =>
+    categoriasElegidas.some((categoria) => categoria.equipos.some((equipo) => equipo.equipoId === equipoId)),
+  );
   const conErroresPorCampo = fallo instanceof ErrorApi && Object.keys(fallo.errores).length > 0;
 
   async function guardar(evento: FormEvent) {
@@ -55,6 +62,8 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
       lugar,
       nota: nota.trim() === '' ? null : nota,
       categoriaIds: elegidas,
+      // Al cambiar, la audiencia no se toca aquí: se cambia desde el detalle (spec 013).
+      ...(entrenamiento ? {} : { equipoIds: equiposDeLasElegidas }),
     });
 
     if (entrenamiento) {
@@ -88,7 +97,11 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
   }
 
   const ofrecidas = entrenamiento
-    ? entrenamiento.categorias.map((categoria) => ({ categoriaId: categoria.categoriaId, anio: categoria.anio }))
+    ? entrenamiento.categorias.map((categoria) => ({
+        categoriaId: categoria.categoriaId,
+        anio: categoria.anio,
+        equipos: [],
+      }))
     : categorias;
 
   return (
@@ -100,6 +113,14 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
         error={errorDe('categoriaIds')}
         fijas={entrenamiento !== undefined}
       />
+      {!entrenamiento && (
+        <SelectorEquipos
+          categorias={categoriasElegidas}
+          elegidos={equiposDeLasElegidas}
+          alCambiar={setEquiposElegidos}
+          error={errorDe('equipoIds')}
+        />
+      )}
       {!entrenamiento && <SelectorFechas fechas={fechas} alCambiar={setFechas} error={errorDe('fecha')} />}
       <div className="rejilla">
         {entrenamiento && (

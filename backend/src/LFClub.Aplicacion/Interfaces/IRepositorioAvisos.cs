@@ -1,4 +1,5 @@
 using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 using LFClub.Dominio.Reglas;
 
 namespace LFClub.Aplicacion.Interfaces;
@@ -18,13 +19,17 @@ public interface IRepositorioAvisos
     /// <summary>
     /// Los jugadores activos del club (rol <c>JUGADOR</c>, ingreso aprobado, sin retirar y con
     /// categoría) que reciben un aviso con esa cobertura, en una sola consulta, sin las filas de la
-    /// cuenta que hizo la acción (RF-005): <c>CATEGORIAS</c> los de esas categorías;
-    /// <c>CONVOCADOS</c> los convocados al partido; <c>ALUDIDOS</c> solo esos jugadores.
+    /// cuenta que hizo la acción (RF-005): <c>CATEGORIAS</c> los de esas categorías y, si
+    /// <paramref name="actividadId"/> es un partido, también sus convocados (spec 013, research §8);
+    /// <c>CONVOCADOS</c> los convocados al partido; <c>AUDIENCIA_DE_ENTRENAMIENTO</c> los de la
+    /// audiencia del entrenamiento <paramref name="actividadId"/> (sus equipos, o sus categorías si
+    /// no los tiene, más los añadidos), limitados a las categorías indicadas si hay alguna;
+    /// <c>ALUDIDOS</c> solo esos jugadores.
     /// </summary>
     Task<IReadOnlyList<DestinatarioDeAviso>> ResolverDestinatariosAsync(
         CoberturaDeAviso cobertura,
         IReadOnlyCollection<Guid> categoriaIds,
-        Guid? partidoId,
+        Guid? actividadId,
         IReadOnlyCollection<Guid> jugadorIds,
         Guid cuentaQueActua,
         CancellationToken cancelacion = default);
@@ -41,6 +46,17 @@ public interface IRepositorioAvisos
     /// </summary>
     Task GenerarAsync(
         AvisoDeActividad aviso, IReadOnlyCollection<DestinatarioDeAviso> destinatarios, CancellationToken cancelacion = default);
+
+    /// <summary>
+    /// Borra, para esos jugadores, sus avisos sin leer de esa actividad y los avisos que queden sin
+    /// ningún destinatario. Es el borrado del sistema de quien dejó de ver la actividad (spec 013,
+    /// RF-017): el aviso ya leído no se toca. Corre en la transacción del llamador.
+    /// </summary>
+    Task BorrarSinLeerAsync(
+        TipoDeActividad tipo,
+        Guid actividadId,
+        IReadOnlyCollection<Guid> usuarioRolIds,
+        CancellationToken cancelacion = default);
 
     /// <summary>
     /// Los avisos que le llegaron a la cuenta, del más reciente al más antiguo, uno por aviso aunque

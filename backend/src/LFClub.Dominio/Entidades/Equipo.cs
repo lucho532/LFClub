@@ -41,7 +41,7 @@ public class Equipo : IPerteneceAClub
 
     /// <summary>
     /// Obligatorio. Nace en falso; pasa a verdadero la primera vez que tiene un jugador o un
-    /// entrenador.
+    /// entrenador, o que se le dirige un entrenamiento (spec 013).
     /// </summary>
     public bool Usado { get; set; }
 

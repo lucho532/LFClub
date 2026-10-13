@@ -139,6 +139,11 @@ public class EliminarClubPruebas
         await _fabrica.Actividades.ResponderAsync(entrenamiento, jugador, RespuestaFamilia.ASISTIRA);
         await _fabrica.Actividades.CrearPartidoAsync([categoria], new DateOnly(2026, 10, 17), convocados: [jugador]);
 
+        // Spec 013: el entrenamiento dirigido al equipo y un jugador añadido.
+        await _fabrica.Actividades.DirigirAEquiposAsync(entrenamiento, equipo);
+        var (_, anadido) = await _fabrica.Categorias.CrearJugadorAsync(club, 2014, categoria);
+        await _fabrica.Actividades.AnadirJugadorAsync(entrenamiento, anadido);
+
         // Spec 010: la carta del jugador.
         await _fabrica.Cartas.PonerCartaAsync(jugador, 10, PosicionJugador.DELANTERO, [70, 65, 80, 72, 60, 88]);
 

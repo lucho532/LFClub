@@ -84,7 +84,7 @@ export function FormularioPartido({ clubId, categorias, partido, alGuardar, alCa
   }
 
   const ofrecidas = partido
-    ? partido.categorias.map((categoria) => ({ categoriaId: categoria.categoriaId, anio: categoria.anio }))
+    ? partido.categorias.map((categoria) => ({ categoriaId: categoria.categoriaId, anio: categoria.anio, equipos: [] }))
     : categorias;
 
   return (

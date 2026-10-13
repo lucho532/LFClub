@@ -7,7 +7,8 @@ namespace LFClub.Dominio.Entidades;
 /// §11.1; spec 009, RF-001 a RF-006).
 /// Su responsabilidad es guardar la fecha, las horas y el lugar tal como los escribió quien lo
 /// programó, en hora de Colombia, su nota, su estado actual y quién lo creó. De él cuelgan sus
-/// categorías, las respuestas de las familias y la asistencia registrada.
+/// categorías, los equipos a los que se dirige y los jugadores añadidos (spec 013), las respuestas
+/// de las familias y la asistencia registrada.
 /// No decide quién lo ve ni quién lo gestiona (eso es de las reglas del dominio), no guarda
 /// historial de cambios (§18) y nunca se borra: se cancela (RF-035). Puede ser la actividad de un
 /// aviso (<see cref="AvisoDeActividad"/>, spec 012), que lo referencia por tipo e identificador sin
@@ -59,4 +60,16 @@ public class Entrenamiento : IPerteneceAClub
 
     /// <summary>Categorías a las que va dirigido; una o más, y no cambian después de crearlo.</summary>
     public List<EntrenamientoCategoria> Categorias { get; set; } = [];
+
+    /// <summary>
+    /// Equipos a los que va dirigido (spec 013). Vacía: es de toda la categoría. Una fila se
+    /// conserva aunque su equipo se desactive.
+    /// </summary>
+    public List<EntrenamientoEquipo> Equipos { get; set; } = [];
+
+    /// <summary>
+    /// Jugadores que lo ven sin ser de su audiencia natural: los añadidos por quien dirige y los
+    /// congelados al desactivar un equipo (spec 013).
+    /// </summary>
+    public List<EntrenamientoJugador> Jugadores { get; set; } = [];
 }

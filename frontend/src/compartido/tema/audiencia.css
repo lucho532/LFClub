@@ -1,0 +1,32 @@
+/* Equipos de una actividad y pertenencia de un jugador (spec 013): siempre con texto, no solo color. */
+.grupo-de-equipos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.casilla-equipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+}
+
+.casilla-equipo input {
+  width: 18px;
+  height: 18px;
+}
+
+.etiqueta-pertenencia {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}

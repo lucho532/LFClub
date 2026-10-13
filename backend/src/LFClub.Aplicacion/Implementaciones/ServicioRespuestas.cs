@@ -50,8 +50,7 @@ public class ServicioRespuestas : IServicioRespuestas
         var respuesta = Validar(datos);
         var visible = await _acceso.EntrenamientoAsync(entrenamientoId, quienPregunta, cancelacion);
         var entrenamiento = visible.Entrenamiento;
-        if (quienPregunta.CategoriaId is not { } suCategoria
-            || entrenamiento.Categorias.All(fila => fila.CategoriaId != suCategoria))
+        if (!visible.EnLaAudiencia)
         {
             throw ErroresDeActividades.JugadorFueraDeLaActividad();
         }

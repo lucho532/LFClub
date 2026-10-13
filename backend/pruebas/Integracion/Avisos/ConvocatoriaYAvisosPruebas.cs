@@ -99,7 +99,7 @@ public class ConvocatoriaYAvisosPruebas : IDisposable
     }
 
     [Fact]
-    public async Task Guardar_la_misma_convocatoria_o_convocar_a_quien_no_es_de_la_categoria_no_avisa()
+    public async Task Guardar_la_misma_convocatoria_no_avisa_de_nuevo_y_un_retirado_no_se_convoca()
     {
         var e = await _fabrica.Actividades.CrearClubAsync();
         var partido = await _fabrica.Actividades.CrearPartidoAsync([e.C2014], Manana);
@@ -108,11 +108,14 @@ public class ConvocatoriaYAvisosPruebas : IDisposable
         var antes = (await _fabrica.Avisos.DeLaActividadAsync(TipoDeActividad.PARTIDO, partido.Id)).Count;
 
         await Actividades.LeerAsync(await e.E1.Cliente.PutAsync(ruta, Convocar(e.Jn(3))));
+        Assert.Equal(antes, (await _fabrica.Avisos.DeLaActividadAsync(TipoDeActividad.PARTIDO, partido.Id)).Count);
+
+        // Spec 013: un jugador de otra categoría ya se puede convocar; uno retirado, no.
+        await _fabrica.Categorias.RetirarAsync(e.Jn(5).Integrante, e.P.Integrante);
         await Actividades.ErrorAsync(
-            await e.E1.Cliente.PutAsync(ruta, Convocar(e.Jn(3), e.K1)),
+            await e.E1.Cliente.PutAsync(ruta, Convocar(e.Jn(3), e.Jn(5))),
             HttpStatusCode.Conflict,
             "jugador_fuera_de_la_actividad");
-
         Assert.Equal(antes, (await _fabrica.Avisos.DeLaActividadAsync(TipoDeActividad.PARTIDO, partido.Id)).Count);
         Assert.Empty(await AyudaDeAvisos.TextosAsync(e, e.K1));
     }

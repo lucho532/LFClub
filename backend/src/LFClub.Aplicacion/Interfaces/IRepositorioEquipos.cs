@@ -14,6 +14,9 @@ public interface IRepositorioEquipos
     /// <summary>Un equipo activo de esa categoría, o nulo si no existe, está inactivo o es de otra.</summary>
     Task<Equipo?> ObtenerActivoAsync(Guid categoriaId, Guid equipoId, CancellationToken cancelacion = default);
 
+    /// <summary>Identificadores de los equipos activos en los que juega hoy el jugador (spec 013).</summary>
+    Task<IReadOnlyList<Guid>> EquiposDeJugadorAsync(Guid usuarioRolId, CancellationToken cancelacion = default);
+
     /// <summary>Identificadores de los equipos activos de una categoría.</summary>
     Task<IReadOnlyList<Guid>> ListarActivosAsync(Guid categoriaId, CancellationToken cancelacion = default);
 
@@ -32,9 +35,11 @@ public interface IRepositorioEquipos
 
     /// <summary>
     /// Desactiva el equipo y borra quién juega en él y quién lo dirige (RF-030). Los jugadores y
-    /// los entrenadores siguen en la categoría.
+    /// los entrenadores siguen en la categoría. Antes, copia a cada jugador activo del equipo a los
+    /// entrenamientos con fecha desde <paramref name="desde"/> dirigidos a él, para que sigan viéndolos
+    /// (spec 013, RF-026).
     /// </summary>
-    Task DesactivarAsync(Guid equipoId, CancellationToken cancelacion = default);
+    Task DesactivarAsync(Guid equipoId, DateOnly desde, DateTime ahoraUtc, CancellationToken cancelacion = default);
 
     /// <summary>Borra el equipo solo si nunca se usó. Devuelve si lo borró.</summary>
     Task<bool> BorrarSiNuncaSeUsoAsync(Guid equipoId, CancellationToken cancelacion = default);

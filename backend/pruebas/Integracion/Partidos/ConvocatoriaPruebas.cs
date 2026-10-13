@@ -50,7 +50,7 @@ public class ConvocatoriaPruebas
     }
 
     [Fact]
-    public async Task En_un_partido_conjunto_se_convoca_de_sus_categorias_y_de_ninguna_mas()
+    public async Task En_un_partido_conjunto_se_convoca_de_cualquier_categoria_pero_no_a_un_retirado()
     {
         var e = await _fabrica.Actividades.CrearClubAsync();
         var partido = await _fabrica.Actividades.CrearPartidoAsync([e.C2014, e.C2015], Sabado);
@@ -63,8 +63,15 @@ public class ConvocatoriaPruebas
 
         Assert.Equal(2, Convocados(await Actividades.LeerAsync(
             await e.E2.Cliente.PutAsync($"{ruta}/convocatoria", Convocar(e.Jn(3), e.K1)))).Count);
+
+        // Spec 013 (RF-013): ya no hace falta ser de las categorías del partido; sí ser un jugador activo.
+        Assert.Equal(3, Convocados(await Actividades.LeerAsync(
+            await e.E2.Cliente.PutAsync($"{ruta}/convocatoria", Convocar(e.Jn(3), e.K1, e.M1)))).Count);
+        await _fabrica.Categorias.RetirarAsync(e.Jn(5).Integrante, e.P.Integrante);
         await Actividades.ErrorAsync(
-            await e.E2.Cliente.PutAsync($"{ruta}/convocatoria", Convocar(e.Jn(3), e.M1)), HttpStatusCode.Conflict, "jugador_fuera_de_la_actividad");
+            await e.E2.Cliente.PutAsync($"{ruta}/convocatoria", Convocar(e.Jn(3), e.Jn(5))),
+            HttpStatusCode.Conflict,
+            "jugador_fuera_de_la_actividad");
 
         // Escenario 2.7: E1 entrena solo la 2014: ve la planilla y no la cambia.
         Assert.Equal(HttpStatusCode.OK, (await e.E1.Cliente.GetAsync($"{ruta}/jugadores")).StatusCode);

@@ -23,10 +23,14 @@ public static class MapperEntrenamientos
             entrenamiento.Lugar,
             entrenamiento.Estado,
             Categorias(entrenamiento),
-            miRespuesta);
+            miRespuesta,
+            Equipos(entrenamiento));
 
-    /// <summary>El detalle de un entrenamiento que quien pregunta puede ver.</summary>
-    public static EntrenamientoDto ADetalle(EntrenamientoVisible visible)
+    /// <summary>
+    /// El detalle de un entrenamiento que quien pregunta puede ver. Los jugadores añadidos solo se
+    /// entregan a quien dirige (spec 013, RF-018): para los demás se omiten del JSON.
+    /// </summary>
+    public static EntrenamientoDto ADetalle(EntrenamientoVisible visible, IReadOnlyList<JugadorSumableDto>? anadidos = null)
     {
         var entrenamiento = visible.Entrenamiento;
         return new EntrenamientoDto(
@@ -40,8 +44,18 @@ public static class MapperEntrenamientos
             visible.MiRespuesta,
             entrenamiento.Nota,
             visible.Permisos,
-            visible.MiAsistencia);
+            visible.MiAsistencia,
+            Equipos(entrenamiento),
+            visible.Permisos.Dirige ? anadidos ?? [] : null);
     }
+
+    private static IReadOnlyList<EquipoDeActividadDto> Equipos(Entrenamiento entrenamiento) => entrenamiento.Equipos
+        .Where(fila => fila.Equipo is not null)
+        .Select(fila => new EquipoDeActividadDto(
+            fila.EquipoId, fila.Equipo!.Nombre, fila.Equipo.CategoriaId, fila.Equipo.Categoria?.Anio ?? 0, fila.Equipo.Activo))
+        .OrderBy(equipo => equipo.Anio)
+        .ThenBy(equipo => equipo.Nombre, StringComparer.CurrentCultureIgnoreCase)
+        .ToList();
 
     private static IReadOnlyList<CategoriaDeActividadDto> Categorias(Entrenamiento entrenamiento) =>
         MapperActividades.Categorias(entrenamiento.Categorias.Select(fila => (fila.CategoriaId, fila.Categoria)));

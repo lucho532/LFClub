@@ -38,6 +38,7 @@ public record PlanillaEntrenamientoDto(
 /// <param name="Respuesta">Respuesta de su familia, o nula.</param>
 /// <param name="Presente">Si asistió, o nulo si nadie la registró.</param>
 /// <param name="Marcable">Si se puede registrar ahora: entrenamiento programado cuya fecha ya llegó.</param>
+/// <param name="Anadido">Lo sumó una persona y no es de la audiencia natural (spec 013); solo se ve si quien pregunta dirige.</param>
 public record JugadorDePlanillaEntrenamientoDto(
     Guid UsuarioRolId,
     string Nombres,
@@ -46,4 +47,5 @@ public record JugadorDePlanillaEntrenamientoDto(
     CategoriaDeActividadDto Categoria,
     RespuestaFamilia? Respuesta,
     bool? Presente,
-    bool Marcable);
+    bool Marcable,
+    bool Anadido = false);

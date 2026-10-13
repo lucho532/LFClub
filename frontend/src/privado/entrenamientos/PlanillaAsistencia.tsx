@@ -7,6 +7,7 @@ import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
+import { EtiquetaDePertenencia } from '../actividades/EtiquetaDePertenencia';
 
 interface Props {
   clubId: string;
@@ -78,6 +79,7 @@ export function PlanillaAsistencia({ clubId, entrenamiento, planilla }: Props) {
                         clubId={clubId}
                         textoVolver="Entrenamiento"
                       />
+                      {jugador.anadido && <EtiquetaDePertenencia pertenencia="ANADIDO" />}
                       {jugador.marcable && presente === null && <span className="texto-suave texto-pequeno">Sin registrar</span>}
                     </span>
                     {jugador.marcable ? (

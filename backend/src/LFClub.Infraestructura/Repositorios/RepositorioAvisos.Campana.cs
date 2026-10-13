@@ -92,17 +92,25 @@ public partial class RepositorioAvisos
         if (entrenamientoIds.Count > 0)
         {
             var ids = entrenamientoIds.ToList();
-            var porCategoria = await _contexto.EntrenamientosCategoria.AsNoTracking()
-                .Where(fila => ids.Contains(fila.EntrenamientoId)
-                    && jugadores.Any(jugador => jugador.CategoriaId == fila.CategoriaId))
-                .Select(fila => fila.EntrenamientoId)
+
+            // La audiencia de la spec 013: con equipos, estar en alguno; sin equipos, la categoría; y
+            // siempre, estar en la lista guardada del entrenamiento.
+            var porAudiencia = await _contexto.Entrenamientos.AsNoTracking()
+                .Where(entrenamiento => ids.Contains(entrenamiento.Id)
+                    && jugadores.Any(jugador =>
+                        entrenamiento.Jugadores.Any(fila => fila.UsuarioRolId == jugador.Id)
+                        || (entrenamiento.Equipos.Any()
+                            ? entrenamiento.Equipos.Any(fila => _contexto.JugadoresEquipo.Any(
+                                pertenencia => pertenencia.UsuarioRolId == jugador.Id && pertenencia.EquipoId == fila.EquipoId))
+                            : entrenamiento.Categorias.Any(fila => fila.CategoriaId == jugador.CategoriaId))))
+                .Select(entrenamiento => entrenamiento.Id)
                 .ToListAsync(cancelacion);
             var porAsistencia = await _contexto.AsistenciasEntrenamiento.AsNoTracking()
                 .Where(fila => ids.Contains(fila.EntrenamientoId)
                     && jugadores.Any(jugador => jugador.Id == fila.UsuarioRolId))
                 .Select(fila => fila.EntrenamientoId)
                 .ToListAsync(cancelacion);
-            disponibles.UnionWith(porCategoria);
+            disponibles.UnionWith(porAudiencia);
             disponibles.UnionWith(porAsistencia);
         }
 

@@ -18,6 +18,7 @@ namespace LFClub.Aplicacion.DTOs;
 /// <param name="Estado">Programado o cancelado.</param>
 /// <param name="Categorias">Sus categorías, por año.</param>
 /// <param name="MiRespuesta">La respuesta de la familia del jugador de la petición; ausente si no respondió.</param>
+/// <param name="Equipos">Sus equipos, con su categoría y si siguen activos; vacío si es de toda la categoría (spec 013).</param>
 public record EntrenamientoResumenDto(
     Guid EntrenamientoId,
     DateOnly Fecha,
@@ -26,4 +27,5 @@ public record EntrenamientoResumenDto(
     string Lugar,
     EstadoEntrenamiento Estado,
     IReadOnlyList<CategoriaDeActividadDto> Categorias,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] RespuestaFamilia? MiRespuesta);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] RespuestaFamilia? MiRespuesta,
+    IReadOnlyList<EquipoDeActividadDto>? Equipos = null);

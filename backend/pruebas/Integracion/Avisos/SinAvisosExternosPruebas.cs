@@ -33,6 +33,10 @@ public class SinAvisosExternosPruebas : IDisposable
         var hoy = _fabrica.Reloj.Hoy;
         var antes = _fabrica.Correo.Enviados.Count;
 
+        // El entrenamiento es de las 4:00 p. m.: con el reloj real, pasadas las 4:00 p. m. ya habría
+        // empezado y no se podría reactivar. Las sesiones ya están abiertas, así que se puede fijar.
+        _fabrica.Reloj.FijarEnColombia(hoy, new TimeOnly(8, 0));
+
         // Entrenamiento: programar, cambiar, cancelar, reactivar y registrar asistencia.
         var creado = await Actividades.LeerAsync(
             await e.E1.Cliente.PostAsync(e.Ruta("/entrenamientos"), Actividades.Entrenamiento(hoy, [e.C2014])),

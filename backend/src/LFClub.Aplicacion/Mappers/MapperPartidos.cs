@@ -75,9 +75,20 @@ public static class MapperPartidos
             conPublicacion ? partido.OrigenResultado : null);
     }
 
-    /// <summary>La planilla con los conteos de respuestas y, si se pasan, los convocables.</summary>
+    /// <summary>
+    /// La planilla con los conteos de respuestas, los equipos de las categorías del partido y, si se
+    /// pasan, los convocables. Cada jugador lleva los equipos en los que juega hoy; el convocado cuya
+    /// categoría copiada no es una del partido va marcado como añadido, solo para quien gestiona
+    /// (spec 013, RF-009 y RF-021).
+    /// </summary>
     public static PlanillaPartidoDto APlanilla(
-        Guid partidoId, IReadOnlyList<PartidoJugador> convocados, IReadOnlyList<UsuarioRol> convocables, QuienPregunta quien) =>
+        Guid partidoId,
+        IReadOnlyList<PartidoJugador> convocados,
+        IReadOnlyList<UsuarioRol> convocables,
+        IReadOnlyList<Equipo> equipos,
+        IReadOnlySet<Guid> categoriasDelPartido,
+        bool gestiona,
+        QuienPregunta quien) =>
         new(
             partidoId,
             convocados.Count(fila => fila.Respuesta == RespuestaFamilia.ASISTIRA),
@@ -98,7 +109,9 @@ public static class MapperPartidos
                     fila.Goles,
                     fila.IndicadoPor is { } origen
                         ? new IndicacionDto(origen, fila.IndicadoPorNombre ?? string.Empty, fila.IndicadoEn!.Value)
-                        : null))
+                        : null,
+                    fila.UsuarioRol.Equipos.Select(pertenencia => pertenencia.EquipoId).ToList(),
+                    gestiona && !categoriasDelPartido.Contains(fila.CategoriaId)))
                 .ToList(),
             convocables
                 .OrderBy(jugador => jugador.Categoria?.Anio)
@@ -108,7 +121,12 @@ public static class MapperPartidos
                     jugador.Id,
                     jugador.Nombres,
                     jugador.Apellidos,
-                    MapperActividades.Categoria(jugador.CategoriaId!.Value, jugador.Categoria)))
+                    MapperActividades.Categoria(jugador.CategoriaId!.Value, jugador.Categoria),
+                    jugador.Equipos.Select(pertenencia => pertenencia.EquipoId).ToList()))
+                .ToList(),
+            equipos
+                .Select(equipo => new EquipoDeActividadDto(
+                    equipo.Id, equipo.Nombre, equipo.CategoriaId, equipo.Categoria?.Anio ?? 0, equipo.Activo))
                 .ToList());
 
     private static IReadOnlyList<CategoriaDeActividadDto> Categorias(Partido partido) =>

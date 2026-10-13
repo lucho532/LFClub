@@ -22,6 +22,7 @@ public class AccesoAActividad
     private readonly IRepositorioEntrenamientos _entrenamientos;
     private readonly IRepositorioPartidos _partidos;
     private readonly IRepositorioAsignaciones _asignaciones;
+    private readonly IRepositorioEquipos _equipos;
     private readonly IReloj _reloj;
 
     /// <summary>Crea el colaborador con sus dependencias.</summary>
@@ -29,27 +30,32 @@ public class AccesoAActividad
         IRepositorioEntrenamientos entrenamientos,
         IRepositorioPartidos partidos,
         IRepositorioAsignaciones asignaciones,
+        IRepositorioEquipos equipos,
         IReloj reloj)
     {
         _entrenamientos = entrenamientos;
         _partidos = partidos;
         _asignaciones = asignaciones;
+        _equipos = equipos;
         _reloj = reloj;
     }
 
     /// <summary>
-    /// Quien hace la petición: su rol, su categoría si es la cuenta de un jugador y las categorías
-    /// que entrena hoy. La cuenta de un jugador no entrena ninguna: no se consulta.
+    /// Quien hace la petición: su rol, su categoría y sus equipos si es la cuenta de un jugador y las
+    /// categorías que entrena hoy. La cuenta de un jugador no entrena ninguna: no se consultan sus
+    /// asignaciones; los demás roles no tienen equipos de jugador: no se consultan.
     /// </summary>
     public async Task<QuienPregunta> QuienPreguntaAsync(UsuarioRol integrante, CancellationToken cancelacion = default)
     {
         if (integrante.Rol == Rol.JUGADOR)
         {
-            return new QuienPregunta(integrante.Id, integrante.Rol, integrante.CategoriaId, new HashSet<Guid>());
+            var misEquipos = await _equipos.EquiposDeJugadorAsync(integrante.Id, cancelacion);
+            return new QuienPregunta(
+                integrante.Id, integrante.Rol, integrante.CategoriaId, new HashSet<Guid>(), misEquipos.ToHashSet());
         }
 
         var entrena = await _asignaciones.CategoriasDeAsync(integrante.Id, cancelacion);
-        return new QuienPregunta(integrante.Id, integrante.Rol, null, entrena.ToHashSet());
+        return new QuienPregunta(integrante.Id, integrante.Rol, null, entrena.ToHashSet(), new HashSet<Guid>());
     }
 
     /// <summary>
@@ -66,27 +72,45 @@ public class AccesoAActividad
         var categorias = entrenamiento.Categorias.Select(fila => fila.CategoriaId).ToList();
 
         var esDeSuCategoria = quien.CategoriaId is { } suCategoria && categorias.Contains(suCategoria);
+        var tieneEquipos = entrenamiento.Equipos.Count > 0;
+        var enSusEquipos = entrenamiento.Equipos.Any(fila => quien.EquipoIds.Contains(fila.EquipoId));
+        var enLaLista = quien.EsJugador
+            && await _entrenamientos.EnListaDeAsync(entrenamientoId, quien.UsuarioRolId, cancelacion);
         var miAsistencia = quien.EsJugador
             ? await _entrenamientos.AsistenciaDeAsync(entrenamientoId, quien.UsuarioRolId, cancelacion)
             : null;
         var laVe = ReglaVisibilidadDeEntrenamiento.LaVe(
-            quien.Rol, categorias.Any(quien.CategoriasQueEntrena.Contains), esDeSuCategoria, miAsistencia is not null);
+            quien.Rol,
+            categorias.Any(quien.CategoriasQueEntrena.Contains),
+            esDeSuCategoria,
+            miAsistencia is not null,
+            tieneEquipos,
+            enSusEquipos,
+            enLaLista);
         if (!laVe)
         {
             throw ExcepcionDeAplicacion.NoEncontrado();
         }
 
+        var enLaAudiencia = quien.EsJugador && ReglaAudienciaDeEntrenamiento.EnLaAudiencia(
+            activo: true,
+            tieneCategoria: quien.CategoriaId is not null,
+            entrenamientoTieneEquipos: tieneEquipos,
+            estaEnAlgunDeSusEquipos: enSusEquipos,
+            suCategoriaEsDelEntrenamiento: esDeSuCategoria,
+            estaEnLaListaGuardada: enLaLista);
         var (hoy, ahora) = HoraDeColombia.Ahora(_reloj);
         var permisos = new PermisosDeActividadDto(
             ReglaGestionDeActividad.PuedeGestionar(quien.Rol, categorias, quien.CategoriasQueEntrena),
             ReglaAlcanceDeAsistencia.CategoriasMarcables(quien.Rol, categorias, quien.CategoriasQueEntrena).Count > 0,
-            quien.EsJugador && esDeSuCategoria && entrenamiento.Estado == EstadoEntrenamiento.PROGRAMADO
-                && !ReglaMomentoDeActividad.YaEmpezo(entrenamiento.Fecha, entrenamiento.HoraInicio, hoy, ahora));
+            enLaAudiencia && entrenamiento.Estado == EstadoEntrenamiento.PROGRAMADO
+                && !ReglaMomentoDeActividad.YaEmpezo(entrenamiento.Fecha, entrenamiento.HoraInicio, hoy, ahora),
+            Dirige: ReglaDireccionDeActividad.PuedeDirigir(quien.Rol, categorias, quien.CategoriasQueEntrena));
 
         var miRespuesta = quien.EsJugador
             ? await _entrenamientos.RespuestaDeAsync(entrenamientoId, quien.UsuarioRolId, cancelacion)
             : null;
-        return new EntrenamientoVisible(entrenamiento, quien, permisos, miRespuesta, miAsistencia);
+        return new EntrenamientoVisible(entrenamiento, quien, permisos, miRespuesta, miAsistencia, enLaAudiencia);
     }
 
     /// <summary>
@@ -137,12 +161,17 @@ public class AccesoAActividad
 /// <param name="Permisos">Lo que puede hacer con él.</param>
 /// <param name="MiRespuesta">La respuesta de su familia, si es la cuenta de un jugador y respondió.</param>
 /// <param name="MiAsistencia">Su asistencia, si es la cuenta de un jugador y se registró.</param>
+/// <param name="EnLaAudiencia">
+/// Si es la cuenta de un jugador que pertenece a su audiencia (spec 013): puede responder; tener solo
+/// asistencia registrada permite verlo, no responder.
+/// </param>
 public record EntrenamientoVisible(
     Entrenamiento Entrenamiento,
     QuienPregunta Quien,
     PermisosDeActividadDto Permisos,
     RespuestaFamilia? MiRespuesta,
-    bool? MiAsistencia);
+    bool? MiAsistencia,
+    bool EnLaAudiencia);
 
 /// <summary>
 /// Representa un partido que quien pregunta puede ver, con lo que puede hacer con él.

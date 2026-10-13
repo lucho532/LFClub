@@ -8,6 +8,8 @@ import { Boton } from '../../compartido/componentes/Boton';
 import { NombrePersona } from '../../compartido/componentes/NombrePersona';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { ResumenRespuestas } from '../entrenamientos/ResumenRespuestas';
+import type { JugadorSumableDto } from '../../compartido/api/tiposAudiencia';
+import { EtiquetaDePertenencia } from '../actividades/EtiquetaDePertenencia';
 import { EditorConvocatoria, type JugadorConvocable } from './EditorConvocatoria';
 
 interface Props {
@@ -26,6 +28,7 @@ export function SeccionConvocatoria({ clubId, partido }: Props) {
   const carga = useCarga(`${ruta}/jugadores#${partido.estado}`, () => api.get<PlanillaPartidoDto>(`${ruta}/jugadores`));
   const [editando, setEditando] = useState(false);
   const [elegidos, setElegidos] = useState<string[]>([]);
+  const [sumados, setSumados] = useState<JugadorSumableDto[]>([]);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const planilla = carga.datos;
@@ -33,8 +36,30 @@ export function SeccionConvocatoria({ clubId, partido }: Props) {
 
   const jugadores: JugadorConvocable[] = planilla
     ? [
-        ...planilla.convocados.map((fila) => ({ ...fila, anio: fila.categoria.anio })),
-        ...planilla.convocables.map((fila) => ({ ...fila, anio: fila.categoria.anio })),
+        ...planilla.convocados.map((fila) => ({
+          usuarioRolId: fila.usuarioRolId,
+          nombres: fila.nombres,
+          apellidos: fila.apellidos,
+          anio: fila.categoria.anio,
+          equipoIds: fila.equipoIds,
+          anadido: fila.anadido,
+        })),
+        ...planilla.convocables.map((fila) => ({
+          usuarioRolId: fila.usuarioRolId,
+          nombres: fila.nombres,
+          apellidos: fila.apellidos,
+          anio: fila.categoria.anio,
+          equipoIds: fila.equipoIds,
+        })),
+        // Los que se sumaron con el buscador en esta edición: de otra categoría, marcados "Añadido".
+        ...sumados.map((jugador) => ({
+          usuarioRolId: jugador.usuarioRolId,
+          nombres: jugador.nombres,
+          apellidos: jugador.apellidos,
+          anio: jugador.categoria.anio,
+          equipoIds: [],
+          anadido: true,
+        })),
       ]
     : [];
 
@@ -62,6 +87,7 @@ export function SeccionConvocatoria({ clubId, partido }: Props) {
             variante="secundario"
             onClick={() => {
               setElegidos(planilla.convocados.map((fila) => fila.usuarioRolId));
+              setSumados([]);
               setEditando(true);
             }}
           >
@@ -74,7 +100,17 @@ export function SeccionConvocatoria({ clubId, partido }: Props) {
       {!planilla && carga.cargando && <p className="texto-suave">Cargando…</p>}
       {planilla && editando && (
         <>
-          <EditorConvocatoria clubId={clubId} jugadores={jugadores} elegidos={elegidos} alCambiar={setElegidos} />
+          <EditorConvocatoria
+            clubId={clubId}
+            jugadores={jugadores}
+            equipos={planilla.equipos}
+            elegidos={elegidos}
+            alCambiar={setElegidos}
+            alSumar={(jugador) => {
+              setSumados((previos) => [...previos, jugador]);
+              setElegidos((previos) => [...previos, jugador.usuarioRolId]);
+            }}
+          />
           {error && <Aviso tono="error">{error}</Aviso>}
           <div className="fila">
             <Boton cargando={guardando} textoCargando="Guardando…" onClick={() => void guardar()}>
@@ -101,6 +137,7 @@ export function SeccionConvocatoria({ clubId, partido }: Props) {
                   textoVolver="Partido"
                 />
                 <span className="texto-suave">Categoría {fila.categoria.anio}</span>
+                {fila.anadido && <EtiquetaDePertenencia pertenencia="ANADIDO" />}
               </li>
             ))}
           </ul>

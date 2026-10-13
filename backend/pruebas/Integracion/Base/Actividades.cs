@@ -14,14 +14,19 @@ public static class Actividades
     /// <summary>Fecha como la pide el contrato.</summary>
     public static string Texto(DateOnly fecha) => fecha.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-    /// <summary>Cuerpo de un entrenamiento de 4:00 a 5:30 p. m. en "Cancha de Minitas".</summary>
+    /// <summary>
+    /// Cuerpo de un entrenamiento de 4:00 a 5:30 p. m. en "Cancha de Minitas", dirigido a esos
+    /// equipos y con esos jugadores añadidos si se indican (spec 013).
+    /// </summary>
     public static object Entrenamiento(
         DateOnly fecha,
         IEnumerable<Categoria> categorias,
         string horaInicio = "16:00",
         string horaFin = "17:30",
         string? lugar = "Cancha de Minitas",
-        string? nota = "Traer peto") => new
+        string? nota = "Traer peto",
+        IEnumerable<Equipo>? equipos = null,
+        IEnumerable<UsuarioRol>? anadidos = null) => new
         {
             fecha = Texto(fecha),
             horaInicio,
@@ -29,6 +34,8 @@ public static class Actividades
             lugar,
             nota,
             categoriaIds = categorias.Select(categoria => categoria.Id).ToList(),
+            equipoIds = equipos?.Select(equipo => equipo.Id).ToList(),
+            jugadorAnadidoIds = anadidos?.Select(jugador => jugador.Id).ToList(),
         };
 
     /// <summary>Cuerpo de un partido amistoso y local contra "Equipo C" a las 9:00 a. m.</summary>

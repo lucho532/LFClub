@@ -11,9 +11,9 @@ public class ReglaDestinatariosDeAvisoPruebas
     [InlineData(HechoDeActividad.ENTRENAMIENTO_CANCELADO)]
     [InlineData(HechoDeActividad.ENTRENAMIENTO_REACTIVADO)]
     [InlineData(HechoDeActividad.ASISTENCIA_REGISTRADA)]
-    public void Los_hechos_de_un_entrenamiento_van_a_las_categorias(HechoDeActividad hecho)
+    public void Los_hechos_de_un_entrenamiento_van_a_su_audiencia(HechoDeActividad hecho)
     {
-        Assert.Equal(CoberturaDeAviso.CATEGORIAS, ReglaDestinatariosDeAviso.Evaluar(hecho));
+        Assert.Equal(CoberturaDeAviso.AUDIENCIA_DE_ENTRENAMIENTO, ReglaDestinatariosDeAviso.Evaluar(hecho));
     }
 
     [Theory]

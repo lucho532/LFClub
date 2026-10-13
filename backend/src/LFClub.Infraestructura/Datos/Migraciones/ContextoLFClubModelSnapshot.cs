@@ -592,6 +592,62 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.ToTable("EntrenamientosCategoria", (string)null);
                 });
 
+            modelBuilder.Entity("LFClub.Dominio.Entidades.EntrenamientoEquipo", b =>
+                {
+                    b.Property<Guid>("EntrenamientoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EquipoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("EntrenamientoId", "EquipoId");
+
+                    b.HasIndex("ClubId");
+
+                    b.HasIndex("EquipoId");
+
+                    b.ToTable("EntrenamientosEquipo", (string)null);
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.EntrenamientoJugador", b =>
+                {
+                    b.Property<Guid>("EntrenamientoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UsuarioRolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AnadidoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("EquipoDeOrigenId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Origen")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("EntrenamientoId", "UsuarioRolId");
+
+                    b.HasIndex("ClubId");
+
+                    b.HasIndex("EquipoDeOrigenId");
+
+                    b.HasIndex("UsuarioRolId");
+
+                    b.ToTable("EntrenamientosJugador", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EntrenamientosJugador_OrigenDelAnadido", "\"Origen\" <> 'ANADIDO' OR \"EquipoDeOrigenId\" IS NULL");
+                        });
+                });
+
             modelBuilder.Entity("LFClub.Dominio.Entidades.Equipo", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1556,6 +1612,67 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.Navigation("Entrenamiento");
                 });
 
+            modelBuilder.Entity("LFClub.Dominio.Entidades.EntrenamientoEquipo", b =>
+                {
+                    b.HasOne("LFClub.Dominio.Entidades.Club", "Club")
+                        .WithMany()
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LFClub.Dominio.Entidades.Entrenamiento", "Entrenamiento")
+                        .WithMany("Equipos")
+                        .HasForeignKey("EntrenamientoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LFClub.Dominio.Entidades.Equipo", "Equipo")
+                        .WithMany()
+                        .HasForeignKey("EquipoId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Club");
+
+                    b.Navigation("Entrenamiento");
+
+                    b.Navigation("Equipo");
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.EntrenamientoJugador", b =>
+                {
+                    b.HasOne("LFClub.Dominio.Entidades.Club", "Club")
+                        .WithMany()
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LFClub.Dominio.Entidades.Entrenamiento", "Entrenamiento")
+                        .WithMany("Jugadores")
+                        .HasForeignKey("EntrenamientoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LFClub.Dominio.Entidades.Equipo", "EquipoDeOrigen")
+                        .WithMany()
+                        .HasForeignKey("EquipoDeOrigenId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LFClub.Dominio.Entidades.UsuarioRol", "UsuarioRol")
+                        .WithMany()
+                        .HasForeignKey("UsuarioRolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Club");
+
+                    b.Navigation("Entrenamiento");
+
+                    b.Navigation("EquipoDeOrigen");
+
+                    b.Navigation("UsuarioRol");
+                });
+
             modelBuilder.Entity("LFClub.Dominio.Entidades.Equipo", b =>
                 {
                     b.HasOne("LFClub.Dominio.Entidades.Categoria", "Categoria")
@@ -1875,6 +1992,10 @@ namespace LFClub.Infraestructura.Datos.Migraciones
             modelBuilder.Entity("LFClub.Dominio.Entidades.Entrenamiento", b =>
                 {
                     b.Navigation("Categorias");
+
+                    b.Navigation("Equipos");
+
+                    b.Navigation("Jugadores");
                 });
 
             modelBuilder.Entity("LFClub.Dominio.Entidades.Equipo", b =>

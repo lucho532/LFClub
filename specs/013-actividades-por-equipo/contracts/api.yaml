@@ -1,0 +1,408 @@
+openapi: 3.1.0
+info:
+  title: LFClub - API de la funcionalidad 013 (actividades por equipo)
+  version: 0.13.0
+  description: |
+    Contrato de lo que esta funcionalidad añade o cambia respecto de los contratos de la 001 a la
+    012. Lo que no aparece aquí sigue igual.
+
+    Cuenta de operaciones (partiendo de 109 en el contrato y 85 en las de club, con la 012 ya
+    construida; **confirmar contando con la expresión regular de `EndpointsDeLaApi` al empezar**):
+    - **+2**: cambiar la audiencia de un entrenamiento y buscar jugadores que se pueden sumar.
+    - Total: 109 -> 111 operaciones; las de club, 85 -> 87.
+    - El resto son cambios aditivos de contrato (campos nuevos y opcionales) sobre operaciones
+      existentes de la 009 y la 010.
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - `/api/clubes/{clubId}/**` exige un integrante del usuario en ese club. Sin él, también el
+      DESARROLLADOR, responde 404 `no_encontrado`.
+    - Un entrenamiento o partido que no existe, que es de otro club o que quien pregunta no puede
+      ver responde 404 `no_encontrado`, sin distinguir los casos (§7.5, §17.2).
+    - Ninguna respuesta lleva a una cuenta de jugador la lista de convocados ni de añadidos.
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Entrenamientos
+  - name: Convocatoria
+  - name: Actividades
+
+paths:
+  /api/clubes/{clubId}/entrenamientos:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    post:
+      tags: [Entrenamientos]
+      summary: CAMBIA. Programar un entrenamiento, ahora con equipos y jugadores añadidos
+      description: |
+        Igual que en la 009, con dos campos opcionales. Quien programa gestiona todas las
+        categorías (o es PRESIDENTE). Sin `equipoIds` el entrenamiento es de toda la categoría.
+        Los jugadores añadidos se aceptan de cualquier categoría del club.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarEntrenamientoDto' }
+      responses:
+        '201':
+          description: Entrenamiento programado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '403': { $ref: '#/components/responses/NoGestiona' }
+        '400': { $ref: '#/components/responses/Validacion' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    get:
+      tags: [Entrenamientos]
+      summary: CAMBIA. Detalle con los equipos y, para quien dirige, los jugadores añadidos
+      responses:
+        '200':
+          description: Detalle
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Entrenamientos]
+      summary: CAMBIA. Cambiar datos; los equipos y añadidos no se cambian aquí
+      description: |
+        Como en la 009. `equipoIds` y `jugadorAnadidoIds` solo se aceptan si coinciden con los
+        actuales; si no, 400 `datos_invalidos` apuntando a la audiencia. La audiencia se cambia con
+        `PUT .../audiencia`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarEntrenamientoDto' }
+      responses:
+        '200':
+          description: Entrenamiento cambiado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '403': { $ref: '#/components/responses/NoGestiona' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/ActividadCancelada' }
+        '400': { $ref: '#/components/responses/Validacion' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/audiencia:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    put:
+      tags: [Entrenamientos]
+      summary: NUEVA. Cambiar los equipos y los jugadores añadidos de un entrenamiento
+      description: |
+        Reemplaza los equipos activos y los jugadores añadidos (RF-020). Lo hace el PRESIDENTE o
+        quien entrena alguna de las categorías del entrenamiento (RF-016). Quien lo ve y no dirige
+        recibe 403 `no_gestiona_actividad`; quien no lo ve, 404 `no_encontrado`.
+
+        - Los equipos desactivados que ya tenía el entrenamiento se conservan y no se envían
+          (RF-026).
+        - Los jugadores que entran a verlo reciben su aviso (spec 012). Los que dejan de verlo no
+          reciben ninguno ni dejan rastro (RF-017, RF-022).
+        - Solo con el entrenamiento `PROGRAMADO`; cancelado, 409 `actividad_cancelada`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AudienciaDeEntrenamientoDto' }
+      responses:
+        '200':
+          description: Entrenamiento con su audiencia nueva
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntrenamientoDto' }
+        '403': { $ref: '#/components/responses/NoGestiona' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '409':
+          description: |
+            `actividad_cancelada` (el entrenamiento está cancelado) o `jugador_fuera_de_la_actividad`
+            (alguien no es un jugador activo del club con categoría).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '422':
+          description: |
+            `equipo_no_valido` (no existe, no está activo o no es de una categoría del entrenamiento).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+
+  /api/clubes/{clubId}/entrenamientos/{entrenamientoId}/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/entrenamientoId'
+    get:
+      tags: [Entrenamientos]
+      summary: CAMBIA. Planilla con los jugadores de la audiencia y los añadidos
+      description: |
+        Con equipos, trae a los jugadores de esos equipos que quien pregunta puede marcar, y no a
+        toda la categoría. Los añadidos van marcados con `anadido` y solo los ve quien dirige.
+      responses:
+        '200':
+          description: Planilla
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaEntrenamientoDto' }
+        '403': { $ref: '#/components/responses/NoGestiona' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    get:
+      tags: [Convocatoria]
+      summary: CAMBIA. Planilla con los equipos de las categorías, para convocar por equipo
+      description: |
+        Añade `equipos` (los activos de las categorías del partido) y, en cada convocado y
+        convocable, `equipoIds` y `anadido`. El agrupamiento y "marcar a todos" son de la pantalla;
+        la API no cambia lo que se guarda.
+      responses:
+        '200':
+          description: Planilla
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
+        '403': { $ref: '#/components/responses/NoGestiona' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/partidos/{partidoId}/convocatoria:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/partidoId'
+    put:
+      tags: [Convocatoria]
+      summary: CAMBIA. La convocatoria admite jugadores activos de cualquier categoría del club
+      description: |
+        Mismo cuerpo que en la 009. Lo que cambia es la validación: un convocado ya no tiene que ser
+        de las categorías del partido (RF-013); sí un jugador activo, aprobado, no retirado y con
+        categoría, 409 `jugador_fuera_de_la_actividad` si no. Un jugador repetido por dos caminos
+        queda convocado una vez (RF-011). Sumar a otra categoría no cambia la categoría ni los
+        equipos del jugador (RF-015). Solo quien gestiona el partido convoca.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarConvocatoriaDto' }
+      responses:
+        '200':
+          description: Planilla actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlanillaPartidoDto' }
+        '403': { $ref: '#/components/responses/NoGestiona' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '400': { $ref: '#/components/responses/Validacion' }
+
+  /api/clubes/{clubId}/actividades/jugadores-sumables:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Actividades]
+      summary: NUEVA. Buscar jugadores que se pueden sumar a un entrenamiento o a un partido
+      description: |
+        Para el PRESIDENTE y para el DIRECTIVO o ENTRENADOR asignado a alguna categoría (sin
+        asignación, lista vacía). La cuenta de un jugador recibe 403 `rol_no_autorizado`; el
+        DESARROLLADOR, 404.
+
+        Busca por nombres o apellidos entre los jugadores activos del club con categoría. Mínimo 2
+        letras; como máximo 20 resultados, por apellidos. Devuelve solo lo necesario para elegir:
+        nada de foto, documento, equipos ni enlace a la ficha. Que aparezca en la lista no da
+        acceso a su ficha (RF-016).
+      parameters:
+        - name: busqueda
+          in: query
+          required: true
+          schema: { type: string, minLength: 2, maxLength: 60 }
+      responses:
+        '200':
+          description: Coincidencias
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 20
+                items: { $ref: '#/components/schemas/JugadorSumableDto' }
+        '403': { $ref: '#/components/responses/NoAutorizado' }
+        '400': { $ref: '#/components/responses/Validacion' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    clubId: { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+    entrenamientoId: { name: entrenamientoId, in: path, required: true, schema: { type: string, format: uuid } }
+    partidoId: { name: partidoId, in: path, required: true, schema: { type: string, format: uuid } }
+
+  responses:
+    NoEncontrado:
+      description: No existe, es de otro club o quien pregunta no lo ve (`no_encontrado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoGestiona:
+      description: Lo ve pero no puede hacerlo (`no_gestiona_actividad`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoAutorizado:
+      description: El rol no puede usar la operación (`rol_no_autorizado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    ActividadCancelada:
+      description: La actividad está cancelada (`actividad_cancelada`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    Validacion:
+      description: Datos no válidos (`datos_invalidos`, con `errores` por campo)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [codigo, title, status]
+      properties:
+        codigo: { type: string }
+        title: { type: string }
+        status: { type: integer }
+
+    GuardarEntrenamientoDto:
+      type: object
+      description: Los de la 009 más dos campos opcionales.
+      properties:
+        fecha: { type: string, format: date }
+        horaInicio: { type: string, example: '16:00' }
+        horaFin: { type: string, example: '17:30' }
+        lugar: { type: string, maxLength: 120 }
+        nota: { type: string, maxLength: 500 }
+        categoriaIds:
+          type: array
+          items: { type: string, format: uuid }
+        equipoIds:
+          type: array
+          description: Equipos activos de esas categorías. Ausente o vacío, toda la categoría.
+          items: { type: string, format: uuid }
+        jugadorAnadidoIds:
+          type: array
+          description: Jugadores de cualquier categoría del club que se suman. Ausente, ninguno.
+          items: { type: string, format: uuid }
+
+    AudienciaDeEntrenamientoDto:
+      type: object
+      required: [equipoIds, jugadorIds]
+      properties:
+        equipoIds:
+          type: array
+          description: Los equipos activos, completos. Vacío deja el entrenamiento en toda la categoría.
+          items: { type: string, format: uuid }
+        jugadorIds:
+          type: array
+          description: Los jugadores añadidos, completos; los que no estén aquí salen.
+          items: { type: string, format: uuid }
+
+    EquipoDeActividadDto:
+      type: object
+      required: [equipoId, nombre, categoriaId, anio, activo]
+      properties:
+        equipoId: { type: string, format: uuid }
+        nombre: { type: string }
+        categoriaId: { type: string, format: uuid }
+        anio: { type: integer }
+        activo:
+          type: boolean
+          description: Falso si se desactivó después de dirigirle el entrenamiento (RF-026).
+
+    EntrenamientoDto:
+      type: object
+      description: El de la 009 más tres campos.
+      properties:
+        equipos:
+          type: array
+          description: Lo ve todo el que ve el entrenamiento. Vacío, toda la categoría.
+          items: { $ref: '#/components/schemas/EquipoDeActividadDto' }
+        anadidos:
+          type: array
+          description: Solo para quien dirige; ausente para los demás (RF-018, RF-024).
+          items: { $ref: '#/components/schemas/JugadorSumableDto' }
+        permisos:
+          type: object
+          properties:
+            dirige:
+              type: boolean
+              description: Puede cambiar los equipos y los añadidos (RF-016).
+
+    JugadorSumableDto:
+      type: object
+      required: [usuarioRolId, nombres, apellidos, categoria]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        categoria:
+          type: object
+          required: [categoriaId, anio]
+          properties:
+            categoriaId: { type: string, format: uuid }
+            anio: { type: integer }
+
+    PlanillaEntrenamientoDto:
+      type: object
+      description: La de la 009; cada jugador gana `anadido`.
+      properties:
+        jugadores:
+          type: array
+          items:
+            type: object
+            properties:
+              anadido:
+                type: boolean
+                description: Lo sumó una persona y no es de la audiencia natural. Solo lo ve quien dirige.
+
+    PlanillaPartidoDto:
+      type: object
+      description: La de la 009 más los equipos y dos campos por jugador.
+      properties:
+        equipos:
+          type: array
+          items: { $ref: '#/components/schemas/EquipoDeActividadDto' }
+        convocados:
+          type: array
+          items:
+            type: object
+            properties:
+              equipoIds: { type: array, items: { type: string, format: uuid } }
+              anadido: { type: boolean }
+        convocables:
+          type: array
+          items:
+            type: object
+            properties:
+              equipoIds: { type: array, items: { type: string, format: uuid } }
+
+    GuardarConvocatoriaDto:
+      type: object
+      required: [usuarioRolIds]
+      properties:
+        usuarioRolIds:
+          type: array
+          items: { type: string, format: uuid }

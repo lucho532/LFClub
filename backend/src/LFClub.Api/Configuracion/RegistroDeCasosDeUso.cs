@@ -67,8 +67,11 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioDatosPropios, ServicioDatosPropios>();
 
         servicios.AddScoped<AccesoAActividad>();
+        servicios.AddScoped<ArmadoDeAudiencia>();
         servicios.AddScoped<IServicioEntrenamientos, ServicioEntrenamientos>();
         servicios.AddScoped<IServicioConsultaEntrenamientos, ServicioConsultaEntrenamientos>();
+        servicios.AddScoped<IServicioAudienciaDeEntrenamiento, ServicioAudienciaDeEntrenamiento>();
+        servicios.AddScoped<IServicioJugadoresSumables, ServicioJugadoresSumables>();
         servicios.AddScoped<IServicioCalendario, ServicioCalendario>();
         servicios.AddScoped<IServicioPartidos, ServicioPartidos>();
         servicios.AddScoped<IServicioConsultaPartidos, ServicioConsultaPartidos>();

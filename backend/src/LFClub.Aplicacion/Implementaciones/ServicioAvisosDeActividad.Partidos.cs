@@ -71,7 +71,6 @@ public partial class ServicioAvisosDeActividad
             texto,
             ReglaDestinatariosDeAviso.Evaluar(HechoDeActividad.RESULTADO_PUBLICADO, partido.Estado),
             partido.Categorias.Select(fila => fila.CategoriaId).ToList(),
-            partido.Id,
             cuentaQueActua,
             cancelacion);
     }

@@ -32,7 +32,7 @@ public partial class RepositorioAvisos : IRepositorioAvisos
     public async Task<IReadOnlyList<DestinatarioDeAviso>> ResolverDestinatariosAsync(
         CoberturaDeAviso cobertura,
         IReadOnlyCollection<Guid> categoriaIds,
-        Guid? partidoId,
+        Guid? actividadId,
         IReadOnlyCollection<Guid> jugadorIds,
         Guid cuentaQueActua,
         CancellationToken cancelacion = default)
@@ -43,10 +43,21 @@ public partial class RepositorioAvisos : IRepositorioAvisos
 
         jugadores = cobertura switch
         {
-            CoberturaDeAviso.CATEGORIAS => jugadores.Where(
-                integrante => integrante.CategoriaId != null && categorias.Contains(integrante.CategoriaId.Value)),
+            CoberturaDeAviso.CATEGORIAS => jugadores.Where(integrante =>
+                (integrante.CategoriaId != null && categorias.Contains(integrante.CategoriaId.Value))
+                || _contexto.PartidosJugador.Any(fila => fila.PartidoId == actividadId && fila.UsuarioRolId == integrante.Id)),
             CoberturaDeAviso.CONVOCADOS => jugadores.Where(integrante => _contexto.PartidosJugador.Any(
-                fila => fila.PartidoId == partidoId && fila.UsuarioRolId == integrante.Id)),
+                fila => fila.PartidoId == actividadId && fila.UsuarioRolId == integrante.Id)),
+            CoberturaDeAviso.AUDIENCIA_DE_ENTRENAMIENTO => jugadores.Where(integrante =>
+                (categorias.Count == 0 || categorias.Contains(integrante.CategoriaId!.Value))
+                && (_contexto.EntrenamientosJugador.Any(
+                        fila => fila.EntrenamientoId == actividadId && fila.UsuarioRolId == integrante.Id)
+                    || (_contexto.EntrenamientosEquipo.Any(fila => fila.EntrenamientoId == actividadId)
+                        ? _contexto.JugadoresEquipo.Any(pertenencia => pertenencia.UsuarioRolId == integrante.Id
+                            && _contexto.EntrenamientosEquipo.Any(fila => fila.EntrenamientoId == actividadId
+                                && fila.EquipoId == pertenencia.EquipoId))
+                        : _contexto.EntrenamientosCategoria.Any(fila => fila.EntrenamientoId == actividadId
+                            && fila.CategoriaId == integrante.CategoriaId)))),
             _ => jugadores.Where(integrante => ids.Contains(integrante.Id)),
         };
 
@@ -114,6 +125,30 @@ public partial class RepositorioAvisos : IRepositorioAvisos
 
             _contexto.Entry(aviso).State = EntityState.Detached;
         }
+    }
+
+    /// <inheritdoc />
+    public async Task BorrarSinLeerAsync(
+        TipoDeActividad tipo,
+        Guid actividadId,
+        IReadOnlyCollection<Guid> usuarioRolIds,
+        CancellationToken cancelacion = default)
+    {
+        if (usuarioRolIds.Count == 0)
+        {
+            return;
+        }
+
+        var ids = usuarioRolIds.ToList();
+        await _contexto.AvisosDeActividadDestinatario
+            .Where(fila => fila.LeidoEn == null
+                && ids.Contains(fila.UsuarioRolId)
+                && fila.Aviso!.ActividadTipo == tipo
+                && fila.Aviso.ActividadId == actividadId)
+            .ExecuteDeleteAsync(cancelacion);
+        await _contexto.AvisosDeActividad
+            .Where(aviso => aviso.ActividadTipo == tipo && aviso.ActividadId == actividadId && !aviso.Destinatarios.Any())
+            .ExecuteDeleteAsync(cancelacion);
     }
 
     /// <summary>Los jugadores activos del club: aprobados, sin retirar y con categoría.</summary>

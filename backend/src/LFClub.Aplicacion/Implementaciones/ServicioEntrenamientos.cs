@@ -14,7 +14,9 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// RF-001, RF-002, RF-004, RF-005 y RF-038).
 /// Su responsabilidad es validar los datos, exigir categorías activas del club y que quien pregunta
 /// gestione la actividad con <see cref="ReglaGestionDeActividad"/>, marcar cada categoría como
-/// usada al dirigirle un entrenamiento (research §11) y permitir cada cambio de estado solo cuando
+/// usada al dirigirle un entrenamiento (research §11), guardar los equipos y los jugadores añadidos
+/// que arma <see cref="ArmadoDeAudiencia"/> (spec 013; cambiarlos después es de
+/// <c>ServicioAudienciaDeEntrenamiento</c>) y permitir cada cambio de estado solo cuando
 /// corresponde: cancelar uno programado y reactivar uno cancelado que no ha empezado. Programar,
 /// cambiar, cancelar y reactivar bloquean el club, igual que desactivar una categoría, para que no
 /// se crucen, y dentro de esa misma transacción avisan a las familias (spec 012) solo si algo
@@ -27,6 +29,8 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
     private readonly AccesoAActividad _acceso;
     private readonly IRepositorioEntrenamientos _entrenamientos;
     private readonly IRepositorioCategorias _categorias;
+    private readonly IRepositorioEquipos _equipos;
+    private readonly ArmadoDeAudiencia _audiencia;
     private readonly IRepositorioClub _club;
     private readonly IServicioConsultaEntrenamientos _consulta;
     private readonly IServicioAvisosDeActividad _avisos;
@@ -38,6 +42,8 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
         AccesoAActividad acceso,
         IRepositorioEntrenamientos entrenamientos,
         IRepositorioCategorias categorias,
+        IRepositorioEquipos equipos,
+        ArmadoDeAudiencia audiencia,
         IRepositorioClub club,
         IServicioConsultaEntrenamientos consulta,
         IServicioAvisosDeActividad avisos,
@@ -47,6 +53,8 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
         _acceso = acceso;
         _entrenamientos = entrenamientos;
         _categorias = categorias;
+        _equipos = equipos;
+        _audiencia = audiencia;
         _club = club;
         _consulta = consulta;
         _avisos = avisos;
@@ -71,27 +79,17 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
                     throw ErroresDeActividades.NoGestionaActividad();
                 }
 
-                var entrenamiento = new Entrenamiento
-                {
-                    ClubId = clubId,
-                    Fecha = validos.Fecha,
-                    HoraInicio = validos.HoraInicio,
-                    HoraFin = validos.HoraFin,
-                    Lugar = validos.Lugar,
-                    Nota = validos.Nota,
-                    Estado = EstadoEntrenamiento.PROGRAMADO,
-                    CreadoEn = _reloj.AhoraUtc,
-                    CreadoPorUsuarioRolId = quienPregunta.Id,
-                    Categorias = validos.CategoriaIds
-                        .Select(categoriaId => new EntrenamientoCategoria { CategoriaId = categoriaId, ClubId = clubId })
-                        .ToList(),
-                };
+                var audiencia = await _audiencia.ArmarAsync(
+                    validos.CategoriaIds, datos.EquipoIds, datos.JugadorAnadidoIds, [], cancelacion);
+                var entrenamiento = ConstructorDeEntrenamiento.Armar(
+                    validos, audiencia, clubId, quienPregunta.Id, _reloj.AhoraUtc);
 
                 foreach (var categoriaId in validos.CategoriaIds)
                 {
                     await _categorias.MarcarUsadaAsync(categoriaId, cancelacion);
                 }
 
+                await _equipos.MarcarUsadosAsync(audiencia.EquipoIds, cancelacion);
                 await _entrenamientos.AgregarAsync(entrenamiento, cancelacion);
                 await _avisos.EntrenamientoProgramadoAsync(entrenamiento, quienPregunta.UsuarioId, cancelacion);
                 return entrenamiento.Id;
@@ -125,6 +123,8 @@ public class ServicioEntrenamientos : IServicioEntrenamientos
                 {
                     throw ErroresDeActividades.CategoriasNoCambian();
                 }
+
+                await _audiencia.ExigirSinCambiosAsync(antes, datos.EquipoIds, datos.JugadorAnadidoIds, cancelacion);
 
                 var cambios = ReglaCambiosDeActividad.Evaluar(
                     antes.Fecha, antes.HoraInicio, antes.HoraFin, antes.Lugar,
