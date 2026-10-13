@@ -13,8 +13,18 @@ namespace LFClub.Aplicacion.Interfaces;
 /// </summary>
 public interface IRepositorioAsistencias
 {
-    /// <summary>Los jugadores activos y aprobados cuya categoría actual es una de esas, con su categoría.</summary>
-    Task<IReadOnlyList<UsuarioRol>> JugadoresActivosAsync(IReadOnlyCollection<Guid> categoriaIds, CancellationToken cancelacion = default);
+    /// <summary>
+    /// Los jugadores activos y aprobados de la audiencia del entrenamiento, con su categoría: con
+    /// equipos, los de esos equipos y los congelados por un equipo desactivado; sin equipos, los de
+    /// sus categorías; siempre limitados a aquellos cuya categoría actual es una de
+    /// <paramref name="categoriaIds"/>. Con <paramref name="conAnadidos"/>, suma a los añadidos de
+    /// cualquier categoría (spec 013, RF-021).
+    /// </summary>
+    Task<IReadOnlyList<UsuarioRol>> JugadoresDeLaAudienciaAsync(
+        Guid entrenamientoId,
+        IReadOnlyCollection<Guid> categoriaIds,
+        bool conAnadidos,
+        CancellationToken cancelacion = default);
 
     /// <summary>Las asistencias registradas en el entrenamiento, con su jugador y la categoría copiada.</summary>
     Task<IReadOnlyList<AsistenciaEntrenamiento>> AsistenciasAsync(Guid entrenamientoId, CancellationToken cancelacion = default);

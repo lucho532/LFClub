@@ -27,9 +27,18 @@ public class RepositorioConvocatoria : IRepositorioConvocatoria
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Equipo>> EquiposActivosAsync(
+        IReadOnlyCollection<Guid> categoriaIds, CancellationToken cancelacion = default) =>
+        await _contexto.Equipos.AsNoTracking()
+            .Include(equipo => equipo.Categoria)
+            .Where(equipo => equipo.Activo && categoriaIds.Contains(equipo.CategoriaId))
+            .OrderBy(equipo => equipo.Categoria!.Anio).ThenBy(equipo => equipo.Nombre)
+            .ToListAsync(cancelacion);
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<PartidoJugador>> ConvocadosAsync(Guid partidoId, CancellationToken cancelacion = default) =>
         await _contexto.PartidosJugador.AsNoTracking()
-            .Include(fila => fila.UsuarioRol)
+            .Include(fila => fila.UsuarioRol).ThenInclude(integrante => integrante!.Equipos)
             .Include(fila => fila.Categoria)
             .Where(fila => fila.PartidoId == partidoId)
             .ToListAsync(cancelacion);
@@ -39,6 +48,7 @@ public class RepositorioConvocatoria : IRepositorioConvocatoria
         Guid partidoId, IReadOnlyCollection<Guid> categoriaIds, CancellationToken cancelacion = default) =>
         await _contexto.UsuariosRol.AsNoTracking()
             .Include(integrante => integrante.Categoria)
+            .Include(integrante => integrante.Equipos)
             .Where(integrante => integrante.Rol == Rol.JUGADOR
                 && integrante.EstadoIngreso == EstadoIngreso.APROBADO
                 && integrante.Activo

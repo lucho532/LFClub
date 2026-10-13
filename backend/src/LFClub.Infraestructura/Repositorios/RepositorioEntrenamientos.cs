@@ -8,9 +8,9 @@ namespace LFClub.Infraestructura.Repositorios;
 
 /// <summary>
 /// Representa el acceso a los entrenamientos del club de la petición con Entity Framework.
-/// Su responsabilidad es leerlos con sus categorías, guardarlos y cambiarlos con sentencias
-/// directas y, en las listas, aplicar en SQL la condición de visibilidad del modelo de datos
-/// ("Consultas de visibilidad"). Trabaja siempre con el filtro de aislamiento activo.
+/// Su responsabilidad es leerlos con sus categorías y sus equipos, guardarlos y cambiarlos con
+/// sentencias directas y, en las listas, aplicar en SQL la condición de visibilidad del modelo de
+/// datos ("Consultas de visibilidad"; spec 013 la amplía con equipos y añadidos). Trabaja siempre con el filtro de aislamiento activo.
 /// No decide quién ve qué: traduce la regla del dominio sin cambiarla. No se salta el filtro de
 /// aislamiento ni borra entrenamientos.
 /// </summary>
@@ -30,6 +30,8 @@ public class RepositorioEntrenamientos : IRepositorioEntrenamientos
         _contexto.Entrenamientos.Add(entrenamiento);
         await _contexto.SaveChangesAsync(cancelacion);
         entrenamiento.Categorias.ForEach(fila => _contexto.Entry(fila).State = EntityState.Detached);
+        entrenamiento.Equipos.ForEach(fila => _contexto.Entry(fila).State = EntityState.Detached);
+        entrenamiento.Jugadores.ForEach(fila => _contexto.Entry(fila).State = EntityState.Detached);
         _contexto.Entry(entrenamiento).State = EntityState.Detached;
     }
 
@@ -99,6 +101,11 @@ public class RepositorioEntrenamientos : IRepositorioEntrenamientos
             .ToDictionaryAsync(fila => fila.EntrenamientoId, fila => fila.Respuesta, cancelacion);
 
     /// <inheritdoc />
+    public Task<bool> EnListaDeAsync(Guid entrenamientoId, Guid usuarioRolId, CancellationToken cancelacion = default) =>
+        _contexto.EntrenamientosJugador.AsNoTracking()
+            .AnyAsync(fila => fila.EntrenamientoId == entrenamientoId && fila.UsuarioRolId == usuarioRolId, cancelacion);
+
+    /// <inheritdoc />
     public async Task<bool?> AsistenciaDeAsync(Guid entrenamientoId, Guid usuarioRolId, CancellationToken cancelacion = default) =>
         await _contexto.AsistenciasEntrenamiento
             .Where(fila => fila.EntrenamientoId == entrenamientoId && fila.UsuarioRolId == usuarioRolId)
@@ -106,31 +113,42 @@ public class RepositorioEntrenamientos : IRepositorioEntrenamientos
             .FirstOrDefaultAsync(cancelacion);
 
     /// <summary>
-    /// La condición de visibilidad del modelo de datos en SQL: PRESIDENTE o DIRECTIVO; o alguna
-    /// categoría que entrena; o la cuenta de un jugador con su categoría actual entre las del
-    /// entrenamiento o con asistencia registrada en él.
+    /// La condición de visibilidad de <c>ReglaVisibilidadDeEntrenamiento</c> en SQL: el PRESIDENTE;
+    /// quien entrena alguna de sus categorías; el DIRECTIVO, además, los que no van dirigidos a
+    /// equipos; y la cuenta de un jugador, los que lo tienen en su lista guardada (añadido o
+    /// congelado), aquellos con asistencia registrada y los de su audiencia: con equipos, estar en
+    /// alguno; sin equipos, su categoría actual.
     /// </summary>
     private IQueryable<Entrenamiento> Visibles(QuienPregunta quien)
     {
-        var todos = quien.Rol is Rol.PRESIDENTE or Rol.DIRECTIVO;
+        var esPresidente = quien.Rol == Rol.PRESIDENTE;
+        var esDirectivo = quien.Rol == Rol.DIRECTIVO;
         var esJugador = quien.EsJugador;
         var entrena = quien.CategoriasQueEntrena.ToList();
+        var misEquipos = quien.EquipoIds.ToList();
         var suCategoria = quien.CategoriaId;
         var yo = quien.UsuarioRolId;
 
         return ConCategorias().Where(entrenamiento =>
-            todos
+            esPresidente
             || entrenamiento.Categorias.Any(fila => entrena.Contains(fila.CategoriaId))
+            || (esDirectivo && !entrenamiento.Equipos.Any())
             || (esJugador
-                && (entrenamiento.Categorias.Any(fila => fila.CategoriaId == suCategoria)
+                && (entrenamiento.Jugadores.Any(fila => fila.UsuarioRolId == yo)
                     || _contexto.AsistenciasEntrenamiento.Any(asistencia =>
-                        asistencia.EntrenamientoId == entrenamiento.Id && asistencia.UsuarioRolId == yo))));
+                        asistencia.EntrenamientoId == entrenamiento.Id && asistencia.UsuarioRolId == yo)
+                    || (entrenamiento.Equipos.Any()
+                        ? entrenamiento.Equipos.Any(fila => misEquipos.Contains(fila.EquipoId))
+                        : entrenamiento.Categorias.Any(fila => fila.CategoriaId == suCategoria)))));
     }
 
     private IQueryable<Entrenamiento> ConCategorias() => _contexto.Entrenamientos
         .AsNoTracking()
         .Include(entrenamiento => entrenamiento.Categorias)
-        .ThenInclude(fila => fila.Categoria);
+        .ThenInclude(fila => fila.Categoria)
+        .Include(entrenamiento => entrenamiento.Equipos)
+        .ThenInclude(fila => fila.Equipo)
+        .ThenInclude(equipo => equipo!.Categoria);
 
     /// <inheritdoc />
     public async Task ResponderAsync(

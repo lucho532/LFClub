@@ -13,4 +13,9 @@ namespace LFClub.Aplicacion.DTOs;
 /// corrigió quien entrena: puede publicar el resultado o indicar lo de su jugador (spec 010).
 /// Siempre falso en los entrenamientos.
 /// </param>
-public record PermisosDeActividadDto(bool Gestiona, bool VePlanilla, bool Responde, bool IndicaResultado = false);
+/// <param name="Dirige">
+/// Puede cambiar los equipos y los jugadores añadidos de un entrenamiento: el PRESIDENTE o quien
+/// entrena alguna de sus categorías (spec 013, RF-016). Siempre falso en los partidos.
+/// </param>
+public record PermisosDeActividadDto(
+    bool Gestiona, bool VePlanilla, bool Responde, bool IndicaResultado = false, bool Dirige = false);

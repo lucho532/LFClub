@@ -323,6 +323,25 @@ Enmienda 4.10.0 → 4.10.1 (2026-10-12), decidida por el propietario del proyect
 - §4 y estructura del repositorio: los proyectos del backend pasan de LaPecosa.* a LFClub.*
 - Pendientes: renombrar la carpeta del proyecto y el repositorio, que se hace al final
 
+Enmienda 4.10.1 → 4.11.0 (2026-10-12), decidida por el propietario del proyecto en la spec 013:
+- §11.1: una actividad puede dirigirse, además de a categorías, a equipos de ellas, y puede sumar a
+  jugadores concretos de otros equipos o de otras categorías sin cambiarles nada
+- §11.3: el entrenador puede dirigir una actividad a cualquier equipo de sus categorías, aunque su
+  asignación indique que dirige solo algunos
+- §7.5: un jugador añadido a una actividad de otra categoría ve solo esa actividad
+- §8 (Entrenador): al crear una convocatoria o dirigir un entrenamiento puede sumar jugadores de
+  otras categorías; no es "gestionarlos". §8 (Jugador): ve los entrenamientos de su categoría que van
+  a sus equipos o a todos, y los de otra categoría a los que fue añadido
+- §14.4: los avisos de entrenamientos llegan a quien puede ver la actividad, también a los añadidos
+- §17.2: sustituye la frase "visibles para todos los jugadores de las categorías a las que van
+  dirigidos, sin excepción": con equipos, solo los ven los jugadores de esos equipos y los añadidos.
+  Quién suma jugadores de otra categoría: el PRESIDENTE y quien entrena la actividad. Un entrenamiento
+  de un equipo desactivado sigue visible para quienes eran de ese equipo hasta que se realiza
+- §20: pruebas nuevas de visibilidad por equipo y por jugador añadido
+- §28: sin cambios. Principios modificados: ninguno renombrado. Secciones añadidas y eliminadas:
+  ninguna
+- Pendientes: ninguna decisión nueva. La spec 013 implementa esta versión
+
 -->
 
 # Constitución del Proyecto — LFClub, plataforma multiclub de escuelas de fútbol
@@ -743,6 +762,8 @@ Dentro de un club, el aislamiento es entre personas y categorías:
   los jugadores, de cualquier equipo (ver §11.3).
 - Una cuenta de jugador solamente accede a la información de su propio jugador. Cada familia ve
   únicamente lo de su hijo.
+- Un jugador añadido a un entrenamiento o a un partido de otra categoría (ver §11.1) ve solo esa
+  actividad, y no accede a nada más de esa categoría.
 
 La aceptación del tratamiento de datos se da por hecha al inscribirse en el club. La plataforma no
 gestiona autorizaciones ni consentimientos.
@@ -897,7 +918,9 @@ Dentro de sus categorías puede:
 - Consultar la ficha de sus jugadores, incluidos los datos médicos y de contacto de emergencia.
 - Programar entrenamientos.
 - Registrar asistencia.
-- Crear convocatorias, seleccionando de la lista los jugadores a los que se envían.
+- Crear convocatorias, seleccionando de la lista los jugadores a los que se envían, y dirigir
+  entrenamientos a equipos de sus categorías. Puede sumar a jugadores de otros equipos o de otras
+  categorías a esa actividad (ver §11.1 y §17.2).
 - Registrar resultados, goles y demás eventos del partido, y corregir el resultado publicado por
   una familia (ver §17.3).
 - Poner las estadísticas, el dorsal y la posición de la carta de sus jugadores (ver §14.3).
@@ -911,8 +934,9 @@ Además dispone de un apartado de finanzas generales del club, de solo lectura: 
 cartera pendiente y totales por categoría.
 
 No puede modificar el valor de la mensualidad del club ni la de un jugador, anular o corregir
-pagos, ni gestionar jugadores de categorías que no tenga asignadas. Tampoco decide en qué equipo
-juega cada jugador: eso es del PRESIDENTE (ver §11.3).
+pagos, ni gestionar jugadores de categorías que no tenga asignadas. Sumar a un jugador de otra
+categoría a una actividad no es gestionarlo: no ve su ficha ni cambia nada de él. Tampoco decide en
+qué equipo juega cada jugador: eso es del PRESIDENTE (ver §11.3).
 
 ### Jugador
 
@@ -951,8 +975,9 @@ Puede, únicamente sobre su propio jugador:
 
 No accede a la ficha, la carta, los pagos ni los datos de contacto de otros jugadores.
 
-Ve todos los entrenamientos de su categoría, pero solamente los partidos a los que fue convocado
-(ver §17.2).
+Ve los entrenamientos de su categoría dirigidos a toda ella o a alguno de sus equipos, y los
+entrenamientos y partidos de otras categorías a los que fue añadido, pero solamente los partidos a
+los que fue convocado (ver §17.2).
 
 ## 9. Sitio público
 
@@ -1034,6 +1059,13 @@ dirigirse a una o a varias categorías.
 Juntar categorías para una actividad no cambia la categoría de ningún jugador ni crea una
 categoría nueva.
 
+Cuando una categoría tiene equipos (ver §11.3), un entrenamiento también puede dirigirse a uno o
+varios de sus equipos. Sin equipos elegidos, la actividad es de toda la categoría.
+
+Si los jugadores de la audiencia no alcanzan, quien dirige la actividad (ver §17.2) puede sumar a
+ella a jugadores concretos de otros equipos o de otras categorías del club. Sumar a un jugador no
+cambia su categoría ni sus equipos, ni crea una categoría nueva.
+
 ### 11.2. Cambio de categoría
 
 Debe existir un único registro de Jugador por persona.
@@ -1069,7 +1101,7 @@ equipos funciona igual.
 - Solo el PRESIDENTE decide en qué equipos juega cada jugador.
 - El entrenador se asigna a la categoría, no al equipo. La asignación indica qué equipos dirige,
   pero ve a todos los jugadores de la categoría: el aislamiento sigue siendo por categoría (ver
-  §7.5).
+  §7.5). Puede dirigir una actividad a cualquier equipo de sus categorías, no solo a los que dirige.
 
 No se guarda historial de los equipos por los que pasó un jugador.
 
@@ -1501,8 +1533,9 @@ cambia un entrenamiento o un partido. Al tocarla se abre el detalle de la activi
 
 - Avisan: la creación de un entrenamiento o de un partido, los cambios de fecha, hora y lugar, la
   cancelación y su reactivación, la convocatoria, el resultado y la asistencia.
-- Llegan a las cuentas con al menos un jugador activo en la categoría de la actividad. En un
-  partido próximo, solo a las cuentas con un jugador convocado (ver §17.2).
+- Llegan a las cuentas con al menos un jugador que puede ver la actividad: en un entrenamiento, uno
+  activo en su categoría o, si va dirigido a equipos, en esos equipos, o uno añadido. En un partido
+  próximo, solo a las cuentas con un jugador convocado (ver §17.2).
 - Un aviso no revela nada que la familia no pueda ver de esa actividad (ver §17.2). Quien entra a
   la categoría después no recibe los avisos anteriores.
 - Una actividad cancelada sigue existiendo (ver §14): su aviso abre el detalle, marcado como
@@ -1664,7 +1697,8 @@ la comodidad de mostrar el calendario completo.
 #### Convocatoria a partidos
 
 Quien entrena las categorías del partido, o el PRESIDENTE, crea la convocatoria seleccionando,
-de la lista de jugadores, a quiénes se les envía. Quien entrena una categoría es un ENTRENADOR
+de la lista de jugadores agrupada por equipo, a quiénes se les envía. Puede sumar a jugadores de
+otros equipos o de otras categorías (ver §11.1); ese jugador ve solo ese partido. Quien entrena una categoría es un ENTRENADOR
 asignado a ella, o un PRESIDENTE o DIRECTIVO asignado a ella (ver §8, "Entrenador").
 
 Un partido próximo y su convocatoria solamente son visibles para:
@@ -1687,8 +1721,19 @@ El cargo de arbitraje solamente se genera para los convocados.
 
 #### Convocatoria a entrenamientos
 
-Los entrenamientos son visibles para todos los jugadores de las categorías a las que van
-dirigidos, sin excepción.
+Un entrenamiento sin equipos es visible para todos los jugadores activos de las categorías a las
+que va dirigido, incluso los que no están en ningún equipo.
+
+Un entrenamiento dirigido a equipos es visible solo para los jugadores de esos equipos, los
+jugadores que se le añadieron, quienes entrenan alguna de sus categorías y el PRESIDENTE. Para
+cualquier otra cuenta no existe, en las mismas condiciones que un partido sin convocar. Un jugador
+ve los entrenamientos de su equipo actual.
+
+Quien puede dirigir un entrenamiento y sumar a él a jugadores de otras categorías es el PRESIDENTE
+y quien entrena alguna de sus categorías. Quitar a un jugador añadido no le genera ningún aviso.
+
+Un entrenamiento próximo dirigido a un equipo que se desactiva sigue visible para quienes eran de
+ese equipo hasta que se realiza.
 
 #### Partidos ya jugados
 
@@ -1840,8 +1885,11 @@ Las pruebas deben validar principalmente:
   cuenta.
 - Que la foto de un jugador se elimina al retirarlo, de cualquiera de las tres formas, y al
   eliminarse su ficha por cambio de rol, y que al reincorporarlo vuelve sin foto.
-- Que una cuenta no convocada no puede ver ni consultar un partido próximo, y que sí ve todos los
-  entrenamientos de su categoría.
+- Que una cuenta no convocada no puede ver ni consultar un partido próximo, y que sí ve los
+  entrenamientos de su categoría dirigidos a toda ella o a sus equipos.
+- Que un entrenamiento dirigido a un equipo no lo ve ni lo consulta un jugador de otro equipo ni uno
+  sin equipo, y que un jugador añadido de otra categoría ve solo esa actividad sin que cambien su
+  categoría ni sus equipos.
 - Que la cuenta de un jugador cambia sus nombres, apellidos y fecha de nacimiento, que ese cambio
   no le cambia la categoría, y que no cambia los datos de otro jugador.
 - Que solo la cuenta de un convocado publica el resultado de un partido, y solo si ya empezó; que
@@ -2048,4 +2096,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.10.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12
+**Versión**: 4.11.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12

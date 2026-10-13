@@ -27,14 +27,19 @@ public class ControladorEntrenamientos : ControladorBase
     private readonly IServicioEntrenamientos _entrenamientos;
     private readonly IServicioConsultaEntrenamientos _consulta;
     private readonly IServicioRespuestas _respuestas;
+    private readonly IServicioAudienciaDeEntrenamiento _audiencia;
 
     /// <summary>Crea el controlador con sus servicios.</summary>
     public ControladorEntrenamientos(
-        IServicioEntrenamientos entrenamientos, IServicioConsultaEntrenamientos consulta, IServicioRespuestas respuestas)
+        IServicioEntrenamientos entrenamientos,
+        IServicioConsultaEntrenamientos consulta,
+        IServicioRespuestas respuestas,
+        IServicioAudienciaDeEntrenamiento audiencia)
     {
         _entrenamientos = entrenamientos;
         _consulta = consulta;
         _respuestas = respuestas;
+        _audiencia = audiencia;
     }
 
     /// <summary>Programa un entrenamiento para una o varias categorías.</summary>
@@ -84,6 +89,20 @@ public class ControladorEntrenamientos : ControladorBase
     [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
     public Task<EntrenamientoDto> Reactivar(Guid entrenamientoId, CancellationToken cancelacion) =>
         _entrenamientos.ReactivarAsync(entrenamientoId, Integrante, cancelacion);
+
+    /// <summary>
+    /// Cambia los equipos y los jugadores añadidos de un entrenamiento programado (spec 013). Lo hace
+    /// el PRESIDENTE o quien entrena alguna de sus categorías.
+    /// </summary>
+    [HttpPut("{entrenamientoId:guid}/audiencia")]
+    [IntegranteDelClub(Rol.PRESIDENTE, Rol.DIRECTIVO, Rol.ENTRENADOR)]
+    [ProducesResponseType<EntrenamientoDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]
+    [ProducesResponseType<Problema>(StatusCodes.Status409Conflict, Problema.TipoContenido)]
+    [ProducesResponseType<Problema>(StatusCodes.Status422UnprocessableEntity, Problema.TipoContenido)]
+    public Task<EntrenamientoDto> CambiarAudiencia(
+        Guid entrenamientoId, AudienciaDeEntrenamientoDto datos, CancellationToken cancelacion) =>
+        _audiencia.CambiarAsync(entrenamientoId, datos, Integrante, cancelacion);
 
     /// <summary>La familia del jugador de la petición dice si asistirá.</summary>
     [HttpPut("{entrenamientoId:guid}/mi-respuesta")]

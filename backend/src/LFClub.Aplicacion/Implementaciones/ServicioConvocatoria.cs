@@ -14,7 +14,7 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// Su responsabilidad es resolver el acceso con <see cref="AccesoAActividad"/>; dar la planilla solo
 /// a quien puede verla (a los demás que ven el partido, <c>403 no_gestiona_actividad</c>); y guardar
 /// la convocatoria solo en un partido próximo que quien pregunta gestiona, con jugadores activos de
-/// sus categorías (RF-009). Quien sigue convocado conserva su fila, su categoría copiada y su
+/// sus categorías o de cualquier otra (spec 013, RF-013). Quien sigue convocado conserva su fila, su categoría copiada y su
 /// respuesta aunque haya cambiado de categoría (RF-034); quien sale pierde su fila y su respuesta
 /// (RF-013). Al guardar toma el bloqueo del club, vuelve a leer el partido y, en la misma
 /// transacción, avisa a la familia de cada jugador recién convocado, con un solo aviso por cuenta
@@ -88,12 +88,12 @@ public class ServicioConvocatoria : IServicioConvocatoria
                     .Select(fila => fila.UsuarioRolId)
                     .ToHashSet();
                 var nuevos = pedidos.Where(id => !actuales.Contains(id)).ToList();
-                var categorias = visible.Partido.Categorias.Select(fila => fila.CategoriaId).ToHashSet();
+
+                // RF-013: se puede convocar a cualquier jugador activo del club con categoría; su
+                // categoría y sus equipos no cambian (RF-015). La fila copia la suya.
                 var integrantes = await _convocatoria.IntegrantesAsync(nuevos, cancelacion);
                 var validos = integrantes
-                    .Where(jugador => jugador.EsJugadorDelClub
-                        && jugador.CategoriaId is { } categoria
-                        && categorias.Contains(categoria))
+                    .Where(jugador => jugador.EsJugadorDelClub && jugador.CategoriaId is not null)
                     .ToList();
                 if (validos.Count != nuevos.Count)
                 {
@@ -113,12 +113,14 @@ public class ServicioConvocatoria : IServicioConvocatoria
     private async Task<PlanillaPartidoDto> LeerAsync(PartidoVisible visible, CancellationToken cancelacion)
     {
         var partido = visible.Partido;
+        var categorias = partido.Categorias.Select(fila => fila.CategoriaId).ToList();
         var convocados = await _convocatoria.ConvocadosAsync(partido.Id, cancelacion);
         IReadOnlyList<UsuarioRol> convocables = partido.Estado == EstadoPartido.PROXIMO
-            ? await _convocatoria.ConvocablesAsync(
-                partido.Id, partido.Categorias.Select(fila => fila.CategoriaId).ToList(), cancelacion)
+            ? await _convocatoria.ConvocablesAsync(partido.Id, categorias, cancelacion)
             : [];
-        return MapperPartidos.APlanilla(partido.Id, convocados, convocables, visible.Quien);
+        var equipos = await _convocatoria.EquiposActivosAsync(categorias, cancelacion);
+        return MapperPartidos.APlanilla(
+            partido.Id, convocados, convocables, equipos, categorias.ToHashSet(), visible.Permisos.Gestiona, visible.Quien);
     }
 
     private static HashSet<Guid> Validar(GuardarConvocatoriaDto datos)
@@ -128,11 +130,8 @@ public class ServicioConvocatoria : IServicioConvocatoria
         {
             errores.Agregar("usuarioRolIds", "Indica los jugadores convocados; puede ser una lista vacía.");
         }
-        else if (datos.UsuarioRolIds.Distinct().Count() != datos.UsuarioRolIds.Count)
-        {
-            errores.Agregar("usuarioRolIds", "Hay un jugador repetido.");
-        }
 
+        // Un jugador que llega por dos caminos (dos equipos) queda convocado una sola vez (RF-011).
         errores.LanzarSiHayErrores();
         return datos.UsuarioRolIds!.ToHashSet();
     }

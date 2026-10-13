@@ -22,6 +22,17 @@ public interface IServicioAvisosDeActividad
     Task EntrenamientoCambiadoAsync(
         Entrenamiento entrenamiento, CambiosDeActividad cambios, Guid cuentaQueActua, CancellationToken cancelacion = default);
 
+    /// <summary>
+    /// Avisa de "nuevo entrenamiento" solo a los jugadores que pasan a verlo al cambiar su audiencia
+    /// (spec 013, RF-022). A quienes dejan de verlo no se les avisa. Sin jugadores que entren, no
+    /// hace nada.
+    /// </summary>
+    Task EntrenamientoAudienciaCambiadaAsync(
+        Entrenamiento entrenamiento,
+        IReadOnlyCollection<Guid> jugadoresQueEntran,
+        Guid cuentaQueActua,
+        CancellationToken cancelacion = default);
+
     /// <summary>Se canceló un entrenamiento.</summary>
     Task EntrenamientoCanceladoAsync(Entrenamiento entrenamiento, Guid cuentaQueActua, CancellationToken cancelacion = default);
 

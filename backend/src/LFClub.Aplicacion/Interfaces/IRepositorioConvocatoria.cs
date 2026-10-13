@@ -16,7 +16,16 @@ namespace LFClub.Aplicacion.Interfaces;
 /// </summary>
 public interface IRepositorioConvocatoria
 {
-    /// <summary>Los convocados de un partido, con su integrante y la categoría copiada.</summary>
+    /// <summary>
+    /// Los equipos activos de esas categorías, con su categoría, por año y nombre (spec 013, RF-009).
+    /// </summary>
+    Task<IReadOnlyList<Equipo>> EquiposActivosAsync(
+        IReadOnlyCollection<Guid> categoriaIds, CancellationToken cancelacion = default);
+
+    /// <summary>
+    /// Los convocados de un partido, con su integrante (y los equipos en los que juega hoy) y la
+    /// categoría copiada.
+    /// </summary>
     Task<IReadOnlyList<PartidoJugador>> ConvocadosAsync(Guid partidoId, CancellationToken cancelacion = default);
 
     /// <summary>

@@ -9,12 +9,15 @@ import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { diaDeLaSemana, rangoDeHoras, yaEmpezo } from '../../compartido/fechas';
 import { AccionesDeEstado } from '../actividades/AccionesDeEstado';
 import { EtiquetaActividad } from '../actividades/EtiquetaActividad';
+import { useCategoriasGestionables } from '../actividades/useCategoriasGestionables';
 import { FormularioEntrenamiento } from '../actividades/FormularioEntrenamiento';
 import { BotonesRespuesta } from '../calendario/BotonesRespuesta';
 import { textoDeCategorias } from '../calendario/TarjetaActividad';
 import { useClub } from '../contextoClub';
+import { DialogoAudiencia } from './DialogoAudiencia';
 import { PlanillaAsistencia } from './PlanillaAsistencia';
 import { ResumenRespuestas } from './ResumenRespuestas';
+import { SeccionAudiencia } from './SeccionAudiencia';
 
 /**
  * Detalle de un entrenamiento: fecha, horas, lugar, nota, categorías y estado escrito. Quien lo
@@ -29,6 +32,8 @@ export function DetalleEntrenamiento() {
   const carga = useCarga(ruta, () => api.get<EntrenamientoDto>(ruta));
   const [parametros] = useSearchParams();
   const [cambiando, setCambiando] = useState(parametros.get('editar') === '1');
+  const [cambiandoAudiencia, setCambiandoAudiencia] = useState(false);
+  const { categorias: gestionables } = useCategoriasGestionables(club);
   const entrenamiento = carga.datos;
   const vePlanilla = entrenamiento?.permisos.vePlanilla ?? false;
   const planilla = useCarga<PlanillaEntrenamientoDto | null>(`${ruta}/jugadores#${vePlanilla}#${entrenamiento?.estado}`, () =>
@@ -83,6 +88,7 @@ export function DetalleEntrenamiento() {
                   <dt>Categorías</dt>
                   <dd>{textoDeCategorias(entrenamiento.categorias)}</dd>
                 </div>
+
                 {entrenamiento.nota && (
                   <div className="dato-ancho">
                     <dt>Nota</dt>
@@ -90,6 +96,7 @@ export function DetalleEntrenamiento() {
                   </div>
                 )}
               </dl>
+              <SeccionAudiencia entrenamiento={entrenamiento} alCambiar={() => setCambiandoAudiencia(true)} />
               {club.miRol === 'JUGADOR' && (
                 <BotonesRespuesta
                   key={`${entrenamiento.estado}`}
@@ -115,6 +122,22 @@ export function DetalleEntrenamiento() {
                 />
               )}
             </Tarjeta>
+          )}
+          {cambiandoAudiencia && (
+            <DialogoAudiencia
+              key={`${entrenamiento.equipos?.length}-${entrenamiento.anadidos?.length}`}
+              clubId={club.clubId}
+              abierto
+              entrenamiento={entrenamiento}
+              categorias={gestionables.filter((categoria) =>
+                entrenamiento.categorias.some((propia) => propia.categoriaId === categoria.categoriaId),
+              )}
+              alGuardar={(cambiado) => {
+                carga.fijar(cambiado);
+                setCambiandoAudiencia(false);
+              }}
+              alCancelar={() => setCambiandoAudiencia(false)}
+            />
           )}
           {vePlanilla && planilla.datos && (
             <Tarjeta titulo="Respuestas de las familias">

@@ -21,6 +21,10 @@ namespace LFClub.Aplicacion.DTOs;
 /// <param name="Nota">Nota para las familias; ausente si no tiene.</param>
 /// <param name="Permisos">Lo que quien pregunta puede hacer con él.</param>
 /// <param name="MiAsistencia">Si el jugador de la petición asistió; ausente si nadie la registró.</param>
+/// <param name="Equipos">Sus equipos, con su categoría y si siguen activos; vacío si es de toda la categoría (spec 013).</param>
+/// <param name="Anadidos">
+/// Los jugadores añadidos: solo para quien dirige, ausente para los demás (RF-018, RF-024).
+/// </param>
 public record EntrenamientoDto(
     Guid EntrenamientoId,
     DateOnly Fecha,
@@ -32,4 +36,6 @@ public record EntrenamientoDto(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] RespuestaFamilia? MiRespuesta,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Nota,
     PermisosDeActividadDto Permisos,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? MiAsistencia);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? MiAsistencia,
+    IReadOnlyList<EquipoDeActividadDto>? Equipos = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<JugadorSumableDto>? Anadidos = null);

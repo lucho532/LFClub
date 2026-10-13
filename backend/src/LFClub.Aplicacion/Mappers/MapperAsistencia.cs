@@ -41,7 +41,8 @@ public static class MapperAsistencia
                     MapperActividades.Categoria(fila.CategoriaId, fila.Categoria),
                     RespuestaDe(fila.Jugador.Id),
                     fila.Presente,
-                    marcable))
+                    marcable,
+                    fila.Anadido))
                 .ToList());
     }
 }

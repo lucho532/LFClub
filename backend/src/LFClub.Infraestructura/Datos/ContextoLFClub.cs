@@ -78,6 +78,12 @@ public class ContextoLFClub : DbContext
     /// <summary>Categorías a las que va dirigido cada entrenamiento.</summary>
     public DbSet<EntrenamientoCategoria> EntrenamientosCategoria => Set<EntrenamientoCategoria>();
 
+    /// <summary>Equipos a los que va dirigido cada entrenamiento.</summary>
+    public DbSet<EntrenamientoEquipo> EntrenamientosEquipo => Set<EntrenamientoEquipo>();
+
+    /// <summary>Jugadores añadidos o congelados en cada entrenamiento.</summary>
+    public DbSet<EntrenamientoJugador> EntrenamientosJugador => Set<EntrenamientoJugador>();
+
     /// <summary>Asistencia registrada a cada entrenamiento.</summary>
     public DbSet<AsistenciaEntrenamiento> AsistenciasEntrenamiento => Set<AsistenciaEntrenamiento>();
 

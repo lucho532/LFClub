@@ -4,10 +4,17 @@ import type { CategoriaDto } from '../../compartido/api/tiposCategorias';
 import { useCarga } from '../../compartido/api/useCarga';
 import { puedeVerCategorias } from '../categorias/textos';
 
-/** Una categoría que se puede elegir en el formulario de una actividad. */
+/** Un equipo activo de una categoría. */
+export interface EquipoDeCategoria {
+  equipoId: string;
+  nombre: string;
+}
+
+/** Una categoría que se puede elegir en el formulario de una actividad, con sus equipos activos. */
 export interface CategoriaGestionable {
   categoriaId: string;
   anio: number;
+  equipos: EquipoDeCategoria[];
 }
 
 /**
@@ -29,7 +36,11 @@ export function useCategoriasGestionables(club: ClubDto): { categorias: Categori
         club.miRol === 'PRESIDENTE' ||
         categoria.entrenadores.some((entrenador) => entrenador.usuarioRolId === club.miUsuarioRolId),
     )
-    .map((categoria) => ({ categoriaId: categoria.categoriaId, anio: categoria.anio }))
+    .map((categoria) => ({
+      categoriaId: categoria.categoriaId,
+      anio: categoria.anio,
+      equipos: categoria.equipos.map((equipo) => ({ equipoId: equipo.equipoId, nombre: equipo.nombre })),
+    }))
     .sort((a, b) => a.anio - b.anio);
 
   return { categorias, cargando: carga.cargando };

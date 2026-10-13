@@ -15,6 +15,14 @@ public static class ErroresDeActividades
         "no_gestiona_actividad", 403,
         "Solo puede hacer esto el presidente o quien entrena todas las categorías de esta actividad.");
 
+    /// <summary>
+    /// 403: ve el entrenamiento pero no es el PRESIDENTE ni entrena alguna de sus categorías, así
+    /// que no cambia a quién va dirigido (spec 013, RF-016).
+    /// </summary>
+    public static ExcepcionDeAplicacion NoDirigeActividad() => new(
+        "no_gestiona_actividad", 403,
+        "Solo puede cambiar a quién va dirigido el presidente o quien entrena alguna de sus categorías.");
+
     /// <summary>409: la actividad está cancelada y no admite cambios, respuestas ni asistencia.</summary>
     public static ExcepcionDeAplicacion ActividadCancelada() => ExcepcionDeAplicacion.Conflicto(
         "actividad_cancelada", "Esta actividad está cancelada. Reactívala antes, si todavía no empieza.");
@@ -54,7 +62,15 @@ public static class ErroresDeActividades
 
     /// <summary>409: el jugador no es activo o no es de una categoría que se pueda usar aquí (RF-009, RF-022).</summary>
     public static ExcepcionDeAplicacion JugadorFueraDeLaActividad() => ExcepcionDeAplicacion.Conflicto(
-        "jugador_fuera_de_la_actividad", "Uno de los jugadores no es de las categorías de esta actividad.");
+        "jugador_fuera_de_la_actividad", "Uno de los jugadores no está activo en el club o no tiene categoría.");
+
+    /// <summary>
+    /// 422: un equipo no existe, no está activo o no es de una de las categorías del entrenamiento
+    /// (spec 013, RF-001).
+    /// </summary>
+    public static ExcepcionDeAplicacion EquipoNoValido() => new(
+        "equipo_no_valido", 422,
+        "Uno de los equipos no está activo o no es de las categorías de este entrenamiento.");
 
     /// <summary>400: se enviaron goles a quien no jugó (RF-017).</summary>
     public static ExcepcionDeAplicacion GolesDeQuienNoJugo() => new(

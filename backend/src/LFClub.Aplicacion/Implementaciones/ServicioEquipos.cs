@@ -98,7 +98,8 @@ public class ServicioEquipos : IServicioEquipos
             async _ =>
             {
                 await ExistenteAsync(categoriaId, equipoId, cancelacion);
-                await _equipos.DesactivarAsync(equipoId, cancelacion);
+                await _equipos.DesactivarAsync(
+                    equipoId, HoraDeColombia.Ahora(_reloj).Hoy, _reloj.AhoraUtc, cancelacion);
             },
             categoriaId,
             cancelacion);

@@ -7,6 +7,7 @@ import type {
 } from '../../compartido/api/tiposActividades';
 import { horaCorta, rangoDeHoras } from '../../compartido/fechas';
 import { EtiquetaActividad } from '../actividades/EtiquetaActividad';
+import { textoDeAudiencia } from '../actividades/textosDeAudiencia';
 import { nombreRival } from '../partidos/textos';
 
 /** "Categoría 2014", "Categorías 2014 y 2015" o "Categorías 2013, 2014 y 2015". */
@@ -58,7 +59,11 @@ export function TarjetaActividad(props: Props) {
             {rangoDeHoras(props.entrenamiento.horaInicio, props.entrenamiento.horaFin)}
           </Link>
           <span className="dato-largo">{props.entrenamiento.lugar}</span>
-          <span className="texto-suave">{textoDeCategorias(props.entrenamiento.categorias)}</span>
+          <span className="texto-suave">
+            {(props.entrenamiento.equipos?.length ?? 0) > 0
+              ? `Para: ${textoDeAudiencia(props.entrenamiento.categorias, props.entrenamiento.equipos)}`
+              : textoDeCategorias(props.entrenamiento.categorias)}
+          </span>
         </>
       ) : (
         <>

@@ -25,6 +25,7 @@ public class ServicioAsistencia : IServicioAsistencia
 {
     private readonly AccesoAActividad _acceso;
     private readonly IRepositorioAsistencias _asistencias;
+    private readonly IRepositorioAudiencia _audiencia;
     private readonly IRepositorioClub _club;
     private readonly IServicioAvisosDeActividad _avisos;
     private readonly IUnidadDeTrabajo _unidadDeTrabajo;
@@ -34,6 +35,7 @@ public class ServicioAsistencia : IServicioAsistencia
     public ServicioAsistencia(
         AccesoAActividad acceso,
         IRepositorioAsistencias asistencias,
+        IRepositorioAudiencia audiencia,
         IRepositorioClub club,
         IServicioAvisosDeActividad avisos,
         IUnidadDeTrabajo unidadDeTrabajo,
@@ -41,6 +43,7 @@ public class ServicioAsistencia : IServicioAsistencia
     {
         _acceso = acceso;
         _asistencias = asistencias;
+        _audiencia = audiencia;
         _club = club;
         _avisos = avisos;
         _unidadDeTrabajo = unidadDeTrabajo;
@@ -126,22 +129,32 @@ public class ServicioAsistencia : IServicioAsistencia
     }
 
     /// <summary>
-    /// Los jugadores de la planilla: los que ya tienen asistencia en una categoría marcable, con la
-    /// categoría copiada, y los activos de las categorías marcables que todavía no la tienen.
+    /// Los jugadores de la planilla (spec 013, RF-021): los de la audiencia (los de los equipos del
+    /// entrenamiento y los congelados, o los de sus categorías si no tiene equipos) que están en una
+    /// categoría marcable, más los que ya tienen asistencia en una categoría marcable con la
+    /// categoría copiada y, solo para quien dirige, los añadidos, de cualquier categoría.
     /// </summary>
     private async Task<IReadOnlyList<FilaDePlanilla>> FilasAsync(EntrenamientoVisible visible, CancellationToken cancelacion)
     {
         var quien = visible.Quien;
+        var entrenamientoId = visible.Entrenamiento.Id;
         var marcables = ReglaAlcanceDeAsistencia.CategoriasMarcables(
             quien.Rol, visible.Entrenamiento.Categorias.Select(fila => fila.CategoriaId).ToList(), quien.CategoriasQueEntrena);
-        var conAsistencia = (await _asistencias.AsistenciasAsync(visible.Entrenamiento.Id, cancelacion))
-            .Where(fila => marcables.Contains(fila.CategoriaId))
-            .Select(fila => new FilaDePlanilla(fila.UsuarioRol!, fila.CategoriaId, fila.Categoria, fila.Presente))
+        var anadidos = visible.Permisos.Dirige
+            ? (await _audiencia.AnadidosAsync(entrenamientoId, cancelacion)).Select(jugador => jugador.UsuarioRolId).ToHashSet()
+            : new HashSet<Guid>();
+
+        var conAsistencia = (await _asistencias.AsistenciasAsync(entrenamientoId, cancelacion))
+            .Where(fila => marcables.Contains(fila.CategoriaId) || anadidos.Contains(fila.UsuarioRolId))
+            .Select(fila => new FilaDePlanilla(
+                fila.UsuarioRol!, fila.CategoriaId, fila.Categoria, fila.Presente, anadidos.Contains(fila.UsuarioRolId)))
             .ToList();
         var yaEstan = conAsistencia.Select(fila => fila.Jugador.Id).ToHashSet();
-        var sinAsistencia = (await _asistencias.JugadoresActivosAsync(marcables.ToList(), cancelacion))
+        var sinAsistencia = (await _asistencias.JugadoresDeLaAudienciaAsync(
+                entrenamientoId, marcables.ToList(), conAnadidos: visible.Permisos.Dirige, cancelacion))
             .Where(jugador => !yaEstan.Contains(jugador.Id))
-            .Select(jugador => new FilaDePlanilla(jugador, jugador.CategoriaId!.Value, jugador.Categoria, null));
+            .Select(jugador => new FilaDePlanilla(
+                jugador, jugador.CategoriaId!.Value, jugador.Categoria, null, anadidos.Contains(jugador.Id)));
         return conAsistencia.Concat(sinAsistencia).ToList();
     }
 
@@ -172,4 +185,5 @@ public class ServicioAsistencia : IServicioAsistencia
 /// <param name="CategoriaId">La copiada si ya tiene asistencia; si no, la actual.</param>
 /// <param name="Categoria">Esa categoría, con su año.</param>
 /// <param name="Presente">Si asistió, o nulo si no se registró.</param>
-public record FilaDePlanilla(UsuarioRol Jugador, Guid CategoriaId, Categoria? Categoria, bool? Presente);
+/// <param name="Anadido">Si lo sumó una persona y no es de la audiencia natural (spec 013); solo para quien dirige.</param>
+public record FilaDePlanilla(UsuarioRol Jugador, Guid CategoriaId, Categoria? Categoria, bool? Presente, bool Anadido = false);

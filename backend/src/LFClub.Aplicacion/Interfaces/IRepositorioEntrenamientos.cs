@@ -51,6 +51,12 @@ public interface IRepositorioEntrenamientos
     Task<IReadOnlyDictionary<Guid, RespuestaFamilia>> RespuestasDeAsync(
         IReadOnlyCollection<Guid> entrenamientoIds, Guid usuarioRolId, CancellationToken cancelacion = default);
 
+    /// <summary>
+    /// Si ese jugador está en la lista guardada del entrenamiento: añadido por quien dirige o
+    /// congelado al desactivar un equipo (spec 013).
+    /// </summary>
+    Task<bool> EnListaDeAsync(Guid entrenamientoId, Guid usuarioRolId, CancellationToken cancelacion = default);
+
     /// <summary>Si ese jugador estuvo presente, o nulo si nadie registró su asistencia.</summary>
     Task<bool?> AsistenciaDeAsync(Guid entrenamientoId, Guid usuarioRolId, CancellationToken cancelacion = default);
 

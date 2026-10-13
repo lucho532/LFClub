@@ -25,16 +25,36 @@ public class RepositorioAsistencias : IRepositorioAsistencias
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<UsuarioRol>> JugadoresActivosAsync(
-        IReadOnlyCollection<Guid> categoriaIds, CancellationToken cancelacion = default) =>
-        await _contexto.UsuariosRol.AsNoTracking()
+    public async Task<IReadOnlyList<UsuarioRol>> JugadoresDeLaAudienciaAsync(
+        Guid entrenamientoId,
+        IReadOnlyCollection<Guid> categoriaIds,
+        bool conAnadidos,
+        CancellationToken cancelacion = default)
+    {
+        var categorias = categoriaIds.ToList();
+        var tieneEquipos = await _contexto.EntrenamientosEquipo
+            .AnyAsync(fila => fila.EntrenamientoId == entrenamientoId, cancelacion);
+
+        return await _contexto.UsuariosRol.AsNoTracking()
             .Include(integrante => integrante.Categoria)
             .Where(integrante => integrante.Rol == Rol.JUGADOR
                 && integrante.EstadoIngreso == EstadoIngreso.APROBADO
                 && integrante.Activo
                 && integrante.CategoriaId != null
-                && categoriaIds.Contains(integrante.CategoriaId.Value))
+                && ((categorias.Contains(integrante.CategoriaId.Value)
+                        && (!tieneEquipos
+                            || _contexto.JugadoresEquipo.Any(pertenencia => pertenencia.UsuarioRolId == integrante.Id
+                                && _contexto.EntrenamientosEquipo.Any(fila => fila.EntrenamientoId == entrenamientoId
+                                    && fila.EquipoId == pertenencia.EquipoId))
+                            || _contexto.EntrenamientosJugador.Any(fila => fila.EntrenamientoId == entrenamientoId
+                                && fila.UsuarioRolId == integrante.Id
+                                && fila.Origen == OrigenDeJugadorEnEntrenamiento.EQUIPO_DESACTIVADO)))
+                    || (conAnadidos
+                        && _contexto.EntrenamientosJugador.Any(fila => fila.EntrenamientoId == entrenamientoId
+                            && fila.UsuarioRolId == integrante.Id
+                            && fila.Origen == OrigenDeJugadorEnEntrenamiento.ANADIDO))))
             .ToListAsync(cancelacion);
+    }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<AsistenciaEntrenamiento>> AsistenciasAsync(

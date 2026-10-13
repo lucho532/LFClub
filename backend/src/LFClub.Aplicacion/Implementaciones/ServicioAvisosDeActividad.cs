@@ -38,7 +38,7 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
             entrenamiento,
             HechoDeActividad.ENTRENAMIENTO_PROGRAMADO,
             RedaccionDeAvisos.EntrenamientoProgramado(entrenamiento.Fecha, entrenamiento.HoraInicio, Hoy()),
-            CategoriasDe(entrenamiento),
+            [],
             cuentaQueActua,
             cancelacion);
 
@@ -50,9 +50,37 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
             HechoDeActividad.ENTRENAMIENTO_CAMBIADO,
             RedaccionDeAvisos.EntrenamientoCambiado(
                 cambios, entrenamiento.Fecha, entrenamiento.HoraInicio, entrenamiento.Lugar, Hoy()),
-            CategoriasDe(entrenamiento),
+            [],
             cuentaQueActua,
             cancelacion);
+
+    /// <inheritdoc />
+    public async Task EntrenamientoAudienciaCambiadaAsync(
+        Entrenamiento entrenamiento,
+        IReadOnlyCollection<Guid> jugadoresQueEntran,
+        Guid cuentaQueActua,
+        CancellationToken cancelacion = default)
+    {
+        if (jugadoresQueEntran.Count == 0)
+        {
+            return;
+        }
+
+        var destinatarios = await _avisos.ResolverDestinatariosAsync(
+            CoberturaDeAviso.ALUDIDOS, [], null, jugadoresQueEntran, cuentaQueActua, cancelacion);
+        if (destinatarios.Count == 0)
+        {
+            return;
+        }
+
+        var aviso = NuevoAviso(
+            entrenamiento.ClubId,
+            HechoDeActividad.ENTRENAMIENTO_PROGRAMADO,
+            TipoDeActividad.ENTRENAMIENTO,
+            entrenamiento.Id,
+            RedaccionDeAvisos.EntrenamientoProgramado(entrenamiento.Fecha, entrenamiento.HoraInicio, Hoy()));
+        await _avisos.GenerarAsync(aviso, destinatarios, cancelacion);
+    }
 
     /// <inheritdoc />
     public Task EntrenamientoCanceladoAsync(Entrenamiento entrenamiento, Guid cuentaQueActua, CancellationToken cancelacion = default) =>
@@ -60,7 +88,7 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
             entrenamiento,
             HechoDeActividad.ENTRENAMIENTO_CANCELADO,
             RedaccionDeAvisos.EntrenamientoCancelado(entrenamiento.Fecha, Hoy()),
-            CategoriasDe(entrenamiento),
+            [],
             cuentaQueActua,
             cancelacion);
 
@@ -70,7 +98,7 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
             entrenamiento,
             HechoDeActividad.ENTRENAMIENTO_REACTIVADO,
             RedaccionDeAvisos.EntrenamientoReactivado(entrenamiento.Fecha, Hoy()),
-            CategoriasDe(entrenamiento),
+            [],
             cuentaQueActua,
             cancelacion);
 
@@ -132,7 +160,6 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
             texto,
             ReglaDestinatariosDeAviso.Evaluar(hecho),
             categorias,
-            null,
             cuentaQueActua,
             cancelacion);
 
@@ -146,7 +173,6 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
             texto,
             ReglaDestinatariosDeAviso.Evaluar(hecho, partido.Estado),
             partido.Categorias.Select(fila => fila.CategoriaId).ToList(),
-            partido.Id,
             cuentaQueActua,
             cancelacion);
 
@@ -158,12 +184,11 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
         string texto,
         CoberturaDeAviso cobertura,
         IReadOnlyCollection<Guid> categorias,
-        Guid? partidoId,
         Guid cuentaQueActua,
         CancellationToken cancelacion)
     {
         var destinatarios = await _avisos.ResolverDestinatariosAsync(
-            cobertura, categorias, partidoId, [], cuentaQueActua, cancelacion);
+            cobertura, categorias, actividadId, [], cuentaQueActua, cancelacion);
         if (destinatarios.Count == 0)
         {
             return;
@@ -185,7 +210,4 @@ public partial class ServicioAvisosDeActividad : IServicioAvisosDeActividad
         };
 
     private DateOnly Hoy() => HoraDeColombia.Ahora(_reloj).Hoy;
-
-    private static List<Guid> CategoriasDe(Entrenamiento entrenamiento) =>
-        entrenamiento.Categorias.Select(fila => fila.CategoriaId).ToList();
 }
