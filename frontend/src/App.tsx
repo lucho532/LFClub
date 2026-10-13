@@ -10,6 +10,7 @@ import { EliminarCuentaPublica } from './cuenta/EliminarCuentaPublica';
 import { Invitacion } from './cuenta/Invitacion';
 import { MiPerfil } from './cuenta/MiPerfil';
 import { Privacidad } from './cuenta/Privacidad';
+import { Probadores } from './cuenta/Probadores';
 import { Recuperar } from './cuenta/Recuperar';
 import { Restablecer } from './cuenta/Restablecer';
 import { Inicio } from './Inicio';
@@ -58,6 +59,7 @@ export function App({ conArranque = false }: Props) {
             <Route path="/invitacion" element={<Invitacion />} />
             <Route path="/privacidad" element={<Privacidad />} />
             <Route path="/eliminar-cuenta" element={<EliminarCuentaPublica />} />
+            <Route path="/probadores" element={<Probadores />} />
 
             <Route element={<RutaProtegida quien="cualquiera" />}>
               <Route path="/perfil" element={<MiPerfil />} />
