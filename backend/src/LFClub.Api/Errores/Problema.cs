@@ -22,13 +22,26 @@ public class Problema
     };
 
     /// <summary>Crea el problema con su estado, su código y su mensaje.</summary>
-    public Problema(int status, string codigo, string title, IReadOnlyDictionary<string, string[]>? errores = null)
+    public Problema(
+        int status,
+        string codigo,
+        string title,
+        IReadOnlyDictionary<string, string[]>? errores = null,
+        IReadOnlyDictionary<string, object>? extras = null)
     {
         Status = status;
         Codigo = codigo;
         Title = title;
         Errores = errores;
+        Extras = extras?.ToDictionary(par => par.Key, par => par.Value);
     }
+
+    /// <summary>
+    /// Campos propios de un código concreto, escritos junto a los demás (por ejemplo <c>clubes</c>
+    /// en <c>presidente_unico</c>).
+    /// </summary>
+    [JsonExtensionData]
+    public Dictionary<string, object>? Extras { get; set; }
 
     /// <summary>Mensaje en español para mostrar a la persona.</summary>
     public string Title { get; }

@@ -41,7 +41,7 @@ public class ManejadorErrores : IExceptionHandler
         var problema = exception switch
         {
             ExcepcionDeAplicacion prevista =>
-                new Problema(prevista.EstadoHttp, prevista.Codigo, prevista.Message, prevista.Errores),
+                new Problema(prevista.EstadoHttp, prevista.Codigo, prevista.Message, prevista.Errores, prevista.Extras),
             BadHttpRequestException peticion when peticion.StatusCode == StatusCodes.Status413PayloadTooLarge =>
                 new Problema(413, "peticion_demasiado_grande", "Lo que enviaste es demasiado grande."),
             BadHttpRequestException =>

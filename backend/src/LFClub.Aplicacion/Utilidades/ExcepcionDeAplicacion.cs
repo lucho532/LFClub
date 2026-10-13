@@ -14,13 +14,21 @@ public class ExcepcionDeAplicacion : Exception
         string codigo,
         int estadoHttp,
         string mensaje,
-        IReadOnlyDictionary<string, string[]>? errores = null)
+        IReadOnlyDictionary<string, string[]>? errores = null,
+        IReadOnlyDictionary<string, object>? extras = null)
         : base(mensaje)
     {
         Codigo = codigo;
         EstadoHttp = estadoHttp;
         Errores = errores;
+        Extras = extras;
     }
+
+    /// <summary>
+    /// Campos propios de un código concreto que la respuesta lleva junto al mensaje, como la lista
+    /// <c>clubes</c> de <c>presidente_unico</c>. Nulo en casi todos los errores.
+    /// </summary>
+    public IReadOnlyDictionary<string, object>? Extras { get; }
 
     /// <summary>Código estable definido en el contrato de la API.</summary>
     public string Codigo { get; }
