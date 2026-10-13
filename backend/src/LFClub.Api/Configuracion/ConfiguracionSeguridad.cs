@@ -70,7 +70,10 @@ public static class ConfiguracionSeguridad
             if (urlFrontend.Length > 0)
             {
                 // Content-Disposition: la pantalla lee el nombre de la imagen de la carta (spec 010).
-                politica.WithOrigins(urlFrontend).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Content-Disposition");
+                // La app Android (Capacitor) sirve la web desde https://localhost dentro del WebView,
+                // y la de iOS desde capacitor://localhost: sin ellos la app no puede llamar a la API.
+                politica.WithOrigins(urlFrontend, "https://localhost", "capacitor://localhost")
+                    .AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Content-Disposition");
             }
         }));
 
