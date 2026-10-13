@@ -22,6 +22,7 @@ export function useJugadoresDeCategorias(clubId: string, categoriaIds: string[])
         nombres: jugador.nombres,
         apellidos: jugador.apellidos,
         anio: detalle.anio,
+        equipoIds: jugador.equipos.map((equipo) => equipo.equipoId),
       })),
     );
   });
