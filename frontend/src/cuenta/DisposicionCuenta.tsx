@@ -10,6 +10,8 @@ interface Props {
   subtitulo?: string;
   /** Identidad del club que invita. Sin ella se usa la identidad neutra de la plataforma. */
   identidad?: IdentidadClubDto;
+  /** Adorno que va detrás del contenido, como el fondo de balones de entrar. */
+  fondo?: ReactNode;
   children: ReactNode;
 }
 
@@ -17,9 +19,10 @@ interface Props {
  * Disposición común de las pantallas sin sesión: entrar, recuperar, restablecer e invitación.
  * Lleva el botón de tema, que debe estar también donde no hay sesión (RF-032).
  */
-export function DisposicionCuenta({ titulo, subtitulo, identidad, children }: Props) {
+export function DisposicionCuenta({ titulo, subtitulo, identidad, fondo, children }: Props) {
   return (
     <IdentidadClub identidad={identidad} className="centrado">
+      {fondo}
       <header className="columna">
         <div className="cabecera">
           <p className="lateral-marca" style={{ padding: 0 }}>

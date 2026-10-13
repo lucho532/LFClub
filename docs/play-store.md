@@ -127,9 +127,12 @@ considera "procesamiento de servicio", no "compartir", así que se marca como **
 
 ## 5. Pendiente en el código antes de publicar
 
-- **Borrado de cuenta**: Play exige que quien crea cuentas en la app ofrezca borrarla dentro de la
-  app y una URL web para pedirlo. No encontré esa función en el frontend. Sin ella, la sección de
-  seguridad de los datos debe decir que no se puede borrar, y la revisión puede rechazarla.
+- **Borrado de cuenta** (spec 014, ya construido): dentro de la app, "Mi perfil" → "Eliminar mi
+  cuenta", con la contraseña; elimina la cuenta y a los jugadores de la cuenta en todos los clubes.
+  **URL web para pedirlo** (campo "Eliminar cuenta" de Play): `<URL del frontend>/eliminar-cuenta`
+  (pública, sin sesión). En "Seguridad de los datos" declara que sí se puede pedir la eliminación y
+  que se conservan comunicados y resultados sin nombre, marcadores y, cuando existan, pagos con
+  nombre y documento. Solo cambia la ficha de Play después de publicar esta versión.
 - **Página de política de privacidad** pública (texto abajo).
 - `minifyEnabled false` en release: funciona, pero conviene activar R8 más adelante.
 
@@ -153,7 +156,13 @@ considera "procesamiento de servicio", no "compartir", así que se marca como **
 > **Menores:** los datos de menores los registran y mantienen sus responsables o el club; los menores
 > no tienen cuenta.
 >
-> **Seguridad:** las comunicaciones usan HTTPS.
+> **Seguridad y conservación:** las comunicaciones usan HTTPS. Al eliminar tu cuenta se borran de
+> inmediato tu cuenta, tus jugadores, sus fichas, documentos, fotos, cartas y estadísticas. Se
+> conservan los comunicados y resultados que publicaste, sin tu nombre; el marcador de los partidos,
+> sin los jugadores; y los pagos registrados, con el nombre y el documento que tenían, porque el club
+> los necesita para su contabilidad.
 >
-> **Tus derechos:** puedes consultar, corregir o pedir la eliminación de tus datos escribiendo a
-> [correo de contacto].
+> **Tus derechos:** puedes consultar y corregir tus datos desde tu perfil y la ficha de tu jugador, y
+> eliminar tu cuenta desde la app en "Mi perfil" → "Eliminar mi cuenta", con tu contraseña. Si no
+> puedes hacerlo desde la app, escribe a [correo de contacto] desde el correo de la cuenta y la
+> atenderemos en un plazo de 15 días. Instrucciones: [URL del frontend]/eliminar-cuenta.

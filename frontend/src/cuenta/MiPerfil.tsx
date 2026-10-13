@@ -46,6 +46,15 @@ export function MiPerfil() {
         />
         {tieneDatosPropios && <SeccionDatosPropios />}
         <AccesosMiFicha clubes={sesion.clubes} />
+        {!sesion.esDesarrollador && (
+          <section className="tarjeta columna" aria-labelledby="eliminar-mi-cuenta">
+            <h2 id="eliminar-mi-cuenta">Eliminar mi cuenta</h2>
+            <p className="texto-suave">
+              Borra tu cuenta y a los jugadores que tiene, en todos los clubes. No se puede deshacer.
+            </p>
+            <Link to="/cuenta/eliminar">Eliminar mi cuenta</Link>
+          </section>
+        )}
       </main>
     </div>
   );

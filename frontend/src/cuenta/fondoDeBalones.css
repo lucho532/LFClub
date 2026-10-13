@@ -1,0 +1,72 @@
+/*
+ * Fondo de balones de la pantalla de entrar (FondoDeBalones.tsx). Va debajo del contenido: todo lo
+ * que le sigue sube por encima con `position: relative`. Los balones son de adorno: de colores
+ * variados (giro de tono sobre el azul del balón) y sin tapar al formulario, que va encima en una tarjeta.
+ */
+
+.fondo-balones {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fondo-balones ~ * {
+  position: relative;
+  z-index: 1;
+}
+
+.fondo-balon {
+  position: absolute;
+  display: block;
+  opacity: 0.85;
+  filter: hue-rotate(var(--tono, 0deg)) saturate(1.6);
+  top: -80px;
+  animation: fondo-balon-lluvia linear infinite;
+}
+
+.fondo-balon-giro {
+  display: block;
+  animation-duration: var(--giro, 12s);
+  animation-direction: var(--sentido, normal);
+  animation-name: fondo-balon-giro;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fondo-balon-lluvia {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(100vh + 120px));
+  }
+}
+
+@keyframes fondo-balon-giro {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fondo-balon,
+  .fondo-balon-giro {
+    animation: none;
+  }
+}
+
+/* `.centrado > *` limita el ancho de sus hijos; el fondo ocupa toda la pantalla. */
+.centrado > .fondo-balones {
+  width: auto;
+  max-width: none;
+}
+
+/* Enlaces al pie de la tarjeta de entrar: uno en cada extremo de la misma línea. */
+.pie-entrar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
