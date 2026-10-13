@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { DisposicionCuenta } from './DisposicionCuenta';
 
 /** Correo público al que se piden consultas, correcciones y eliminación de datos. */
-export const CORREO_PRIVACIDAD = 'privacidad@lfclub.app';
+export const CORREO_PRIVACIDAD = 'luisrak25@gmail.com';
 
 /** Fecha de la última revisión del texto; cámbiala cada vez que cambie la política. */
 export const ACTUALIZADA_PRIVACIDAD = '13 de octubre de 2026';
@@ -57,15 +57,22 @@ export function Privacidad() {
         <h2>Seguridad y conservación</h2>
         <p>
           Las comunicaciones con la aplicación usan HTTPS. Conservamos los datos mientras el club o la
-          cuenta estén activos y los eliminamos cuando se pide su eliminación.
+          cuenta estén activos. Cuando eliminas tu cuenta se borran de inmediato tu cuenta, tus jugadores,
+          sus fichas, documentos, fotos, cartas y estadísticas. Se conservan los comunicados y resultados
+          que publicaste, sin tu nombre; el marcador de los partidos, sin los jugadores; y los pagos
+          registrados, con el nombre y el documento que tenían, porque el club los necesita para su
+          contabilidad.
         </p>
 
         <h2>Tus derechos</h2>
         <p>
-          Puedes consultar y corregir tus datos desde tu perfil y la ficha de tu jugador. Para pedir la
-          eliminación de tu cuenta o de los datos de un jugador, escribe a{' '}
-          <a href={`mailto:${CORREO_PRIVACIDAD}`}>{CORREO_PRIVACIDAD}</a>. Responderemos a esa solicitud y
-          borraremos los datos que corresponda.
+          Puedes consultar y corregir tus datos desde tu perfil y la ficha de tu jugador. Puedes eliminar
+          tu cuenta tú mismo desde la aplicación, en «Mi perfil» → «Eliminar mi cuenta», con tu
+          contraseña; eliminarla borra también a los jugadores de la cuenta, en todos los clubes. Si
+          prefieres retirar a un jugador de un club sin eliminar la cuenta, hazlo desde su ficha. Si no
+          puedes hacerlo desde la aplicación, <Link to="/eliminar-cuenta">te explicamos cómo pedirlo</Link>{' '}
+          o escribe a <a href={`mailto:${CORREO_PRIVACIDAD}`}>{CORREO_PRIVACIDAD}</a> desde el correo de la
+          cuenta y la atenderemos en un plazo de 15 días.
         </p>
 
         <h2>Cambios</h2>

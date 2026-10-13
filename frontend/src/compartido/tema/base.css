@@ -59,6 +59,10 @@ img {
   font-size: 14px;
 }
 
+.texto-pequeno {
+  font-size: 12px;
+}
+
 .solo-lectores {
   position: absolute;
   width: 1px;

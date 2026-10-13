@@ -6,6 +6,8 @@ export class ErrorApi extends Error {
   readonly status: number;
   readonly title: string;
   readonly errores: Record<string, string[]>;
+  /** Campos propios del código (por ejemplo `clubes` en `presidente_unico`), tal como llegaron. */
+  readonly extras: Record<string, unknown>;
 
   constructor(problema: Problema) {
     super(problema.title);
@@ -14,6 +16,7 @@ export class ErrorApi extends Error {
     this.status = problema.status;
     this.title = problema.title;
     this.errores = problema.errores ?? {};
+    this.extras = { ...problema };
   }
 
   /** Primer mensaje de un campo, o `undefined` si ese campo no tiene errores. */

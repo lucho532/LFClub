@@ -65,6 +65,8 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioFichaBasica, ServicioFichaBasica>();
         servicios.AddScoped<ResolutorDeEnlaces>();
         servicios.AddScoped<IServicioDatosPropios, ServicioDatosPropios>();
+        servicios.AddScoped<ServicioResumenEliminacionCuenta>();
+        servicios.AddScoped<IServicioEliminacionCuenta, ServicioEliminacionCuenta>();
 
         servicios.AddScoped<AccesoAActividad>();
         servicios.AddScoped<ArmadoDeAudiencia>();

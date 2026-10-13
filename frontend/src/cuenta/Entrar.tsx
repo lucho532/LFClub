@@ -8,6 +8,7 @@ import { Boton } from '../compartido/componentes/Boton';
 import { Campo } from '../compartido/componentes/Campo';
 import { useSesion } from '../compartido/sesion/useSesion';
 import { DisposicionCuenta } from './DisposicionCuenta';
+import { FondoDeBalones } from './FondoDeBalones';
 
 /**
  * Inicio de sesión con correo o documento. No ofrece registrarse: a la plataforma solo se entra
@@ -17,7 +18,10 @@ export function Entrar() {
   const { estado, sesion, iniciar } = useSesion();
   const navegar = useNavigate();
   const ubicacion = useLocation();
-  const destino = (ubicacion.state as { desde?: string } | null)?.desde ?? '/';
+  const estadoDeLaUbicacion = ubicacion.state as { desde?: string; aviso?: string } | null;
+  const destino = estadoDeLaUbicacion?.desde ?? '/';
+  // Lo deja la pantalla de eliminar la cuenta al volver aquí (spec 014).
+  const avisoDeLlegada = estadoDeLaUbicacion?.aviso ?? null;
 
   const [identificador, setIdentificador] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -43,8 +47,10 @@ export function Entrar() {
   }
 
   return (
-    <DisposicionCuenta titulo="Iniciar sesión">
+    <DisposicionCuenta titulo="Iniciar sesión" fondo={<FondoDeBalones />}
+    >
       <form className="columna" onSubmit={enviar}>
+        {avisoDeLlegada && !error && <Aviso tono="exito">{avisoDeLlegada}</Aviso>}
         {error && (
           <Aviso tono="error">
             {error} <Link to="/recuperar">Recuperar mi contraseña</Link>
@@ -70,7 +76,10 @@ export function Entrar() {
           Entrar
         </Boton>
         <Link to="/recuperar">Olvidé mi contraseña</Link>
-        <Link to="/privacidad">Política de privacidad</Link>
+        <div className="pie-entrar texto-pequeno">
+          <Link to="/privacidad">Política de privacidad</Link>
+          <Link to="/eliminar-cuenta">Eliminar mi cuenta</Link>
+        </div>
       </form>
     </DisposicionCuenta>
   );

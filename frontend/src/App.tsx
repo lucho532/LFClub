@@ -5,6 +5,8 @@ import { ProveedorSesion } from './compartido/sesion/ProveedorSesion';
 import { RutaProtegida } from './compartido/sesion/RutaProtegida';
 import { ProveedorTema } from './compartido/tema/ProveedorTema';
 import { Entrar } from './cuenta/Entrar';
+import { EliminarCuenta } from './cuenta/EliminarCuenta';
+import { EliminarCuentaPublica } from './cuenta/EliminarCuentaPublica';
 import { Invitacion } from './cuenta/Invitacion';
 import { MiPerfil } from './cuenta/MiPerfil';
 import { Privacidad } from './cuenta/Privacidad';
@@ -55,9 +57,11 @@ export function App({ conArranque = false }: Props) {
             <Route path="/restablecer" element={<Restablecer />} />
             <Route path="/invitacion" element={<Invitacion />} />
             <Route path="/privacidad" element={<Privacidad />} />
+            <Route path="/eliminar-cuenta" element={<EliminarCuentaPublica />} />
 
             <Route element={<RutaProtegida quien="cualquiera" />}>
               <Route path="/perfil" element={<MiPerfil />} />
+              <Route path="/cuenta/eliminar" element={<EliminarCuenta />} />
             </Route>
 
             <Route element={<RutaProtegida quien="desarrollador" />}>

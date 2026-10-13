@@ -23,6 +23,8 @@ export interface Problema {
   status: number;
   codigo: string;
   errores?: Record<string, string[]>;
+  /** Campos propios de un código, como la lista `clubes` de `presidente_unico`. */
+  [campo: string]: unknown;
 }
 
 export interface TokenDto {
