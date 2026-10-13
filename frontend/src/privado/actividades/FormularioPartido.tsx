@@ -7,11 +7,12 @@ import type {
   PartidoDto,
   TipoPartido,
 } from '../../compartido/api/tiposActividades';
+import type { EquipoDeActividadDto, JugadorSumableDto } from '../../compartido/api/tiposAudiencia';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
 import { Campo } from '../../compartido/componentes/Campo';
 import { hoyEnColombia } from '../../compartido/fechas';
-import { EditorConvocatoria } from '../partidos/EditorConvocatoria';
+import { EditorConvocatoria, type JugadorConvocable } from '../partidos/EditorConvocatoria';
 import { useJugadoresDeCategorias } from '../partidos/useJugadoresDeCategorias';
 import { SelectorCategorias } from './SelectorCategorias';
 import type { CategoriaGestionable } from './useCategoriasGestionables';
@@ -42,9 +43,34 @@ export function FormularioPartido({ clubId, categorias, partido, alGuardar, alCa
   const [tipo, setTipo] = useState<TipoPartido>(partido?.tipo ?? 'AMISTOSO');
   const [torneo, setTorneo] = useState(partido?.nombreTorneo ?? '');
   const [convocados, setConvocados] = useState<string[]>([]);
+  const [sumados, setSumados] = useState<JugadorSumableDto[]>([]);
   const [fallo, setFallo] = useState<unknown>(null);
   const [enviando, setEnviando] = useState(false);
-  const jugadores = useJugadoresDeCategorias(clubId, partido ? [] : elegidas);
+  const deLasCategorias = useJugadoresDeCategorias(clubId, partido ? [] : elegidas);
+  // Los que se sumaron con el buscador: de cualquier categoría, marcados "Añadido".
+  const jugadores: JugadorConvocable[] = [
+    ...deLasCategorias,
+    ...sumados.map((jugador) => ({
+      usuarioRolId: jugador.usuarioRolId,
+      nombres: jugador.nombres,
+      apellidos: jugador.apellidos,
+      anio: jugador.categoria.anio,
+      equipoIds: [],
+      anadido: true,
+    })),
+  ];
+  // Los equipos activos de las categorías elegidas, para agrupar la convocatoria (spec 013).
+  const equipos: EquipoDeActividadDto[] = categorias
+    .filter((categoria) => elegidas.includes(categoria.categoriaId))
+    .flatMap((categoria) =>
+      categoria.equipos.map((equipo) => ({
+        equipoId: equipo.equipoId,
+        nombre: equipo.nombre,
+        categoriaId: categoria.categoriaId,
+        anio: categoria.anio,
+        activo: true,
+      })),
+    );
   const errorDe = (campo: string) => (fallo instanceof ErrorApi ? fallo.errorDe(campo) : undefined);
   const conErroresPorCampo = fallo instanceof ErrorApi && Object.keys(fallo.errores).length > 0;
 
@@ -140,7 +166,17 @@ export function FormularioPartido({ clubId, categorias, partido, alGuardar, alCa
         />
       )}
       {!partido && elegidas.length > 0 && (
-        <EditorConvocatoria clubId={clubId} jugadores={jugadores} elegidos={convocados} alCambiar={setConvocados} />
+        <EditorConvocatoria
+          clubId={clubId}
+          jugadores={jugadores}
+          equipos={equipos}
+          elegidos={convocados}
+          alCambiar={setConvocados}
+          alSumar={(jugador) => {
+            setSumados((previos) => [...previos, jugador]);
+            setConvocados((previos) => [...previos, jugador.usuarioRolId]);
+          }}
+        />
       )}
       {fallo !== null && !conErroresPorCampo && <Aviso tono="error">{mensajeDe(fallo)}</Aviso>}
       <div className="fila">
