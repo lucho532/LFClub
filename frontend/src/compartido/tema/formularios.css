@@ -7,6 +7,18 @@
   padding-right: 52px;
 }
 
+/* Edge y Safari de escritorio pintan su propio ojo en los campos de contraseña; con el nuestro
+   aparecerían dos. */
+.campo-contrasena input::-ms-reveal,
+.campo-contrasena input::-ms-clear {
+  display: none;
+}
+.campo-contrasena input::-webkit-credentials-auto-fill-button,
+.campo-contrasena input::-webkit-contacts-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .boton-ver-contrasena {
   position: absolute;
   top: 50%;

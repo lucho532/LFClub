@@ -9,6 +9,7 @@
 }
 
 .cifra {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -21,6 +22,24 @@
   color: var(--texto-suave);
   font-size: 13px;
   font-weight: 700;
+}
+
+/* Toda la cifra es el enlace: el área del texto se extiende a la tarjeta. */
+.cifra dt a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cifra dt a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+}
+
+.cifra:hover,
+.cifra:focus-within {
+  border-color: var(--borde-fuerte);
 }
 
 .cifra dd {
