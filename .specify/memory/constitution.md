@@ -342,6 +342,14 @@ Enmienda 4.10.1 → 4.11.0 (2026-10-12), decidida por el propietario del proyect
   ninguna
 - Pendientes: ninguna decisión nueva. La spec 013 implementa esta versión
 
+Enmienda 4.11.0 → 4.12.0 (2026-10-13), decidida por el propietario del proyecto en la spec 014:
+- §12.4: la eliminación de la cuenta incluye a todos sus jugadores en todos los clubes; lo
+  publicado se conserva con "Persona eliminada"; el presidente único no puede eliminarse; cierra
+  sesiones y libera correo y documentos; existe la página pública /eliminar-cuenta
+- Motivo: Google Play exige eliminar la cuenta desde la aplicación y una dirección web pública
+- §28: sin cambios. Principios renombrados, secciones añadidas y eliminadas: ninguno
+- Pendientes: ninguna decisión nueva. La spec 014 implementa esta versión
+
 -->
 
 # Constitución del Proyecto — LFClub, plataforma multiclub de escuelas de fútbol
@@ -1298,6 +1306,16 @@ sola, sin aprobación de nadie. Al eliminarse la cuenta:
   a ellos solo se guardan el nombre completo y el documento.
 - Se borran todos los demás datos personales.
 - Se eliminan todas sus estadísticas deportivas.
+- Se eliminan también todos los jugadores de la cuenta, en todos los clubes, con su ficha, sus
+  documentos, su foto y su carta. Quien solo quiere salir de un club usa "Retirar del club" (ver
+  §14.1).
+- Lo que la persona publicó (comunicados y resultados) se conserva con "Persona eliminada" en lugar
+  de su nombre; el marcador de un partido es del equipo y no cambia.
+- Un PRESIDENTE que es el único de algún club no puede eliminar su cuenta (ver §8).
+- Cierran todas sus sesiones y quedan libres su correo y el documento de cada uno de sus jugadores.
+
+La solicitud se hace con la contraseña de la cuenta. Existe además una página pública, sin sesión,
+`/eliminar-cuenta`, que explica cómo pedirla y cómo hacerlo por correo quien no puede entrar.
 
 Además, si se elimina el único club al que pertenece una persona, su cuenta se elimina con él (ver
 §7.4).
@@ -2096,4 +2114,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.11.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-12
+**Versión**: 4.12.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-13

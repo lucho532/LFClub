@@ -1,0 +1,159 @@
+openapi: 3.1.0
+info:
+  title: LFClub - API de la funcionalidad 014 (eliminar mi cuenta)
+  version: 0.14.0
+  description: |
+    Contrato de lo que esta funcionalidad añade respecto de los contratos de la 001 a la 013. Lo que
+    no aparece aquí sigue igual.
+
+    Cuenta de operaciones (partiendo de 111 en el contrato y 87 en las de club, con la 013 ya
+    construida; **confirmar contando con la expresión regular de `EndpointsDeLaApi` al empezar**):
+    - **+2**: consultar qué se elimina y eliminar la cuenta.
+    - Total: 111 -> 113 operaciones; las de club siguen en 87 (las dos son de la cuenta).
+    - No hay cambios en operaciones existentes.
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - Las dos rutas son de la propia cuenta con sesión: no llevan identificador de cuenta ni de club,
+      así que no hay forma de actuar sobre otra persona (RF-001).
+    - La cuenta DESARROLLADOR recibe 404 `no_encontrado` en las dos (RF-001).
+    - La página pública `/eliminar-cuenta` es del frontend y no tiene operación en la API.
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Cuenta
+
+paths:
+  /api/cuenta/eliminacion:
+    get:
+      tags: [Cuenta]
+      summary: Qué se elimina con la cuenta y si se puede
+      description: |
+        Devuelve, para la pantalla "Eliminar mi cuenta", todos los jugadores de la cuenta con su
+        club (RF-003), también con una sesión iniciada con el documento de un jugador (research §5),
+        y los clubes donde la persona es el único PRESIDENTE (RF-009). Sin documento ni datos de
+        contacto: solo nombre completo y nombre de club.
+      responses:
+        '200':
+          description: Resumen de lo que se eliminaría
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResumenEliminacionCuentaDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    post:
+      tags: [Cuenta]
+      summary: Eliminar mi cuenta
+      description: |
+        Elimina la cuenta, todos sus integrantes y jugadores en todos los clubes y lo que cuelga de
+        ellos, en una sola transacción (RF-004, RF-005, RF-006 y RF-011). Lo publicado se conserva
+        con "Persona eliminada" y los marcadores no cambian (RF-008). Las demás sesiones de la cuenta
+        dejan de servir en su siguiente petición (RF-010). Un fallo de contraseña suma un intento de
+        inicio de sesión (research §4).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EliminarCuentaDto' }
+      responses:
+        '204':
+          description: Cuenta eliminada. El cuerpo está vacío.
+        '400':
+          description: |
+            Contraseña vacía (`validacion`) o incorrecta (`contrasena_incorrecta`). No se elimina
+            nada.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403':
+          description: La cuenta está bloqueada por intentos fallidos (`cuenta_bloqueada`).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409':
+          description: |
+            Es el único PRESIDENTE de uno o más clubes (`presidente_unico`). No se elimina nada. La
+            respuesta lleva la lista `clubes`.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/ProblemaPresidenteUnico' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    SinSesion:
+      description: Sin sesión o con la sesión caducada (`sin_sesion`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoEncontrado:
+      description: La cuenta DESARROLLADOR no elimina su cuenta por esta vía (`no_encontrado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [codigo, titulo, estado]
+      properties:
+        codigo: { type: string }
+        titulo: { type: string }
+        estado: { type: integer }
+        detalle: { type: string }
+
+    ProblemaPresidenteUnico:
+      allOf:
+        - $ref: '#/components/schemas/Problema'
+        - type: object
+          required: [clubes]
+          properties:
+            clubes:
+              type: array
+              items: { $ref: '#/components/schemas/ClubQueImpideDto' }
+
+    ClubQueImpideDto:
+      type: object
+      required: [clubId, clubNombre]
+      properties:
+        clubId: { type: string, format: uuid }
+        clubNombre: { type: string }
+
+    JugadorQueSeEliminaDto:
+      type: object
+      required: [nombreCompleto, clubNombre, retirado, enEspera]
+      properties:
+        nombreCompleto: { type: string }
+        clubNombre: { type: string }
+        retirado: { type: boolean }
+        enEspera: { type: boolean }
+
+    ResumenEliminacionCuentaDto:
+      type: object
+      required: [puedeEliminar, jugadores, clubesQueLoImpiden]
+      properties:
+        puedeEliminar: { type: boolean }
+        jugadores:
+          type: array
+          items: { $ref: '#/components/schemas/JugadorQueSeEliminaDto' }
+        clubesQueLoImpiden:
+          type: array
+          items: { $ref: '#/components/schemas/ClubQueImpideDto' }
+
+    EliminarCuentaDto:
+      type: object
+      required: [contrasena]
+      properties:
+        contrasena: { type: string, description: La contraseña de la cuenta }
