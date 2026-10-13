@@ -1,6 +1,13 @@
+import { useState } from 'react';
 import { Boton } from '../../compartido/componentes/Boton';
-import { Campo } from '../../compartido/componentes/Campo';
-import { sumarDias } from '../../compartido/fechas';
+import {
+  diaCorto,
+  diaDeLaSemana,
+  diasDeLaSemana,
+  hoyEnColombia,
+  inicioDeSemana,
+  sumarDias,
+} from '../../compartido/fechas';
 
 interface Props {
   fechas: string[];
@@ -9,45 +16,73 @@ interface Props {
 }
 
 /**
- * Los días de un entrenamiento nuevo: uno o varios, para no escribir el mismo entreno día tras
- * día. "Agregar otro día" propone el mismo día de la semana siguiente y se puede cambiar. Cada día
- * se programa como un entrenamiento independiente: después se cambia o se cancela por separado.
- * No comprueba nada de las fechas; lo hace la API.
+ * Los días de un entrenamiento nuevo: los siete días de una semana con una casilla cada uno, y los
+ * marcados son los que se publican. Con "Semana anterior" y "Semana siguiente" se pasa a otra
+ * semana sin perder lo ya marcado, y debajo se listan todos los días elegidos. Cada día se
+ * programa como un entrenamiento independiente: después se cambia o se cancela por separado. Los
+ * días pasados no se pueden marcar; el resto de las fechas lo comprueba la API.
  */
 export function SelectorFechas({ fechas, alCambiar, error }: Props) {
-  const cambiar = (indice: number, valor: string) =>
-    alCambiar(fechas.map((fecha, otro) => (otro === indice ? valor : fecha)));
-  const ultima = fechas[fechas.length - 1];
+  const hoy = hoyEnColombia();
+  const [lunes, setLunes] = useState(() => inicioDeSemana(fechas[0] ?? hoy));
+  const marcadas = new Set(fechas);
+  const semana = diasDeLaSemana(lunes);
+  const esLaActual = lunes === inicioDeSemana(hoy);
+
+  function conmutar(fecha: string, marcada: boolean) {
+    const siguiente = marcada ? [...marcadas, fecha] : [...marcadas].filter((otra) => otra !== fecha);
+    alCambiar(siguiente.sort());
+  }
 
   return (
     <fieldset className="columna selector-fechas">
-      <legend>{fechas.length > 1 ? `Días (${fechas.length} entrenamientos)` : 'Día'}</legend>
-      {fechas.map((fecha, indice) => (
-        <div key={indice} className="fila selector-fechas-dia">
-          <Campo
-            etiqueta={fechas.length > 1 ? `Día ${indice + 1}` : 'Fecha'}
-            type="date"
-            valor={fecha}
-            alCambiar={(valor) => cambiar(indice, valor)}
-            error={indice === 0 ? error : undefined}
-            required
-          />
-          {fechas.length > 1 && (
-            <Boton
-              variante="secundario"
-              aria-label={`Quitar el día ${indice + 1}`}
-              onClick={() => alCambiar(fechas.filter((_, otro) => otro !== indice))}
-            >
-              Quitar
-            </Boton>
-          )}
-        </div>
-      ))}
-      <div>
-        <Boton variante="secundario" onClick={() => alCambiar([...fechas, ultima ? sumarDias(ultima, 7) : ''])}>
-          + Agregar otro día
+      <legend>Días del entrenamiento</legend>
+      <div className="fila">
+        <Boton
+          variante="secundario"
+          disabled={esLaActual}
+          onClick={() => setLunes(sumarDias(lunes, -7))}
+        >
+          ← Semana anterior
+        </Boton>
+        <Boton variante="secundario" onClick={() => setLunes(sumarDias(lunes, 7))}>
+          Semana siguiente →
         </Boton>
       </div>
+      <div className="casillas-semana">
+        {semana.map((fecha) => {
+          const { nombre, numero } = diaCorto(fecha);
+          const pasado = fecha < hoy;
+          const marcada = marcadas.has(fecha);
+          return (
+            <label key={fecha} className={`casilla-dia${marcada ? ' marcada' : ''}`}>
+              <input
+                type="checkbox"
+                checked={marcada}
+                disabled={pasado && !marcada}
+                aria-label={diaDeLaSemana(fecha)}
+                onChange={(evento) => conmutar(fecha, evento.target.checked)}
+              />
+              <span className="casilla-dia-nombre">{nombre}</span>
+              <span className="casilla-dia-numero">{numero}</span>
+            </label>
+          );
+        })}
+      </div>
+      {fechas.length === 0 ? (
+        <p className="texto-suave">Marca al menos un día.</p>
+      ) : (
+        <p className="texto-suave">
+          {fechas.length === 1
+            ? `Se publica el ${diaDeLaSemana(fechas[0])}.`
+            : `Se publican ${fechas.length} entrenamientos: ${fechas.map(diaDeLaSemana).join(', ')}.`}
+        </p>
+      )}
+      {error && (
+        <p className="campo-error" role="alert">
+          {error}
+        </p>
+      )}
     </fieldset>
   );
 }

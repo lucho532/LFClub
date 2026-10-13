@@ -154,7 +154,12 @@ export function FormularioEntrenamiento({ clubId, categorias, entrenamiento, alG
       )}
       {fallo !== null && !conErroresPorCampo && <Aviso tono="error">{mensajeDe(fallo)}</Aviso>}
       <div className="fila">
-        <Boton type="submit" cargando={enviando} textoCargando="Guardando…">
+        <Boton
+          type="submit"
+          cargando={enviando}
+          textoCargando="Guardando…"
+          disabled={!entrenamiento && fechas.length === 0}
+        >
           {entrenamiento
             ? 'Guardar cambios'
             : fechas.length > 1
