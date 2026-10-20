@@ -1,0 +1,760 @@
+openapi: 3.1.0
+info:
+  title: LFClub - API de la funcionalidad 015 (mensualidades, cargos y pagos)
+  version: 0.15.0
+  description: |
+    Contrato de lo que esta funcionalidad añade respecto de los contratos de la 001 a la 014. Lo que
+    no aparece aquí sigue igual, salvo el campo `estadoCuenta` de la lista de jugadores (ver
+    `JugadorDeListaDto` al final).
+
+    Cuenta de operaciones (partiendo de 113 en el contrato y 87 en las de club, con la 014 ya
+    construida; **confirmar contando con la expresión regular de `EndpointsDeLaApi` al empezar**):
+    - **+18**: valor de la mensualidad (3), medios de pago (4), cuenta del jugador y registro (3),
+      consulta, soporte y resguardo de un pago (3), confirmar, rechazar y anular (3), pagos en
+      revisión (1) y finanzas (1).
+    - Total: 113 -> 131 operaciones; las de club pasan de 87 a 105 (las 18 son de club).
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - Quién puede qué (constitución §16.9): el PRESIDENTE hace todo; el DIRECTIVO solo consulta; la
+      cuenta de un jugador consulta y informa lo de su propio jugador; el ENTRENADOR recibe `403
+      sin_permiso` en todas; el DESARROLLADOR no tiene ruta de club (§8). Lo que es de otro jugador o
+      de otro club responde `404 no_encontrado`.
+    - Los importes son números decimales en pesos colombianos, enteros y mayores que cero (RF-014).
+    - Los meses son fechas `YYYY-MM-01`. El mes de cobro es el de la hora de Colombia (UTC-5).
+    - Las dos operaciones de imagen (`soporte` y `resguardo`) se sirven solo con sesión, con
+      `Cache-Control: private, no-store` y `X-Content-Type-Options: nosniff`. No hay dirección pública.
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - sesion: []
+
+tags:
+  - name: Mensualidad
+  - name: MediosPago
+  - name: Pagos
+  - name: Finanzas
+
+paths:
+  /api/clubes/{clubId}/mensualidad:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Mensualidad]
+      summary: El valor de la mensualidad del club y los jugadores con valor propio
+      description: |
+        Lo consultan el PRESIDENTE y el DIRECTIVO. `valorClub` es nulo si el club aún no lo definió; en
+        ese caso no se generan cargos y el inicio del PRESIDENTE muestra el aviso (RF-011).
+      responses:
+        '200':
+          description: Mensualidad del club
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MensualidadDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+    put:
+      tags: [Mensualidad]
+      summary: Fijar el valor de la mensualidad del club
+      description: |
+        Solo el PRESIDENTE (RF-011). Aplica a los cargos que se generen después: los ya generados
+        conservan su valor (RF-013). Al guardar, se generan en el acto los cargos del mes en curso si
+        el club no tenía valor.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FijarValorMensualidadDto' }
+      responses:
+        '200':
+          description: Mensualidad actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MensualidadDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+  /api/clubes/{clubId}/mensualidad/jugadores:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    put:
+      tags: [Mensualidad]
+      summary: Fijar o quitar el valor propio de uno o varios jugadores
+      description: |
+        Solo el PRESIDENTE (RF-012). Con `valor` fija ese valor a cada jugador; con `valor` nulo los
+        vuelve al del club. Solo cambia los cargos futuros. Todos los jugadores deben ser jugadores
+        del club; si alguno no lo es, no se cambia ninguno (`404 no_encontrado`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FijarValorPropioDto' }
+      responses:
+        '200':
+          description: Mensualidad actualizada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MensualidadDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/medios-de-pago:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [MediosPago]
+      summary: Los medios por los que el club recibe pagos
+      description: |
+        El PRESIDENTE y el DIRECTIVO ven todos; la cuenta de un jugador, solo los activos (RF-027).
+        El ENTRENADOR recibe 403.
+      responses:
+        '200':
+          description: Medios de pago
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/MedioPagoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+    post:
+      tags: [MediosPago]
+      summary: Añadir un medio de pago
+      description: Solo el PRESIDENTE (RF-027).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarMedioPagoDto' }
+      responses:
+        '201':
+          description: Medio creado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MedioPagoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+  /api/clubes/{clubId}/medios-de-pago/{medioId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/medioId'
+    put:
+      tags: [MediosPago]
+      summary: Editar o desactivar un medio de pago
+      description: |
+        Solo el PRESIDENTE. Los pagos ya registrados con esa entidad no cambian (guardan el nombre
+        como texto).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarMedioPagoDto' }
+      responses:
+        '200':
+          description: Medio actualizado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MedioPagoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    delete:
+      tags: [MediosPago]
+      summary: Quitar un medio de pago
+      description: Solo el PRESIDENTE. Borra el medio; no toca ningún pago.
+      responses:
+        '204':
+          description: Medio quitado. El cuerpo está vacío.
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/cuenta:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    get:
+      tags: [Pagos]
+      summary: El estado de cuenta de un jugador
+      description: |
+        Cargos, pagos, saldo, estado y medios de pago activos (RF-001 a RF-004). Lo ven el
+        PRESIDENTE y el DIRECTIVO de cualquier jugador del club, también retirado, y la cuenta de un
+        jugador solo el suyo, mientras no esté retirado. El ENTRENADOR recibe 403. Deber no restringe
+        nada (RF-015): la respuesta no condiciona ningún otro acceso.
+      responses:
+        '200':
+          description: Estado de cuenta
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CuentaJugadorDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/pagos:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    post:
+      tags: [Pagos]
+      summary: Registrar un pago recibido directamente
+      description: |
+        Solo el PRESIDENTE (RF-020), para efectivo o para una transferencia que ya verificó. El pago
+        nace `CONFIRMADO`, se aplica a los cargos (los más antiguos primero, o los de `cargoIds`), y se
+        generan el recibo y el resguardo (RF-025). Puede hacerse también para un jugador retirado
+        que debe. Se rechaza un valor mayor que lo pendiente (`409 pago_excede_deuda`, RF-023) y un
+        jugador sin pendiente (`409 sin_deuda`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistrarPagoDto' }
+      responses:
+        '201':
+          description: Pago registrado y confirmado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/ConflictoDePago' }
+
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/pagos/informados:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/usuarioRolId'
+    post:
+      tags: [Pagos]
+      summary: La familia informa una transferencia con su soporte
+      description: |
+        Solo la cuenta del propio jugador (RF-021). Cuerpo `multipart/form-data` con la imagen del
+        soporte (obligatoria: PNG, JPEG o WebP de hasta 5 MB). El pago queda `EN_REVISION`, sin
+        aplicaciones, y no cambia ningún saldo. Se admiten varios en revisión a la vez (clarificación 4).
+        Un valor mayor que lo pendiente se rechaza (`409 pago_excede_deuda`).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/InformarPagoDto' }
+      responses:
+        '201':
+          description: Pago informado y en revisión
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagoDto' }
+        '400':
+          description: |
+            Datos inválidos (`validacion`), sin imagen (`soporte_requerido`), archivo que no es una
+            imagen (`soporte_invalido`) o más grande de lo permitido (`soporte_demasiado_grande`). No
+            queda nada registrado.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problema' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/ConflictoDePago' }
+
+  /api/clubes/{clubId}/pagos/en-revision:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Pagos]
+      summary: Los pagos que esperan revisión
+      description: |
+        Del más antiguo al más reciente, con el jugador y sus cargos pendientes. Lo ven el PRESIDENTE y
+        el DIRECTIVO (consulta). `total` es el contador del inicio del PRESIDENTE; no es un recordatorio
+        de cobro (§16.8).
+      responses:
+        '200':
+          description: Pagos en revisión
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagosEnRevisionDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+  /api/clubes/{clubId}/pagos/{pagoId}:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/pagoId'
+    get:
+      tags: [Pagos]
+      summary: El detalle de un pago y su recibo
+      description: |
+        Valor, medio, entidad, fecha, estado, quién hizo cada paso, motivo si lo hay, concepto, número de
+        recibo y saldo tras el pago (RF-024, RF-025). Lo ven el PRESIDENTE, el DIRECTIVO y la cuenta del
+        jugador del pago. El ENTRENADOR recibe 403.
+      responses:
+        '200':
+          description: Pago con su recibo
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagoDto' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/pagos/{pagoId}/soporte:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/pagoId'
+    get:
+      tags: [Pagos]
+      summary: La imagen de soporte de un pago
+      description: |
+        Solo la familia del jugador, el PRESIDENTE y el DIRECTIVO (RF-030). Para cualquier otra cuenta
+        el soporte no existe (`404`). Se conserva aunque el pago se anule o se rechace; se borra con la
+        cuenta del jugador.
+      responses:
+        '200':
+          description: La imagen
+          content:
+            image/png: { schema: { type: string, format: binary } }
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/pagos/{pagoId}/resguardo:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/pagoId'
+    get:
+      tags: [Pagos]
+      summary: El resguardo de pago como imagen
+      description: |
+        PNG de 1080 × 1350 que se dibuja al pedirlo (RF-025). Existe para los pagos `CONFIRMADO` y
+        `ANULADO` (con el sello ANULADO); un pago en revisión o rechazado responde `404`, y también uno
+        cuya cuenta se eliminó. No lleva el documento del jugador. Lo ven el PRESIDENTE, el DIRECTIVO y
+        la cuenta del jugador.
+      responses:
+        '200':
+          description: La imagen
+          content:
+            image/png: { schema: { type: string, format: binary } }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/clubes/{clubId}/pagos/{pagoId}/confirmacion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/pagoId'
+    post:
+      tags: [Pagos]
+      summary: Confirmar un pago en revisión
+      description: |
+        Solo el PRESIDENTE (RF-022). Puede corregir el valor (queda `valorInformado`) y elegir los
+        cargos que cubre; sin `cargoIds` cubre los más antiguos primero. Aplica el pago, asigna el
+        número de recibo y guarda el saldo tras el pago. Si el valor supera lo pendiente:
+        `409 pago_excede_deuda`; si el pago ya no está en revisión: `409 pago_no_esta_en_revision`.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmarPagoDto' }
+      responses:
+        '200':
+          description: Pago confirmado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/ConflictoDePago' }
+
+  /api/clubes/{clubId}/pagos/{pagoId}/rechazo:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/pagoId'
+    post:
+      tags: [Pagos]
+      summary: Rechazar un pago en revisión
+      description: |
+        Solo el PRESIDENTE (RF-022). El motivo es obligatorio y la familia lo ve. No cambia ningún saldo;
+        el pago queda `RECHAZADO` para siempre y la familia informa otro (clarificación 3).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MotivoDto' }
+      responses:
+        '200':
+          description: Pago rechazado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/ConflictoDePago' }
+
+  /api/clubes/{clubId}/pagos/{pagoId}/anulacion:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+      - $ref: '#/components/parameters/pagoId'
+    post:
+      tags: [Pagos]
+      summary: Anular un pago confirmado
+      description: |
+        Solo el PRESIDENTE (RF-019). El motivo es obligatorio. El pago, su recibo y su resguardo siguen
+        existiendo, marcados como anulados; el saldo se recalcula. Un pago no se edita ni se borra
+        (RF-018): no hay ninguna otra operación que cambie uno confirmado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MotivoDto' }
+      responses:
+        '200':
+          description: Pago anulado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagoDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/ConflictoDePago' }
+
+  /api/clubes/{clubId}/finanzas:
+    parameters:
+      - $ref: '#/components/parameters/clubId'
+    get:
+      tags: [Finanzas]
+      summary: Las finanzas del club
+      description: |
+        Recaudo del mes, cartera pendiente, totales por categoría y quién debe. Lo ven el PRESIDENTE y el
+        DIRECTIVO (consulta). El ENTRENADOR recibe 403 (§16.9). No cuenta pagos en revisión, rechazados
+        ni anulados. `mes` es opcional (por defecto el mes en curso, hora de Colombia).
+      parameters:
+        - name: mes
+          in: query
+          required: false
+          schema: { type: string, format: date, description: 'Primer día del mes, YYYY-MM-01' }
+      responses:
+        '200':
+          description: Finanzas
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FinanzasDto' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/SinSesion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+components:
+  securitySchemes:
+    sesion:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    clubId:
+      name: clubId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    usuarioRolId:
+      name: usuarioRolId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    pagoId:
+      name: pagoId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    medioId:
+      name: medioId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    SinSesion:
+      description: Sin sesión o con la sesión caducada (`sin_sesion`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    SinPermiso:
+      description: El rol no puede hacerlo (`sin_permiso`). Siempre el caso del ENTRENADOR
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    NoEncontrado:
+      description: No existe para quien pregunta (`no_encontrado`)
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    Validacion:
+      description: Datos inválidos (`validacion`). No se guarda nada
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+    ConflictoDePago:
+      description: |
+        `pago_excede_deuda` (el valor supera lo pendiente), `sin_deuda` (no hay nada pendiente),
+        `pago_no_esta_en_revision` o `pago_no_esta_confirmado` (estado que no admite la operación). No se
+        cambia nada.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problema' }
+
+  schemas:
+    Problema:
+      type: object
+      required: [codigo, titulo, estado]
+      properties:
+        codigo: { type: string }
+        titulo: { type: string }
+        estado: { type: integer }
+        detalle: { type: string }
+
+    EstadoDeCuenta:
+      type: string
+      enum: [AL_DIA, PAGO_PARCIAL, DEBE]
+
+    EstadoPago:
+      type: string
+      enum: [EN_REVISION, CONFIRMADO, RECHAZADO, ANULADO]
+
+    MedioPago:
+      type: string
+      enum: [EFECTIVO, TRANSFERENCIA]
+
+    TipoCargo:
+      type: string
+      enum: [MENSUALIDAD, OTRO]
+
+    JugadorConValorPropioDto:
+      type: object
+      required: [usuarioRolId, nombreCompleto, valor]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombreCompleto: { type: string }
+        valor: { type: number }
+
+    MensualidadDto:
+      type: object
+      required: [jugadoresConValorPropio]
+      properties:
+        valorClub: { type: [number, 'null'], description: Nulo si el club aún no lo definió }
+        jugadoresConValorPropio:
+          type: array
+          items: { $ref: '#/components/schemas/JugadorConValorPropioDto' }
+
+    FijarValorMensualidadDto:
+      type: object
+      required: [valor]
+      properties:
+        valor: { type: number, description: 'Entero de pesos, mayor que cero' }
+
+    FijarValorPropioDto:
+      type: object
+      required: [usuarioRolIds]
+      properties:
+        usuarioRolIds:
+          type: array
+          minItems: 1
+          items: { type: string, format: uuid }
+        valor: { type: [number, 'null'], description: Nulo vuelve al valor del club }
+
+    MedioPagoDto:
+      type: object
+      required: [id, entidad, titular, numero, activo]
+      properties:
+        id: { type: string, format: uuid }
+        entidad: { type: string, maxLength: 40 }
+        titular: { type: string, maxLength: 100 }
+        numero: { type: string, maxLength: 60 }
+        nota: { type: [string, 'null'], maxLength: 200 }
+        activo: { type: boolean }
+
+    GuardarMedioPagoDto:
+      type: object
+      required: [entidad, titular, numero, activo]
+      properties:
+        entidad: { type: string, maxLength: 40 }
+        titular: { type: string, maxLength: 100 }
+        numero: { type: string, maxLength: 60 }
+        nota: { type: [string, 'null'], maxLength: 200 }
+        activo: { type: boolean }
+
+    CargoDto:
+      type: object
+      required: [id, tipo, valor, pagado, pendiente]
+      properties:
+        id: { type: string, format: uuid }
+        tipo: { $ref: '#/components/schemas/TipoCargo' }
+        mes: { type: [string, 'null'], format: date }
+        valor: { type: number }
+        pagado: { type: number }
+        pendiente: { type: number }
+
+    PagoDto:
+      type: object
+      required: [id, estado, valor, medio, fecha, creadoEn, creadoPorNombre, tieneSoporte, tieneResguardo]
+      properties:
+        id: { type: string, format: uuid }
+        usuarioRolId: { type: [string, 'null'], format: uuid }
+        jugadorNombre: { type: string }
+        estado: { $ref: '#/components/schemas/EstadoPago' }
+        valor: { type: number }
+        valorInformado: { type: [number, 'null'], description: Solo si el PRESIDENTE lo corrigió al confirmar }
+        medio: { $ref: '#/components/schemas/MedioPago' }
+        entidad: { type: [string, 'null'] }
+        referencia: { type: [string, 'null'] }
+        fecha: { type: string, format: date }
+        concepto: { type: [string, 'null'] }
+        numeroRecibo: { type: [integer, 'null'] }
+        saldoTrasPago: { type: [number, 'null'] }
+        tieneSoporte: { type: boolean }
+        tieneResguardo: { type: boolean }
+        creadoEn: { type: string, format: date-time }
+        creadoPorNombre: { type: string }
+        confirmadoEn: { type: [string, 'null'], format: date-time }
+        confirmadoPorNombre: { type: [string, 'null'] }
+        rechazadoEn: { type: [string, 'null'], format: date-time }
+        rechazadoPorNombre: { type: [string, 'null'] }
+        motivoRechazo: { type: [string, 'null'] }
+        anuladoEn: { type: [string, 'null'], format: date-time }
+        anuladoPorNombre: { type: [string, 'null'] }
+        motivoAnulacion: { type: [string, 'null'] }
+
+    CuentaJugadorDto:
+      type: object
+      required: [usuarioRolId, nombreCompleto, estado, saldo, cargos, pagos, mediosPago, puedeRegistrar, puedeInformar]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombreCompleto: { type: string }
+        estado: { $ref: '#/components/schemas/EstadoDeCuenta' }
+        saldo: { type: number }
+        cargos:
+          type: array
+          items: { $ref: '#/components/schemas/CargoDto' }
+        pagos:
+          type: array
+          items: { $ref: '#/components/schemas/PagoDto' }
+        mediosPago:
+          type: array
+          items: { $ref: '#/components/schemas/MedioPagoDto' }
+        puedeRegistrar: { type: boolean, description: Verdadero solo para el PRESIDENTE }
+        puedeInformar: { type: boolean, description: Verdadero solo para la cuenta del jugador }
+
+    RegistrarPagoDto:
+      type: object
+      required: [valor, medio, fecha]
+      properties:
+        valor: { type: number }
+        medio: { $ref: '#/components/schemas/MedioPago' }
+        entidad: { type: [string, 'null'], maxLength: 40, description: Obligatoria si el medio es TRANSFERENCIA }
+        referencia: { type: [string, 'null'], maxLength: 60 }
+        fecha: { type: string, format: date }
+        cargoIds:
+          type: [array, 'null']
+          items: { type: string, format: uuid }
+
+    InformarPagoDto:
+      type: object
+      required: [valor, entidad, fecha, archivo]
+      properties:
+        valor: { type: number }
+        entidad: { type: string, maxLength: 40 }
+        referencia: { type: string, maxLength: 60 }
+        fecha: { type: string, format: date }
+        archivo: { type: string, format: binary, description: 'PNG, JPEG o WebP de hasta 5 MB' }
+
+    ConfirmarPagoDto:
+      type: object
+      properties:
+        valor: { type: [number, 'null'], description: Si se envía y difiere de lo informado, lo corrige }
+        cargoIds:
+          type: [array, 'null']
+          items: { type: string, format: uuid }
+
+    MotivoDto:
+      type: object
+      required: [motivo]
+      properties:
+        motivo: { type: string, minLength: 1, maxLength: 300 }
+
+    PagoEnRevisionDto:
+      type: object
+      required: [pago, jugadorNombre, cargosPendientes]
+      properties:
+        pago: { $ref: '#/components/schemas/PagoDto' }
+        jugadorNombre: { type: string }
+        cargosPendientes:
+          type: array
+          items: { $ref: '#/components/schemas/CargoDto' }
+
+    PagosEnRevisionDto:
+      type: object
+      required: [total, pagos]
+      properties:
+        total: { type: integer }
+        pagos:
+          type: array
+          items: { $ref: '#/components/schemas/PagoEnRevisionDto' }
+
+    TotalPorCategoriaDto:
+      type: object
+      required: [nombre, recaudoMes, cartera]
+      properties:
+        categoriaId: { type: [string, 'null'], format: uuid, description: Nulo es "Sin categoría" }
+        nombre: { type: string }
+        recaudoMes: { type: number }
+        cartera: { type: number }
+
+    JugadorQueDebeDto:
+      type: object
+      required: [usuarioRolId, nombreCompleto, saldo, estado, retirado]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombreCompleto: { type: string }
+        saldo: { type: number }
+        estado: { $ref: '#/components/schemas/EstadoDeCuenta' }
+        retirado: { type: boolean }
+
+    FinanzasDto:
+      type: object
+      required: [mes, recaudoMes, carteraPendiente, porCategoria, jugadoresQueDeben, pagosEnRevision]
+      properties:
+        mes: { type: string, format: date }
+        recaudoMes: { type: number }
+        carteraPendiente: { type: number }
+        pagosEnRevision: { type: integer }
+        porCategoria:
+          type: array
+          items: { $ref: '#/components/schemas/TotalPorCategoriaDto' }
+        jugadoresQueDeben:
+          type: array
+          items: { $ref: '#/components/schemas/JugadorQueDebeDto' }
+
+    JugadorDeListaDto:
+      description: |
+        CAMBIA (spec 007). Gana `estadoCuenta`. Solo se rellena para el PRESIDENTE y el DIRECTIVO; para el
+        ENTRENADOR va nulo y la pantalla no pinta la columna "Al día" (RF-037). El resto de campos no
+        cambia.
+      type: object
+      properties:
+        estadoCuenta:
+          oneOf:
+            - $ref: '#/components/schemas/EstadoDeCuenta'
+            - type: 'null'

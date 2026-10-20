@@ -32,12 +32,12 @@
 ## Notas
 
 - Sin marcadores: las decisiones abiertas (cuándo se genera el mes, mes de ingreso, saldo a favor,
-  orden de aplicación, reparto del arbitraje, tamaño del soporte) se resolvieron con supuestos
+  orden de aplicación, tamaño del soporte) se resolvieron con supuestos
   documentados, que conviene revisar con `/speckit-clarify`.
 - Sin pasarela de pago por decisión del propietario: la familia transfiere directo al PRESIDENTE y
   sube un soporte, o paga en mano; el PRESIDENTE confirma y se genera el resguardo como imagen.
 - La spec se aparta de la constitución (§6.2, §8, §16.3, §16.4, §16.5, §20); esos cambios están
   listados en "Impacto en la constitución" y deben aprobarse antes de planificar.
 - Las historias 1 a 4 forman el MVP (cargos, valor, estado de cuenta y pago registrado por el
-  PRESIDENTE); medios de pago, transferencia con soporte, anulación y recibo con resguardo son P2; arbitraje y
+  PRESIDENTE); medios de pago, transferencia con soporte, anulación y recibo con resguardo son P2;
   finanzas generales, P3.

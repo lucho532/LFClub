@@ -9,21 +9,20 @@
 **Entrada**: Descripción del propietario del proyecto: crear la spec 015 de mensualidades, cargos y
 pagos a partir de la §16 de la constitución. Las specs 002, 003, 004, 005, 006, 007 y 009 dejaron
 esta funcionalidad pendiente: empezar a generar la mensualidad al aprobar a un jugador, el estado de
-pago real en la columna "Al día", y los cargos de arbitraje. Decisión posterior del propietario: por
-ahora no se usa pasarela de pago. La familia transfiere (Nequi, Bancolombia, Daviplata u otra)
+pago real en la columna "Al día". Decisiones posteriores del propietario: el arbitraje queda fuera
+de la aplicación, y por ahora no se usa pasarela de pago. La familia transfiere (Nequi, Bancolombia, Daviplata u otra)
 directamente al PRESIDENTE y sube una imagen como soporte, o le paga en mano; el PRESIDENTE actualiza
 el estado de cuenta y, al ponerlo al día, la aplicación genera su recibo y una imagen por defecto como resguardo
 de pago de la familia.
 
 **Plataforma**: LFClub
 
-**Constitución aplicable**: versión 4.13.0, en especial §7.2, §8, §12.1, §12.4, §13, §16, §17.2 y §20.
+**Constitución aplicable**: versión 4.14.0, en especial §7.2, §8, §12.1, §12.4, §13, §16, §17.2 y §20.
 La §6.2 y la §16.4 ya reflejan que las familias no pagan por pasarela.
 
 **Depende de**: spec 001 (clubes, roles y sesión), spec 002, 004 y 006 (ingreso de jugadores y
 aprobación), spec 003 (categorías y entrenadores asignados), spec 007 (lista de jugadores y columna
-"Al día"), spec 009 (partidos y convocatorias) y spec 014 (conservación de pagos al eliminar una
-cuenta).
+"Al día") y spec 014 (conservación de pagos al eliminar una cuenta).
 
 ## Impacto en la constitución
 
@@ -33,7 +32,6 @@ abierto, como supuestos que se pueden corregir antes de planificar:
 - Cuándo se genera la mensualidad de cada mes y qué pasa con el mes en que el jugador entra
   (ver Supuestos).
 - En qué orden se aplica un pago a varios cargos pendientes (ver Supuestos).
-- Cómo se reparte el costo del arbitraje entre los convocados (ver Supuestos).
 
 Esta especificación se aparta de la versión 4.12.0 en cuatro puntos, ya aplicados a la constitución
 (versión 4.13.0: §6.2, §8, §16.3, §16.4, §16.5, §16.9 y §20):
@@ -49,20 +47,38 @@ Esta especificación se aparta de la versión 4.12.0 en cuatro puntos, ya aplica
 - Se añade a la familia la posibilidad de informar una transferencia con imagen de soporte, y a
   todo pago confirmado, además del recibo, un resguardo en forma de imagen.
 
+## Clarificaciones
+
+### Sesión 2026-10-20
+
+- Q: ¿Cuánto paga de mensualidad un jugador que el club aprueba a mitad de mes? → A: No paga el mes
+  en curso; su primera mensualidad es la del mes siguiente, también al reincorporarse.
+- Q: Si la familia quiere pagar más de lo que debe, ¿el sistema lo rechaza o guarda la diferencia
+  como saldo a favor? → A: Se rechaza; un pago no puede superar lo que el jugador debe en ese
+  momento y no existe saldo a favor.
+- Q: Si el PRESIDENTE rechaza una transferencia informada, ¿la familia puede volver a informarla con
+  otro soporte? → A: Sí, informa un pago nuevo con otro soporte; el rechazado queda en el historial
+  y no se puede reabrir.
+- Decisión del propietario (sobre el reparto del arbitraje): el arbitraje queda fuera de la
+  aplicación; se eliminó de esta spec y de la constitución (v4.14.0), incluidos su cargo y su costo.
+- Q: ¿Puede una familia tener varias transferencias "en revisión" del mismo jugador a la vez? → A:
+  Sí, sin límite; el PRESIDENTE decide cuáles confirma y al confirmar solo se aplica lo pendiente.
+
 ## Escenarios de usuario y pruebas *(obligatorio)*
 
 ### Historia 1 - La mensualidad se genera sola cada mes (Prioridad: P1)
 
 Cada mes el club tiene un cargo de tipo MENSUALIDAD por cada jugador activo, sin que el PRESIDENTE
 tenga que crearlo. El valor es el del club, o el propio del jugador si el PRESIDENTE se lo cambió. Un
-jugador que el club aprueba empieza a tener su mensualidad desde ese momento.
+jugador que el club aprueba paga su primera mensualidad el mes siguiente a su aprobación.
 
 **Por qué esta prioridad**: sin cargos no hay nada que consultar ni pagar; es la base de toda la
 funcionalidad y desbloquea lo que las specs anteriores dejaron pendiente.
 
 **Prueba independiente**: con un club de tres jugadores activos y uno retirado, llegar al primer día
 de un mes y comprobar que hay exactamente tres cargos MENSUALIDAD nuevos, cada uno con el valor
-vigente, y ninguno para el retirado; aprobar a un cuarto jugador y comprobar que recibe el suyo.
+vigente, y ninguno para el retirado; aprobar a un cuarto jugador, comprobar que no recibe cargo ese mes y que sí lo recibe el mes
+siguiente.
 
 **Escenarios de aceptación**:
 
@@ -73,9 +89,11 @@ vigente, y ninguno para el retirado; aprobar a un cuarto jugador y comprobar que
 3. **Dado** un jugador retirado, en espera de aprobación, o una cuenta de ENTRENADOR o DIRECTIVO,
    **cuando** empieza un mes, **entonces** no se le genera mensualidad.
 4. **Dado** un jugador que el PRESIDENTE acaba de aprobar (ingreso o hermano agregado), **cuando** se
-   aprueba, **entonces** queda con su mensualidad del mes en curso si todavía no la tenía.
+   aprueba, **entonces** no se le genera cargo por el mes en curso y recibe su primera mensualidad
+   cuando empieza el mes siguiente.
 5. **Dado** un jugador retirado que se reincorpora, **cuando** vuelve a estar activo, **entonces**
-   empieza a recibir mensualidades desde el mes en curso, sin cargos por los meses que estuvo fuera.
+   recibe su primera mensualidad cuando empieza el mes siguiente, sin cargos por el mes en curso ni
+   por los meses que estuvo fuera.
 6. **Dado** un club suspendido, **cuando** empieza un mes, **entonces** sus cargos se generan igual,
    porque la suspensión congela el acceso y no los datos (§7.4).
 
@@ -131,7 +149,7 @@ mientras otra familia no ve nada de él.
 **Escenarios de aceptación**:
 
 1. **Dado** una cuenta de jugador, **cuando** abre su estado de cuenta, **entonces** ve los cargos
-   (tipo, mes o partido, valor, cuánto está pagado), los pagos con su medio y fecha, y el saldo.
+   (tipo, mes, valor, cuánto está pagado), los pagos con su medio y fecha, y el saldo.
 2. **Dado** un jugador sin cargos pendientes, **cuando** se consulta, **entonces** figura "al día";
    con algún pago aplicado pero cargos sin cubrir, "pago parcial"; sin ningún pago aplicado a lo
    que debe, "debe".
@@ -249,7 +267,8 @@ resguardo; informar otra y que el PRESIDENTE la rechace con un motivo que la fam
 4. **Dado** un pago en revisión, **cuando** el PRESIDENTE lo confirma, **entonces** queda
    confirmado y aplicado a los cargos, el estado de cuenta se actualiza y se generan el recibo y el resguardo.
 5. **Dado** un pago en revisión, **cuando** el PRESIDENTE lo rechaza indicando el motivo, **entonces**
-   no cambia ningún saldo y la familia ve el rechazo y el motivo, y puede informar otro.
+   no cambia ningún saldo y la familia ve el rechazo y el motivo, y puede informar un pago nuevo con otro
+   soporte; el rechazado no se reabre y queda en el historial.
 6. **Dado** el PRESIDENTE al confirmar, **cuando** el valor informado no es el que vio en el
    soporte, **entonces** puede corregir el valor antes de confirmar y queda registrado que lo
    corrigió.
@@ -335,39 +354,7 @@ como imagen.
 
 ---
 
-### Historia 9 - Arbitraje de un partido (Prioridad: P3)
-
-El PRESIDENTE registra el costo del arbitraje de un partido. El costo se reparte entre los jugadores
-convocados y cada uno recibe un cargo de tipo ARBITRAJE, que paga como cualquier otro cargo. Solo
-los convocados lo ven y lo deben.
-
-**Por qué esta prioridad**: lo pide la §16.6 y la spec 009 lo dejó pendiente, pero el club puede
-operar sin él mientras tanto.
-
-**Prueba independiente**: con un partido de 10 convocados y un arbitraje de $100.000, comprobar que
-cada convocado tiene un cargo ARBITRAJE de $10.000 y que quien no fue convocado no tiene nada ni
-sabe del partido.
-
-**Escenarios de aceptación**:
-
-1. **Dado** un partido con convocados, **cuando** el PRESIDENTE registra el costo del arbitraje,
-   **entonces** cada convocado recibe un cargo ARBITRAJE con su parte.
-2. **Dado** un costo que no se divide exacto, **cuando** se reparte, **entonces** la suma de los
-   cargos es exactamente el costo y la diferencia (de centavos) no se pierde (ver Supuestos).
-3. **Dado** un jugador no convocado, **cuando** consulta su cuenta, **entonces** no hay cargo ni
-   rastro del partido (§17.2).
-4. **Dado** un arbitraje ya repartido, **cuando** el PRESIDENTE lo corrige, **entonces** los cargos
-   ARBITRAJE se ajustan solo si ninguno tiene pagos aplicados; si alguno ya fue pagado, no se toca
-   y el PRESIDENTE debe resolverlo anulando esos pagos primero.
-5. **Dado** una convocatoria que cambia después del reparto, **cuando** se agrega o quita a un
-   jugador, **entonces** los cargos ya repartidos no cambian solos; el PRESIDENTE decide si
-   repartir de nuevo.
-6. **Dado** un ENTRENADOR o un DIRECTIVO, **cuando** intenta registrar el costo del arbitraje,
-   **entonces** no puede.
-
----
-
-### Historia 10 - Finanzas generales del club (Prioridad: P3)
+### Historia 9 - Finanzas generales del club (Prioridad: P3)
 
 El PRESIDENTE y el DIRECTIVO ven las finanzas completas del club: el recaudo del mes, la cartera
 pendiente y los totales por categoría. El ENTRENADOR no tiene apartado de finanzas.
@@ -401,8 +388,8 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
   generaron (§13) y los totales por categoría no se reordenan hacia atrás.
 - Una cuenta con varios jugadores: cada uno tiene su propio estado de cuenta; la familia informa
   sus pagos por jugador y puede informar uno después de otro.
-- Un jugador que entra a mitad de mes: recibe la mensualidad completa del mes en curso (ver
-  Supuestos).
+- Un jugador que entra a mitad de mes: no paga el mes en curso; su primera mensualidad es la del mes
+  siguiente (ver Clarificaciones).
 - Un jugador retirado que debe: conserva sus cargos y pagos, sigue apareciendo en la cartera
   pendiente, pero no genera cargos nuevos.
 - Una cuenta eliminada (spec 014): sus pagos se conservan con nombre completo y documento, sus
@@ -429,8 +416,8 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
 
 #### Cargos y saldo
 
-- **RF-001**: Todo lo que un jugador debe DEBE representarse como un cargo de tipo MENSUALIDAD,
-  ARBITRAJE u OTRO. Todo dinero recibido DEBE representarse como un pago aplicado a uno o varios
+- **RF-001**: Todo lo que un jugador debe DEBE representarse como un cargo de tipo MENSUALIDAD
+  u OTRO. Todo dinero recibido DEBE representarse como un pago aplicado a uno o varios
   cargos.
 - **RF-002**: El saldo de un jugador DEBE calcularse siempre a partir de sus cargos y de sus pagos
   confirmados no anulados. NO DEBE existir un saldo que alguien pueda editar a mano.
@@ -441,7 +428,7 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
 - **RF-006**: Los valores DEBEN manejarse en pesos colombianos (COP) con precisión decimal exacta,
   sin errores de redondeo, y mostrarse con formato de moneda colombiana.
 - **RF-007**: Cada cargo DEBE conservar el valor con el que se generó, la fecha de generación, su
-  tipo, el jugador, su categoría de ese momento y el mes (mensualidad) o el partido (arbitraje).
+  tipo, el jugador, su categoría de ese momento y el mes al que corresponde.
 
 #### Mensualidad
 
@@ -450,7 +437,8 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
 - **RF-009**: NO DEBE generarse mensualidad a jugadores retirados, en espera de aprobación ni a
   cuentas de ENTRENADOR o DIRECTIVO, ni a una categoría en la que el jugador no esté activo.
 - **RF-010**: Al aprobar a un jugador (ingreso, invitación como JUGADOR, hermano agregado) o al
-  reincorporarlo, DEBE generarse su mensualidad del mes en curso si todavía no la tiene.
+  reincorporarlo, NO DEBE generarse cargo por el mes en curso; su primera mensualidad DEBE
+  generarse cuando empiece el mes siguiente.
 - **RF-011**: El valor de la mensualidad es configuración de cada club (valor inicial de Valfor F.C.:
   $65.000 COP) que solo el PRESIDENTE DEBE poder actualizar. NO DEBE estar fijo en el código.
 - **RF-012**: El PRESIDENTE DEBE poder seleccionar a uno o varios jugadores y fijar un valor propio
@@ -476,7 +464,7 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
   DIRECTIVO y las cuentas de jugador NO.
 - **RF-021**: La familia DEBE poder informar una transferencia indicando entidad, valor, fecha y una
   imagen de soporte obligatoria. Ese pago DEBE quedar "en revisión" y NO DEBE alterar saldos,
-  estado de cuenta ni recaudo.
+  estado de cuenta ni recaudo. Un jugador PUEDE tener varios pagos en revisión a la vez, sin límite.
 - **RF-022**: Solo el PRESIDENTE DEBE poder confirmar o rechazar un pago en revisión. El rechazo
   exige un motivo que la familia pueda ver. Al confirmar, el PRESIDENTE puede corregir el valor y
   esa corrección DEBE quedar registrada.
@@ -506,44 +494,35 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
   PRESIDENTE y el DIRECTIVO de su club (en consulta). No DEBE ser accesible públicamente ni por su
   dirección directa para nadie más, y el servidor DEBE aplicar la regla.
 
-#### Arbitraje
-
-- **RF-031**: El PRESIDENTE DEBE poder registrar el costo del arbitraje de un partido; el costo se
-  reparte entre los jugadores convocados, y cada uno recibe un cargo ARBITRAJE.
-- **RF-032**: El reparto DEBE sumar exactamente el costo registrado; la diferencia de centavos se
-  asigna a algunos convocados sin perderse.
-- **RF-033**: Un jugador no convocado NO DEBE tener ningún cargo ni rastro de un partido al que no
-  fue convocado (§17.2).
-
 #### Consulta y autorización
 
-- **RF-034**: La cuenta de un jugador DEBE ver únicamente el estado de cuenta, los pagos y los
+- **RF-031**: La cuenta de un jugador DEBE ver únicamente el estado de cuenta, los pagos y los
   recibos y resguardos de su propio jugador, informar sus transferencias y ver cómo pagar. NO DEBE ver ni
   consultar por identificador los de otro.
-- **RF-035**: El PRESIDENTE y el DIRECTIVO DEBEN ver las finanzas completas del club (el DIRECTIVO
+- **RF-032**: El PRESIDENTE y el DIRECTIVO DEBEN ver las finanzas completas del club (el DIRECTIVO
   solo en consulta). El ENTRENADOR NO DEBE ver nada de este tema: ni estados de cuenta, ni estado
   de pago, ni cargos, pagos, recibos, resguardos, soportes, medios de pago del club ni finanzas, ni
   siquiera de los jugadores de sus categorías; el servidor DEBE aplicar la regla.
-- **RF-036**: El DESARROLLADOR NO DEBE acceder a cargos, pagos, recibos, soportes, resguardos ni
+- **RF-033**: El DESARROLLADOR NO DEBE acceder a cargos, pagos, recibos, soportes, resguardos ni
   finanzas de ningún club.
-- **RF-037**: La columna "Al día" de la lista de jugadores (spec 007) DEBE mostrar el estado real de
+- **RF-034**: La columna "Al día" de la lista de jugadores (spec 007) DEBE mostrar el estado real de
   cuenta de cada jugador.
-- **RF-038**: Toda regla de autorización de este módulo DEBE aplicarse en el servidor, no solo en la
+- **RF-035**: Toda regla de autorización de este módulo DEBE aplicarse en el servidor, no solo en la
   interfaz (§15).
-- **RF-039**: Ningún dato financiero de un club DEBE ser visible, contable ni consultable desde otro
+- **RF-036**: Ningún dato financiero de un club DEBE ser visible, contable ni consultable desde otro
   club.
 
 #### Conservación
 
-- **RF-040**: Al eliminar una cuenta (spec 014), sus pagos DEBEN conservarse intactos junto con el
+- **RF-037**: Al eliminar una cuenta (spec 014), sus pagos DEBEN conservarse intactos junto con el
   nombre completo y el documento del jugador, y sus cargos DEBEN dejar de contar en la cartera.
-- **RF-041**: Un jugador retirado DEBE conservar sus cargos y pagos, sin generar nuevos.
-- **RF-042**: Al eliminar un club (§7.4), DEBEN eliminarse con él sus cargos, pagos, recibos, soportes y resguardos.
+- **RF-038**: Un jugador retirado DEBE conservar sus cargos y pagos, sin generar nuevos.
+- **RF-039**: Al eliminar un club (§7.4), DEBEN eliminarse con él sus cargos, pagos, recibos, soportes y resguardos.
 
 ### Entidades principales
 
-- **Cargo**: lo que un jugador debe. Tiene tipo (MENSUALIDAD, ARBITRAJE, OTRO), jugador, valor
-  cobrado, mes o partido de origen, categoría de ese momento y fecha de generación. Su saldo
+- **Cargo**: lo que un jugador debe. Tiene tipo (MENSUALIDAD, OTRO), jugador, valor
+  cobrado, mes de origen, categoría de ese momento y fecha de generación. Su saldo
   pendiente se calcula, no se guarda.
 - **Pago**: dinero recibido de un jugador. Tiene valor, medio (EFECTIVO, TRANSFERENCIA), entidad si
   fue transferencia, estado (en revisión, confirmado, rechazado, anulado), quién lo registró,
@@ -559,8 +538,6 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
 - **Medio de pago del club**: entidad, titular y número o llave por los que el club recibe pagos.
 - **Valor de la mensualidad**: el del club, más el valor propio que el PRESIDENTE pueda fijar a un
   jugador. Es la configuración vigente; los cargos guardan el valor que cobraron.
-- **Costo de arbitraje**: lo que costó el arbitraje de un partido y cómo se repartió entre los
-  convocados.
 
 ## Criterios de éxito *(obligatorio)*
 
@@ -592,15 +569,13 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
 - **Cuándo se genera el mes**: los cargos de cada mes se generan el día 1 de ese mes, en la hora de
   Colombia. Si el sistema estuvo apagado ese día, se generan en cuanto vuelve a funcionar, sin
   duplicar.
-- **Mes de ingreso**: un jugador que entra a mitad de mes paga la mensualidad completa de ese mes;
-  no se prorratea. No se generan cargos retroactivos de meses anteriores a su ingreso.
-- **Sin saldo a favor**: el sistema no acepta pagos por más de lo pendiente ni guarda dinero
+- **Mes de ingreso**: un jugador que entra a mitad de mes no paga ese mes; su primera mensualidad es
+  la del mes siguiente (ver Clarificaciones). No se generan cargos retroactivos.
+- **Sin saldo a favor** (confirmado en Clarificaciones): el sistema no acepta pagos por más de lo pendiente ni guarda dinero
   anticipado; un pago adelantado de meses futuros no existe porque esos cargos aún no están
   generados.
 - **Orden de aplicación**: cuando un pago no indica los cargos, se aplica del más antiguo al más
-  reciente. Al informar o confirmar, se pueden elegir cargos concretos.
-- **Reparto del arbitraje**: el costo se divide en partes iguales entre los convocados, redondeando
-  a pesos enteros; el residuo se suma de a un peso a los primeros convocados por orden alfabético.
+  reciente. Al confirmar o registrar, el PRESIDENTE puede elegir cargos concretos; la familia no elige al informar.
 - **Cargos de tipo OTRO**: existen en el modelo (§16.1) pero esta funcionalidad no incluye una
   pantalla para crearlos.
 - **Estado de cuenta "al día"**: se calcula con todos los cargos generados hasta hoy, también la del
@@ -634,6 +609,7 @@ y los totales por categoría coinciden con la suma de los pagos y cargos de cada
 - Reembolsos o devoluciones de dinero.
 - Facturación electrónica o cumplimiento tributario.
 - Cobro a los clubes por el uso de la plataforma (§7.4), que tiene su propio flujo.
+- Arbitraje: su costo y su cobro se manejan fuera de la aplicación (§16.6).
 - Pantalla para crear cargos de tipo OTRO.
 - Exportar o imprimir informes financieros.
 - Personalizar el diseño del resguardo.

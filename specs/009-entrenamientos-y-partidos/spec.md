@@ -518,7 +518,7 @@ un partido.
 ## Fuera de alcance
 
 - Torneos como entidades y tablas de posiciones (§17.1).
-- Arbitraje y su cargo entre los convocados (§16.6), que depende de los cargos.
+- Arbitraje y su cargo: quedan fuera de la aplicación (§16.6).
 - Mensualidades, cargos y pagos.
 - Evaluaciones del jugador.
 - Comunicados a las familias, mensajes de convocatoria y avisos por correo.

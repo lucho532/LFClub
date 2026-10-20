@@ -373,6 +373,12 @@ Enmienda 4.13.0 → 4.13.1 (2026-10-20), decidida por el propietario del proyect
 - Las llaves y secretos de la pasarela no se escriben en la constitución ni en el repositorio
 - Principios renombrados, secciones añadidas y eliminadas: ninguno
 
+Enmienda 4.13.1 → 4.14.0 (2026-10-20), decidida por el propietario del proyecto en la spec 015:
+- Arbitraje: sale de la aplicación; ni se registra su costo ni genera cargos. Cambios en §1, §2.2
+  (glosario), §6.2, §8 (PRESIDENTE), §16.1 (se retira el tipo ARBITRAJE), §16.6 (queda como nota de
+  que está fuera de la aplicación; se conserva el número) y §17.2
+- Principios renombrados y secciones eliminadas: ninguno
+
 -->
 
 # Constitución del Proyecto — LFClub, plataforma multiclub de escuelas de fútbol
@@ -417,7 +423,6 @@ La plataforma debe permitir, para cada club:
   transferencia (Nequi, Bancolombia, Daviplata u otra), con su soporte, recibo y resguardo.
 - Programar entrenamientos, partidos y torneos.
 - Registrar convocatorias, asistencia y resultados.
-- Gestionar el arbitraje de cada partido y su cobro entre los convocados.
 - Mantener la ficha de cada jugador con acceso restringido.
 - Enviar comunicados y mensajes de convocatoria.
 - Mantener históricos deportivos y financieros sin alterar información histórica.
@@ -494,10 +499,9 @@ Se utilizará siempre el mismo término para cada concepto:
 | Categoria | grupo de jugadores definido por un único año de nacimiento |
 | Equipo | división de una categoría, con nombre propio (A, B, Élite) |
 | Mensualidad | cobro mensual por la formación de un jugador |
-| Cargo | valor que un jugador debe (mensualidad, arbitraje, otro) |
+| Cargo | valor que un jugador debe (mensualidad, otro) |
 | Pago | dinero recibido y aplicado a uno o varios cargos |
 | Convocatoria | lista de jugadores citados a un partido |
-| Arbitraje | costo del árbitro de un partido |
 
 No se usarán sinónimos en el código (por ejemplo Alumno, Profesor, Cuota) para estos conceptos.
 
@@ -683,7 +687,7 @@ el pago de cada club por el uso de la plataforma (ver §7.4).
 La integración queda detrás de una interfaz de Aplicacion (ver §4), de modo que cambiar de
 pasarela no afecte las reglas de negocio.
 
-Los pagos de las familias al club (mensualidades y arbitrajes) no pasan por la pasarela: se hacen
+Los pagos de las familias al club (mensualidades) no pasan por la pasarela: se hacen
 directamente al PRESIDENTE y se registran según la §16. Las llaves de la pasarela son secretos de
 la plataforma: se guardan protegidas, nunca se devuelven por la API y nunca llegan al frontend. Si
 más adelante las familias pagan en línea, será una enmienda de esta constitución.
@@ -888,7 +892,7 @@ Puede:
 - Consultar las finanzas completas del club.
 - Registrar, anular y corregir pagos; confirmar o rechazar las transferencias que las familias
   informan con su soporte; y publicar los medios de pago del club (ver §16).
-- Gestionar torneos, partidos y arbitrajes.
+- Gestionar torneos y partidos.
 - Publicar comunicados dirigidos a cualquier audiencia del club y retirar cualquiera (ver §14.4).
 - Enviar invitaciones de registro a su club con el rol JUGADOR, ENTRENADOR o DIRECTIVO (ver
   §12.1).
@@ -1622,7 +1626,6 @@ Todo lo que un jugador debe se representa como un Cargo:
 
 ```text
 MENSUALIDAD
-ARBITRAJE
 OTRO
 ```
 
@@ -1685,10 +1688,10 @@ club: un recibo, consultable desde la cuenta del jugador, y un resguardo de pago
 defecto que la familia descarga o comparte. El resguardo no sustituye ni elimina al recibo. En un
 pago anulado ambos siguen existiendo y se marcan como anulados.
 
-### 16.6. Arbitraje
+### 16.6. Arbitraje fuera de la aplicación
 
-El costo del arbitraje de un partido se reparte entre los jugadores convocados y genera un Cargo
-de tipo ARBITRAJE para cada uno.
+El arbitraje de los partidos y su cobro se manejan fuera de la aplicación. La plataforma no
+registra el costo del arbitraje ni genera cargos por él.
 
 ### 16.7. Mensualidad
 
@@ -1782,8 +1785,6 @@ ni en contadores, ni en mensajes, ni en avisos de la campana (ver §14.4), ni pu
 su identificador.
 
 Nadie puede ver desde una cuenta de jugador la lista de los demás convocados.
-
-El cargo de arbitraje solamente se genera para los convocados.
 
 #### Convocatoria a entrenamientos
 
@@ -2167,4 +2168,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.13.1 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-20
+**Versión**: 4.14.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-20
