@@ -31,6 +31,17 @@ const COLUMNAS: Columna<ClubResumenDto>[] = [
         <EtiquetaEstado tono="aviso" texto="Presidente sin registrar" />
       ),
   },
+  { titulo: 'Jugadores', celda: (club) => club.integrantes.jugadores },
+  { titulo: 'Entrenadores', celda: (club) => club.integrantes.entrenadores },
+  { titulo: 'Directivos', celda: (club) => club.integrantes.directivos },
+  { titulo: 'Presidentes', celda: (club) => club.integrantes.presidentes },
+  {
+    titulo: 'Total',
+    celda: (club) => {
+      const { jugadores, entrenadores, directivos, presidentes } = club.integrantes;
+      return <strong>{jugadores + entrenadores + directivos + presidentes}</strong>;
+    },
+  },
 ];
 
 /** Lista de todos los clubes de la plataforma y acceso a crear uno. */

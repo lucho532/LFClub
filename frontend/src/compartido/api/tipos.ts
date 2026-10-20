@@ -126,12 +126,21 @@ export interface ActualizarConfiguracionClubDto {
   telefonoContacto: string | null;
 }
 
+/** Integrantes activos de un club por rol, para la facturación. */
+export interface ConteoIntegrantesDto {
+  jugadores: number;
+  entrenadores: number;
+  directivos: number;
+  presidentes: number;
+}
+
 export interface ClubResumenDto {
   clubId: string;
   nombre: string;
   estado: EstadoClub;
   presidenteRegistrado: boolean;
   identidad: IdentidadClubDto;
+  integrantes: ConteoIntegrantesDto;
 }
 
 export interface PresidenteDto {
