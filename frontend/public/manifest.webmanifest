@@ -1,0 +1,16 @@
+{
+  "name": "LFClub",
+  "short_name": "LFClub",
+  "description": "Gestión de tu club deportivo: jugadores, entrenamientos, partidos y comunicados.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f3ef",
+  "theme_color": "#24448c",
+  "icons": [
+    { "src": "/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -9,6 +9,8 @@ Escribe:
 - frontend/android/.../mipmap-*/ic_launcher.png e ic_launcher_round.png: el icono de Android 7, que
   no usa el icono adaptable. Para rasterizarlo usa Chrome sin interfaz y Pillow.
 - frontend/public/favicon.svg, favicon-32.png y apple-touch-icon.png: el icono de la web.
+- frontend/public/icono-192.png, icono-512.png e icono-maskable-512.png: los iconos de la aplicación
+  de escritorio que instala el navegador (manifest.webmanifest).
 
 Uso, desde la raíz del repositorio: python scripts/generar-balon.py
 El balón tiene el estilo de paneles en estrella de un balón clásico, sin ninguna marca.
@@ -194,6 +196,18 @@ def favicon(g):
             (180, 180), Image.LANCZOS).save(os.path.join(publica, 'apple-touch-icon.png'))
 
 
+def iconos_instalacion(g):
+    """Iconos del manifiesto: el cuadrado de bordes redondeados y el 'maskable' a sangre, que el
+    sistema recorta con su propia forma (el balón queda dentro de la zona segura del 80 %)."""
+    publica = os.path.join(FRONTEND, 'public')
+    with tempfile.TemporaryDirectory() as temporal:
+        normal = rasterizar(svg_icono(g, FORMA_CUADRADA), temporal, 'instalacion')
+        normal.resize((192, 192), Image.LANCZOS).save(os.path.join(publica, 'icono-192.png'))
+        normal.save(os.path.join(publica, 'icono-512.png'))
+        a_sangre = rasterizar(svg_icono(g, FORMA_CUADRADA.replace('rx="18"', 'rx="0"')), temporal, 'maskable')
+        a_sangre.save(os.path.join(publica, 'icono-maskable-512.png'))
+
+
 def iconos_png(g):
     """Rasteriza el icono cuadrado y el redondo de Android 7 y los escala a cada densidad."""
     tamanos = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
@@ -214,6 +228,7 @@ def main():
     escribir(os.path.join(RES, 'drawable', 'balon_arranque_animado.xml'), ANIMADO)
     iconos_png(g)
     favicon(g)
+    iconos_instalacion(g)
     print('Balón generado.')
 
 
