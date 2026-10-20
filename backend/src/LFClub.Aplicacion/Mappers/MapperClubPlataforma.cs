@@ -18,7 +18,8 @@ public static class MapperClubPlataforma
         fila.Club.Nombre,
         fila.Club.Estado,
         fila.PresidenteRegistrado,
-        MapperIdentidadClub.AIdentidad(fila.Club));
+        MapperIdentidadClub.AIdentidad(fila.Club),
+        new ConteoIntegrantesDto(fila.Jugadores, fila.Entrenadores, fila.Directivos, fila.Presidentes));
 
     /// <summary>Detalle de un club con sus presidentes y sus invitaciones sin usar ni anular.</summary>
     public static ClubDetalleDto ADetalle(

@@ -52,10 +52,19 @@ describe('Sin permiso de notificaciones', () => {
 
     const hallazgos = fuentes.flatMap((ruta) => {
       const texto = readFileSync(ruta, 'utf-8');
-      return prohibidos.filter((patron) => patron.test(texto)).map((patron) => `${ruta}: ${patron}`);
+      // Único registro permitido: el service worker mínimo que hace instalable la web (sin avisos).
+      const permitidos = ruta.endsWith('instalacionEscritorio.ts') ? [/serviceWorker\.register/] : [];
+      return prohibidos
+        .filter((patron) => patron.test(texto) && !permitidos.some((permitido) => permitido.source === patron.source))
+        .map((patron) => `${ruta}: ${patron}`);
     });
 
     expect(hallazgos).toEqual([]);
+  });
+
+  it('el service worker de la instalación de escritorio no recibe push ni muestra notificaciones', () => {
+    const texto = readFileSync(join(__dirname, '..', 'public', 'sw.js'), 'utf-8');
+    expect(texto).not.toMatch(/addEventListener\(\s*['"](push|notificationclick|sync)['"]|showNotification|PushManager/);
   });
 
   it('leer un aviso no pide permiso ni crea notificaciones', async () => {

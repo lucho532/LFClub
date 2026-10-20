@@ -11,7 +11,7 @@ namespace LFClub.Infraestructura.Repositorios.Plataforma;
 /// excepción).
 /// Su responsabilidad es leer y guardar clubes, sus presidentes y su escudo. Se salta el filtro de
 /// aislamiento porque el panel trabaja sobre todos los clubes, y por eso solo consulta
-/// integrantes con rol PRESIDENTE.
+/// integrantes con rol PRESIDENTE o los cuenta por rol, sin leer sus datos personales.
 /// No expone ningún otro dato de un club (§8) ni contiene reglas de negocio.
 /// </summary>
 public class RepositorioClubesPlataforma : IRepositorioClubesPlataforma
@@ -28,13 +28,22 @@ public class RepositorioClubesPlataforma : IRepositorioClubesPlataforma
         .IgnoreQueryFilters()
         .Where(integrante => integrante.Rol == Rol.PRESIDENTE);
 
+    /// <summary>Integrantes de ingreso aprobado y no retirados, de cualquier club.</summary>
+    private IQueryable<UsuarioRol> Activos => _contexto.UsuariosRol
+        .IgnoreQueryFilters()
+        .Where(integrante => integrante.EstadoIngreso == EstadoIngreso.APROBADO && integrante.Activo);
+
     /// <inheritdoc />
     public async Task<IReadOnlyList<ClubConPresidente>> ListarAsync(CancellationToken cancelacion = default) =>
         await _contexto.Clubes
             .OrderBy(club => club.Nombre)
             .Select(club => new ClubConPresidente(
                 club,
-                Presidentes.Any(integrante => integrante.ClubId == club.Id)))
+                Presidentes.Any(integrante => integrante.ClubId == club.Id),
+                Activos.Count(integrante => integrante.ClubId == club.Id && integrante.Rol == Rol.JUGADOR),
+                Activos.Count(integrante => integrante.ClubId == club.Id && integrante.Rol == Rol.ENTRENADOR),
+                Activos.Count(integrante => integrante.ClubId == club.Id && integrante.Rol == Rol.DIRECTIVO),
+                Activos.Count(integrante => integrante.ClubId == club.Id && integrante.Rol == Rol.PRESIDENTE)))
             .ToListAsync(cancelacion);
 
     /// <inheritdoc />
