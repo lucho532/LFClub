@@ -1,18 +1,22 @@
 import { api } from '../compartido/api/cliente';
-import type { ActualizarConfiguracionClubDto, ClubDetalleDto } from '../compartido/api/tipos';
-import { FormularioDatosClub } from '../compartido/componentes/FormularioDatosClub';
-import { Tarjeta } from '../compartido/componentes/Tarjeta';
+import type { ClubDetalleDto } from '../compartido/api/tipos';
+import { PanelDatosClub } from '../compartido/componentes/PanelDatosClub';
 import type { PropsSeccion } from './DetalleClub';
 
-/** Datos de un club (nombre, sede, dirección y contacto), editables por el desarrollador. */
+/**
+ * Datos e identidad de un club en el panel, como tarjetas de visualización con su lápiz: el escudo
+ * en grande, los datos (nombre, sede, dirección y contacto) y los colores. Los edita el
+ * DESARROLLADOR con las rutas del panel; si el presidente los cambió antes, vale lo último.
+ */
 export function SeccionDatos({ club, alActualizar }: PropsSeccion) {
-  async function guardar(datos: ActualizarConfiguracionClubDto) {
-    alActualizar(await api.put<ClubDetalleDto>(`/api/plataforma/clubes/${club.clubId}/configuracion`, datos));
-  }
+  const base = `/api/plataforma/clubes/${club.clubId}`;
 
   return (
-    <Tarjeta titulo="Datos del club">
-      <FormularioDatosClub key={club.clubId} inicial={club} alGuardar={guardar} />
-    </Tarjeta>
+    <PanelDatosClub
+      club={club}
+      guardarDatos={async (datos) => alActualizar(await api.put<ClubDetalleDto>(`${base}/configuracion`, datos))}
+      guardarColores={async (datos) => alActualizar(await api.put<ClubDetalleDto>(`${base}/colores`, datos))}
+      guardarEscudo={async (archivo) => alActualizar(await api.putArchivo<ClubDetalleDto>(`${base}/escudo`, archivo))}
+    />
   );
 }
