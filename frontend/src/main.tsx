@@ -19,6 +19,7 @@ import './compartido/tema/calendario.css';
 import './compartido/tema/identidad.css';
 import './compartido/tema/carta.css';
 import './compartido/tema/comunicados.css';
+import './compartido/tema/pagos.css';
 import './compartido/tema/movil.css';
 
 registrarInstalacionEscritorio();

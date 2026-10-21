@@ -1,8 +1,10 @@
 import type { ClubDto } from '../compartido/api/tipos';
 import { useClub } from './contextoClub';
+import { AvisoValorMensualidad } from './inicio/AvisoValorMensualidad';
 import { InicioEntrenador } from './inicio/InicioEntrenador';
 import { ResumenDelClub } from './inicio/ResumenDelClub';
 import { TarjetaMiJugador } from './inicio/TarjetaMiJugador';
+import { TarjetaPagosEnRevision } from './inicio/TarjetaPagosEnRevision';
 import { TarjetaPartidos } from './inicio/TarjetaPartidos';
 import { TarjetaProximosEntrenamientos } from './inicio/TarjetaProximosEntrenamientos';
 import { TarjetaTuClub } from './inicio/TarjetaTuClub';
@@ -13,6 +15,13 @@ function DelRol({ club }: { club: ClubDto }) {
   switch (club.miRol) {
     // El resumen se elige por el rol, no por las asignaciones: quien además entrena lo ve igual (RF-015).
     case 'PRESIDENTE':
+      return (
+        <>
+          <AvisoValorMensualidad clubId={club.clubId} />
+          <TarjetaPagosEnRevision clubId={club.clubId} />
+          <ResumenDelClub clubId={club.clubId} />
+        </>
+      );
     case 'DIRECTIVO':
       return <ResumenDelClub clubId={club.clubId} />;
     case 'ENTRENADOR':

@@ -48,6 +48,7 @@ public class ConfiguracionUsuarioRol : IEntityTypeConfiguration<UsuarioRol>
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.Property(integrante => integrante.Activo).HasDefaultValue(true);
+        builder.Property(integrante => integrante.ValorMensualidadPropio).HasColumnType("numeric(14,2)");
         builder.Property(integrante => integrante.RetiradoPorNombre).HasMaxLength(161);
 
         // Borrar una categoría no borra a nadie: solo se borra la que nunca se usó (RF-004a).

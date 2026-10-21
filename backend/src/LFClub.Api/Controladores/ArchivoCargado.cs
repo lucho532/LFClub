@@ -21,6 +21,12 @@ public static class ArchivoCargado
     /// </summary>
     public const int LimiteDePeticionDeDocumento = 12 * 1024 * 1024;
 
+    /// <summary>
+    /// Límite de la petición que informa una transferencia con su imagen de soporte (spec 015): por
+    /// encima de los 5 MB que admite la imagen, para que sea el validador quien explique el rechazo.
+    /// </summary>
+    public const int LimiteDePeticionDeSoporte = 6 * 1024 * 1024;
+
     /// <summary>Bytes del archivo, o nulo si no se envió ninguno.</summary>
     public static async Task<byte[]?> LeerAsync(IFormFile? archivo, CancellationToken cancelacion)
     {

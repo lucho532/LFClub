@@ -117,6 +117,21 @@ public class ContextoLFClub : DbContext
     /// <summary>Jugadores que recibieron cada aviso y si su cuenta lo leyó.</summary>
     public DbSet<AvisoDeActividadDestinatario> AvisosDeActividadDestinatario => Set<AvisoDeActividadDestinatario>();
 
+    /// <summary>Cargos que los jugadores deben al club (spec 015).</summary>
+    public DbSet<Cargo> Cargos => Set<Cargo>();
+
+    /// <summary>Pagos recibidos de los jugadores (spec 015).</summary>
+    public DbSet<Pago> Pagos => Set<Pago>();
+
+    /// <summary>Qué parte de cada pago cubre cada cargo (spec 015).</summary>
+    public DbSet<AplicacionPago> AplicacionesPago => Set<AplicacionPago>();
+
+    /// <summary>Imágenes de soporte de las transferencias informadas (spec 015).</summary>
+    public DbSet<SoportePago> SoportesPago => Set<SoportePago>();
+
+    /// <summary>Cuentas por las que cada club recibe pagos (spec 015).</summary>
+    public DbSet<MedioPagoClub> MediosPagoClub => Set<MedioPagoClub>();
+
     /// <summary>Club de la petición; lo lee el filtro global en cada consulta.</summary>
     private Guid? ClubDeLaPeticion => _contextoClub.ClubId;
 

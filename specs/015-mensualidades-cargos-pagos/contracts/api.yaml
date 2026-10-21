@@ -18,7 +18,7 @@ info:
     - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
     - Quién puede qué (constitución §16.9): el PRESIDENTE hace todo; el DIRECTIVO solo consulta; la
       cuenta de un jugador consulta y informa lo de su propio jugador; el ENTRENADOR recibe `403
-      sin_permiso` en todas; el DESARROLLADOR no tiene ruta de club (§8). Lo que es de otro jugador o
+      rol_no_autorizado` en todas; el DESARROLLADOR no tiene ruta de club (§8). Lo que es de otro jugador o
       de otro club responde `404 no_encontrado`.
     - Los importes son números decimales en pesos colombianos, enteros y mayores que cero (RF-014).
     - Los meses son fechas `YYYY-MM-01`. El mes de cobro es el de la hora de Colombia (UTC-5).
@@ -493,7 +493,7 @@ components:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problema' }
     SinPermiso:
-      description: El rol no puede hacerlo (`sin_permiso`). Siempre el caso del ENTRENADOR
+      description: El rol no puede hacerlo (`rol_no_autorizado`). Siempre el caso del ENTRENADOR
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problema' }

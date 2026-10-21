@@ -2,15 +2,9 @@ import type { Rol } from '../../compartido/api/tipos';
 import type { GrupoDeJugadoresDto } from '../../compartido/api/tiposJugadores';
 
 /**
- * Textos de la lista "Jugadores" (spec 007). "Al día" es un espacio reservado: los pagos todavía no
- * existen, así que el texto es el mismo para todos y no puede leerse como un estado (RF-006, CE-007).
+ * Textos de la lista "Jugadores" (spec 007). La columna "Al día" muestra el estado de cuenta real
+ * del jugador, solo al PRESIDENTE y al DIRECTIVO (spec 015, RF-034): ya no es un espacio reservado.
  */
-
-/** Lo que dice la columna "Al día" en todas las filas (supuesto 5 del plan). */
-export const TEXTO_AL_DIA = 'Sin datos aún';
-
-/** Explicación accesible de la columna "Al día". */
-export const TITULO_AL_DIA = 'El estado de pago todavía no está disponible';
 
 export const SIN_EQUIPO = 'Sin equipo';
 

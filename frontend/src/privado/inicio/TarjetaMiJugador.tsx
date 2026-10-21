@@ -8,6 +8,7 @@ import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { nombreCompleto, rutaDeFicha } from '../categorias/textos';
 import { SeccionFoto } from '../ficha/SeccionFoto';
 import { SIN_CATEGORIA, textoDeEquipos } from '../jugadores/textos';
+import { rutaDeLaCuenta } from '../pagos/textosPagos';
 
 interface Props {
   clubId: string;
@@ -20,7 +21,7 @@ interface Props {
  * nombre, su categoría y sus equipos, y la entrada a su ficha. Quien puede cambiar la ficha cambia o
  * quita la foto desde el lápiz del círculo, igual que en la ficha (`SeccionFoto`). Lee la ficha del jugador elegido,
  * sin pedir nada nuevo a la API; con varios hermanos, es la del que eligió al entrar. El nombre
- * también abre "Mi ficha" (spec 008).
+ * también abre "Mi ficha" (spec 008). Lleva además a su estado de cuenta (spec 015), a un toque del inicio.
  */
 export function TarjetaMiJugador({ clubId, miUsuarioRolId }: Props) {
   const ficha = useCarga(`${clubId}/ficha/${miUsuarioRolId}`, () =>
@@ -46,6 +47,7 @@ export function TarjetaMiJugador({ clubId, miUsuarioRolId }: Props) {
           <span>{jugador.categoriaAnio ? `Categoría ${jugador.categoriaAnio}` : SIN_CATEGORIA}</span>
           <span className="texto-suave">{textoDeEquipos(jugador.equipos)}</span>
           <Link to={rutaDeFicha(clubId, miUsuarioRolId)}>Abrir mi ficha</Link>
+          <Link to={rutaDeLaCuenta(clubId, miUsuarioRolId)}>Ver mi cuenta</Link>
         </SeccionFoto>
       )}
     </Tarjeta>

@@ -436,3 +436,9 @@ su invitación se puede reenviar y corregir.
 - Ficha del jugador, datos médicos y documentos.
 - Cualquier cambio en la invitación de PRESIDENTE que envía el DESARROLLADOR al crear el club
   distinto de los de RF-013, RF-024 y RF-025, y en quitarle el rol a un presidente.
+
+---
+
+**Nota de seguimiento (2026-10-20)**: lo que este documento deja pendiente sobre mensualidades, cargos,
+pagos y el estado de cuenta lo construye la funcionalidad
+[015-mensualidades-cargos-pagos](../015-mensualidades-cargos-pagos/spec.md). Este documento no se reescribe.

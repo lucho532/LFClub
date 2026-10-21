@@ -15,6 +15,16 @@ public static class RegistroDeCasosDeUso
     /// <summary>Registra los servicios de los casos de uso.</summary>
     public static IServiceCollection AgregarCasosDeUso(this IServiceCollection servicios)
     {
+        servicios.AddScoped<IServicioGeneracionCargos, ServicioGeneracionCargos>();
+        servicios.AddScoped<IServicioMensualidad, ServicioMensualidad>();
+        servicios.AddScoped<IServicioCuentaDelJugador, ServicioCuentaDelJugador>();
+        servicios.AddScoped<AplicadorDePagos>();
+        servicios.AddScoped<IServicioRegistroDePagos, ServicioRegistroDePagos>();
+        servicios.AddScoped<IServicioConsultaDePagos, ServicioConsultaDePagos>();
+        servicios.AddScoped<IServicioMediosPago, ServicioMediosPago>();
+        servicios.AddScoped<IServicioRevisionDePagos, ServicioRevisionDePagos>();
+        servicios.AddScoped<IServicioAnulacionDePagos, ServicioAnulacionDePagos>();
+        servicios.AddScoped<IServicioFinanzas, ServicioFinanzas>();
         servicios.AddScoped<IServicioSesion, ServicioSesion>();
         servicios.AddScoped<IServicioRecuperacion, ServicioRecuperacion>();
         servicios.AddScoped<IServicioFotoPerfil, ServicioFotoPerfil>();

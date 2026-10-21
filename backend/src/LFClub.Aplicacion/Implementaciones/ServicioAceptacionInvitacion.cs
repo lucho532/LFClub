@@ -20,7 +20,8 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// club no la tiene. Con una invitación del club, si la cuenta ya está en ese club no cambia nada
 /// (409). Solo una invitación de presidente reemplaza el rol de quien ya era integrante; si era
 /// jugador, sale de su categoría y de sus equipos y deja de estar retirado. A un jugador retirado
-/// no lo devuelve al club una invitación del club (409): se le reincorpora.
+/// no lo devuelve al club una invitación del club (409): se le reincorpora. Si entra como JUGADOR, se le
+/// cobra desde el mes siguiente (spec 015, RF-008).
 /// No crea cuentas ni pide de nuevo los datos de la persona. El responsable es la única excepción:
 /// lo exige, y lo guarda en la cuenta, cuando entra como JUGADOR una persona menor de 18 años cuya
 /// cuenta no lo tiene (RF-026); en cualquier otro caso la cuenta conserva el que tenga. No cambia
@@ -205,6 +206,7 @@ public class ServicioAceptacionInvitacion : IServicioAceptacionInvitacion
             NumeroDocumento = identidad.NumeroDocumento,
             FechaNacimiento = identidad.FechaNacimiento,
             CreadoEn = ahora,
+            CobraDesde = invitacion.Rol == Rol.JUGADOR ? ReglaMesDeCobro.PrimerMesDeCobro(ahora) : null,
         };
     }
 }

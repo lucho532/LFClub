@@ -43,6 +43,8 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 
     public SembradorJugadores Jugadores => new(this);
 
+    public SembradorPagos Pagos => new(this);
+
     public SembradorPersonas Personas => new(this);
 
     public async Task InitializeAsync()
@@ -78,6 +80,9 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Frontend:UrlBase", "http://localhost:5173");
         builder.UseSetting("BaseDatos:MigrarAlArrancar", "true");
         builder.UseSetting("Limites:AnonimoPorMinuto", "100000");
+        // La generación mensual la dispara cada prueba que la necesita; el trabajo en segundo plano la
+        // mezclaría con los datos de las demás.
+        builder.UseSetting("Cargos:TrabajoActivo", "false");
 
         builder.ConfigureTestServices(servicios =>
         {

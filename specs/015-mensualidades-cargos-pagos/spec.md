@@ -4,7 +4,7 @@
 
 **Creada**: 2026-10-20
 
-**Estado**: Borrador
+**Estado**: Implementada (2026-10-20); falta la validación del recorrido de punta a punta con el propietario (T114)
 
 **Entrada**: Descripción del propietario del proyecto: crear la spec 015 de mensualidades, cargos y
 pagos a partir de la §16 de la constitución. Las specs 002, 003, 004, 005, 006, 007 y 009 dejaron

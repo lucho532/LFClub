@@ -31,6 +31,13 @@ import { PantallaCarta } from './privado/carta/PantallaCarta';
 import { Ingresos } from './privado/ingresos/Ingresos';
 import { InicioClub } from './privado/InicioClub';
 import { ListaJugadores } from './privado/jugadores/ListaJugadores';
+import { CuentaDelJugador } from './privado/pagos/CuentaDelJugador';
+import { DetalleDePago } from './privado/pagos/DetalleDePago';
+import { DisposicionPagos, InicioDePagos } from './privado/pagos/DisposicionPagos';
+import { PagosEnRevision } from './privado/pagos/PagosEnRevision';
+import { PantallaFinanzas } from './privado/pagos/PantallaFinanzas';
+import { PantallaMediosDePago } from './privado/pagos/PantallaMediosDePago';
+import { PantallaMensualidad } from './privado/pagos/PantallaMensualidad';
 import { DetallePartido } from './privado/partidos/DetallePartido';
 import { Goleadores } from './privado/partidos/Goleadores';
 import { Partidos } from './privado/partidos/Partidos';
@@ -83,6 +90,8 @@ export function App({ conArranque = false }: Props) {
                 <Route path="jugadores" element={<ListaJugadores />} />
                 <Route path="jugadores/:usuarioRolId/ficha" element={<FichaJugador />} />
                 <Route path="jugadores/:usuarioRolId/carta" element={<PantallaCarta />} />
+                <Route path="jugadores/:usuarioRolId/cuenta" element={<CuentaDelJugador />} />
+                <Route path="recibos/:pagoId" element={<DetalleDePago />} />
                 <Route path="personas/:usuarioRolId" element={<FichaBasica />} />
                 <Route path="calendario" element={<Calendario />} />
                 <Route path="actividades/nueva" element={<FormularioActividad />} />
@@ -90,6 +99,13 @@ export function App({ conArranque = false }: Props) {
                 <Route path="partidos" element={<Partidos />} />
                 <Route path="partidos/:partidoId" element={<DetallePartido />} />
                 <Route path="goleadores" element={<Goleadores />} />
+                <Route path="pagos" element={<DisposicionPagos />}>
+                  <Route index element={<InicioDePagos />} />
+                  <Route path="finanzas" element={<PantallaFinanzas />} />
+                  <Route path="en-revision" element={<PagosEnRevision />} />
+                  <Route path="mensualidad" element={<PantallaMensualidad />} />
+                  <Route path="medios-de-pago" element={<PantallaMediosDePago />} />
+                </Route>
                 <Route path="comunicados" element={<PantallaComunicados />} />
                 <Route path="comunicados/nuevo" element={<FormularioComunicado />} />
                 <Route path="comunicados/:comunicadoId" element={<PantallaComunicados />} />

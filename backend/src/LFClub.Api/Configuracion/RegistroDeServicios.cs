@@ -6,6 +6,7 @@ using LFClub.Infraestructura.Imagenes;
 using LFClub.Infraestructura.Repositorios;
 using LFClub.Infraestructura.Repositorios.Plataforma;
 using LFClub.Infraestructura.Seguridad;
+using LFClub.Infraestructura.Trabajos;
 using Microsoft.EntityFrameworkCore;
 
 namespace LFClub.Api.Configuracion;
@@ -65,6 +66,18 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioComunicados, RepositorioComunicados>();
         servicios.AddScoped<IRepositorioAvisos, RepositorioAvisos>();
         servicios.AddSingleton<IGeneradorImagenCarta, GeneradorImagenCarta>();
+        servicios.AddSingleton<IGeneradorImagenResguardo, GeneradorImagenResguardo>();
+
+        servicios.AddScoped<IRepositorioCargos, RepositorioCargos>();
+        servicios.AddScoped<IRepositorioPagos, RepositorioPagos>();
+        servicios.AddScoped<IRepositorioMediosPago, RepositorioMediosPago>();
+        servicios.AddScoped<IRepositorioFinanzas, RepositorioFinanzas>();
+
+        // La mensualidad nace sola cada mes (spec 015); las pruebas que no la necesitan la apagan.
+        if (configuracion.GetValue("Cargos:TrabajoActivo", true))
+        {
+            servicios.AddHostedService<TrabajoCargosMensuales>();
+        }
 
         servicios.Configure<OpcionesCorreo>(opciones =>
         {

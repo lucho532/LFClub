@@ -10,7 +10,8 @@ namespace LFClub.Infraestructura.Repositorios.Plataforma;
 /// Su responsabilidad es ejecutar con <c>ExecuteUpdate</c> y <c>ExecuteDelete</c>, saltándose el
 /// filtro de aislamiento porque cruza los clubes de una sola cuenta, los pasos que la cascada de la
 /// base de datos no hace: reescribir los nombres copiados, anular invitaciones y borrar primero lo
-/// que bloquea el borrado de los integrantes.
+/// que bloquea el borrado de los integrantes, y, de los pagos (spec 015), reescribir el nombre de
+/// quien los registró y borrar los soportes de los jugadores eliminados.
 /// No contiene reglas de negocio ni abre su propia transacción: va dentro de la del servicio.
 /// </summary>
 public class RepositorioEliminacionCuenta : IRepositorioEliminacionCuenta
@@ -61,6 +62,21 @@ public class RepositorioEliminacionCuenta : IRepositorioEliminacionCuenta
             .Where(f => f.UltimoCambioPorUsuarioId == usuarioId && !propios.Contains(f.UsuarioRolId))
             .ExecuteUpdateAsync(s => s.SetProperty(f => f.UltimoCambioPorNombre, Nombre), cancelacion);
 
+        // Los pagos se conservan (spec 015, §16.3): solo cambia el nombre de quien los registró,
+        // confirmó, rechazó o anuló, que queda copiado en cada paso.
+        await _contexto.Pagos.IgnoreQueryFilters()
+            .Where(p => p.CreadoPorUsuarioId == usuarioId)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.CreadoPorNombre, Nombre), cancelacion);
+        await _contexto.Pagos.IgnoreQueryFilters()
+            .Where(p => p.ConfirmadoPorUsuarioId == usuarioId)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.ConfirmadoPorNombre, Nombre), cancelacion);
+        await _contexto.Pagos.IgnoreQueryFilters()
+            .Where(p => p.RechazadoPorUsuarioId == usuarioId)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.RechazadoPorNombre, Nombre), cancelacion);
+        await _contexto.Pagos.IgnoreQueryFilters()
+            .Where(p => p.AnuladoPorUsuarioId == usuarioId)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.AnuladoPorNombre, Nombre), cancelacion);
+
         await _contexto.UsuariosRol.IgnoreQueryFilters()
             .Where(i => i.AprobadoPorUsuarioId == usuarioId && !propios.Contains(i.Id))
             .ExecuteUpdateAsync(s => s.SetProperty(i => i.AprobadoPorNombre, Nombre), cancelacion);
@@ -88,6 +104,13 @@ public class RepositorioEliminacionCuenta : IRepositorioEliminacionCuenta
             .ExecuteDeleteAsync(cancelacion);
         await _contexto.AsistenciasEntrenamiento.IgnoreQueryFilters()
             .Where(a => propios.Contains(a.UsuarioRolId))
+            .ExecuteDeleteAsync(cancelacion);
+
+        // La imagen de soporte de un pago es de la familia: no sobrevive a su cuenta. El pago sí se
+        // conserva, sin jugador y con su nombre y su documento copiados (spec 015, data-model).
+        await _contexto.SoportesPago.IgnoreQueryFilters()
+            .Where(soporte => _contexto.Pagos.IgnoreQueryFilters()
+                .Any(pago => pago.Id == soporte.PagoId && pago.UsuarioRolId != null && propios.Contains(pago.UsuarioRolId.Value)))
             .ExecuteDeleteAsync(cancelacion);
 
         await _contexto.UsuariosRol.IgnoreQueryFilters()

@@ -51,6 +51,15 @@ public class Club
     /// <summary>Cuándo se hizo el último cambio de estado (RF-031). Nulo hasta el primero.</summary>
     public DateTime? EstadoCambiadoEn { get; set; }
 
+    /// <summary>
+    /// Valor de la mensualidad del club, en pesos enteros (spec 015, RF-011). Nulo significa que el
+    /// PRESIDENTE todavía no lo definió y entonces no se generan cargos.
+    /// </summary>
+    public decimal? ValorMensualidad { get; set; }
+
+    /// <summary>Último número de recibo dado en el club; el siguiente es este más uno (research §7).</summary>
+    public int UltimoRecibo { get; set; }
+
     /// <summary>Fecha de creación, en UTC.</summary>
     public DateTime CreadoEn { get; set; }
 }

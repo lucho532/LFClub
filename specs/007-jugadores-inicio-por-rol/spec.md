@@ -396,3 +396,9 @@ muestra y que otro club no cambia.
 - Jugadores retirados en la lista (siguen en la lista de retirados de la spec 003).
 - Cambios a lo que cada rol puede ver o editar de la ficha (spec 005).
 - Que otros roles distintos del PRESIDENTE y el DESARROLLADOR cambien la identidad del club.
+
+---
+
+**Nota de seguimiento (2026-10-20)**: lo que este documento deja pendiente sobre mensualidades, cargos,
+pagos y el estado de cuenta lo construye la funcionalidad
+[015-mensualidades-cargos-pagos](../015-mensualidades-cargos-pagos/spec.md). Este documento no se reescribe.

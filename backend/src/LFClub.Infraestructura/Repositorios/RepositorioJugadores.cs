@@ -149,12 +149,14 @@ public class RepositorioJugadores : IRepositorioJugadores
                 cancelacion) == 1;
 
     /// <inheritdoc />
-    public async Task<bool> ReincorporarAsync(Guid usuarioRolId, CancellationToken cancelacion = default) =>
+    public async Task<bool> ReincorporarAsync(
+        Guid usuarioRolId, DateOnly cobraDesde, CancellationToken cancelacion = default) =>
         await _contexto.UsuariosRol
             .Where(integrante => integrante.Id == usuarioRolId && integrante.Rol == Rol.JUGADOR && !integrante.Activo)
             .ExecuteUpdateAsync(
                 cambios => cambios
                     .SetProperty(integrante => integrante.Activo, true)
+                    .SetProperty(integrante => integrante.CobraDesde, (DateOnly?)cobraDesde)
                     .SetProperty(integrante => integrante.RetiradoEn, (DateTime?)null)
                     .SetProperty(integrante => integrante.RetiradoPorUsuarioId, (Guid?)null)
                     .SetProperty(integrante => integrante.RetiradoPorNombre, (string?)null),

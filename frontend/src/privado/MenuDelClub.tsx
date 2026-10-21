@@ -10,10 +10,12 @@ import {
   IconoIngresos,
   IconoInicio,
   IconoJugadores,
+  IconoPagos,
   IconoPartido,
 } from '../compartido/componentes/Iconos';
 import { puedeVerCategorias, rutaDeFicha } from './categorias/textos';
 import { puedeVerJugadores } from './jugadores/textos';
+import { puedeVerPagos, rutaDeLaCuenta } from './pagos/textosPagos';
 
 interface Props {
   clubId: string;
@@ -66,6 +68,15 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
       {rol && puedeVerCategorias(rol) && (
         <EnlaceMenu a={`/club/${clubId}/categorias`} icono={<IconoCategorias />}>
           Categorías
+        </EnlaceMenu>
+      )}
+      {/* Pagos: la familia va a la cuenta de su jugador; el presidente y el directivo, a la sección. El entrenador no la ve (§16.9). */}
+      {rol && puedeVerPagos(rol) && (
+        <EnlaceMenu
+          a={rol === 'JUGADOR' && club ? rutaDeLaCuenta(clubId, club.miUsuarioRolId) : `/club/${clubId}/pagos`}
+          icono={<IconoPagos />}
+        >
+          Pagos
         </EnlaceMenu>
       )}
       {rol === 'PRESIDENTE' && (
