@@ -36,6 +36,7 @@ public class CategoriasPorEstadoDelClubPruebas
             && !endpoint.Ruta.EndsWith("/estadisticas", StringComparison.Ordinal)
             && !endpoint.Ruta.Contains("/carta", StringComparison.Ordinal)
             && !endpoint.Ruta.EndsWith("/cuenta", StringComparison.Ordinal)
+            && !endpoint.Ruta.EndsWith("/cuenta/aviso", StringComparison.Ordinal)
             && !endpoint.Ruta.Contains("/pagos", StringComparison.Ordinal))
         .ToList();
 

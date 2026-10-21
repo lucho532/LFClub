@@ -379,6 +379,16 @@ Enmienda 4.13.1 → 4.14.0 (2026-10-20), decidida por el propietario del proyect
   que está fuera de la aplicación; se conserva el número) y §17.2
 - Principios renombrados y secciones eliminadas: ninguno
 
+Enmienda 4.14.0 → 4.15.0 (2026-10-21), decidida por el propietario del proyecto en la spec 016:
+- §16.7: la mensualidad sin pagar después del día 5 deja de ser solo un dato informativo: el inicio
+  de la familia del jugador muestra un aviso fijo (rojo en mora, ámbar dentro del plazo, verde al
+  día). Se mantiene que no hay recargo, interés ni restricción alguna
+- §16.8: se aclara que no hay recordatorios por ningún canal y que el aviso fijo del inicio no es un
+  recordatorio, porque no se envía
+- §16.9: el aviso lo ve únicamente la familia del jugador
+- §28: se ajusta la nota sobre recordatorios de pago
+- Principios renombrados y secciones eliminadas: ninguno
+
 -->
 
 # Constitución del Proyecto — LFClub, plataforma multiclub de escuelas de fútbol
@@ -1711,16 +1721,33 @@ valor del club y, como con este, el cambio no altera los cargos ya generados.
 
 Cada mes se genera un cargo de tipo MENSUALIDAD por cada jugador activo.
 
-Una mensualidad sin pagar después del día 5 simplemente aparece como pendiente en el estado de
-cuenta. Es un dato informativo y no tiene consecuencias.
+Una mensualidad sin pagar después del día 5 aparece como pendiente en el estado de cuenta y deja
+al jugador en mora. El día 5 de cada mes (inclusive, en hora de Colombia) es el último del plazo.
+
+El inicio de la familia del jugador muestra un aviso fijo del estado de su jugador, que no se puede
+cerrar ni descartar:
+
+- **Rojo**: el jugador está en mora, es decir, tiene una mensualidad sin pagar cuyo plazo ya pasó.
+  Dice cuánto debe y de cuántas mensualidades.
+- **Ámbar**: tiene la mensualidad del mes pendiente pero todavía está dentro del plazo.
+- **Verde**: no tiene nada pendiente; dice que está al día.
+
+El aviso se calcula en el servidor cada vez que se abre el inicio y pasa de rojo a verde cuando un
+pago confirmado cubre lo vencido. Los cargos de tipo OTRO no cuentan para la mora. El color nunca es lo
+único que lo dice.
 
 No existe recargo por mora. Deber no genera intereses, cargos adicionales ni restricciones de
-ningún tipo para el jugador: no afecta su acceso, sus entrenamientos ni sus convocatorias.
+ningún tipo para el jugador: no afecta su acceso, sus entrenamientos ni sus convocatorias. Lo único
+que cambia por estar en mora es el aviso del inicio de su familia.
 
 ### 16.8. Recordatorios
 
-En esta primera versión no se envían recordatorios de pago, ni automáticos ni manuales. El estado
-de cuenta se consulta dentro de la aplicación.
+En esta primera versión no se envían recordatorios de pago, ni automáticos ni manuales, por ningún
+canal: ni campana, ni correo, ni mensaje, ni notificación del dispositivo. El estado de cuenta se
+consulta dentro de la aplicación.
+
+El aviso fijo del inicio (ver §16.7) no es un recordatorio: no se envía a nadie, solo se muestra
+dentro de la aplicación a la familia del jugador cuando abre su inicio.
 
 ### 16.9. Quién ve los pagos
 
@@ -1728,6 +1755,9 @@ Los estados de cuenta, cargos, pagos, recibos, resguardos, soportes, medios de p
 club los ven únicamente el PRESIDENTE, el DIRECTIVO (en consulta) y la familia del jugador, y esta
 solo lo de su propio jugador. El ENTRENADOR no ve nada de este tema, tampoco el de los jugadores de
 sus categorías. El DESARROLLADOR tampoco (ver §8).
+
+El aviso de mora (ver §16.7) lo ve únicamente la familia del jugador, en su propio inicio. No lo ven
+el PRESIDENTE, el DIRECTIVO ni el ENTRENADOR por razón de su rol.
 
 El backend aplica esta visibilidad. No basta con ocultarlo en el frontend.
 
@@ -2144,8 +2174,8 @@ implementación.
 - **Matrícula.** Si existe un cobro de inscripción.
 - **Fuente automática de posiciones.** Todavía no se conoce ningún enlace o servicio de las ligas
   del que se puedan leer las tablas. Mientras no exista, se mantienen manuales (ver §17.1).
-- **Recordatorios de pago.** Quedan fuera de esta versión (ver §16.8). Si más adelante se quieren,
-  habrá que decidir el canal.
+- **Recordatorios de pago.** Quedan fuera de esta versión (ver §16.8); solo existe el aviso fijo del
+  inicio (ver §16.7). Si más adelante se quieren envíos, habrá que decidir el canal.
 - **Ficha con historial.** Qué pasa si una cuenta que ya tiene cargos, pagos o partidos como
   jugador pasa a ENTRENADOR o DIRECTIVO.
 
@@ -2168,4 +2198,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.14.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-20
+**Versión**: 4.15.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-21

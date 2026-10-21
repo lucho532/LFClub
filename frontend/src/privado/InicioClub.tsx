@@ -1,5 +1,6 @@
 import type { ClubDto } from '../compartido/api/tipos';
 import { useClub } from './contextoClub';
+import { AvisoDeMora } from './inicio/AvisoDeMora';
 import { AvisoValorMensualidad } from './inicio/AvisoValorMensualidad';
 import { InicioEntrenador } from './inicio/InicioEntrenador';
 import { ResumenDelClub } from './inicio/ResumenDelClub';
@@ -10,7 +11,7 @@ import { TarjetaProximosEntrenamientos } from './inicio/TarjetaProximosEntrenami
 import { TarjetaTuClub } from './inicio/TarjetaTuClub';
 import { TarjetaMiCategoria } from './TarjetaMiCategoria';
 
-/** Lo propio del inicio de cada rol (spec 007, RF-011 a RF-013). */
+/** Lo propio del inicio de cada rol (spec 007, RF-011 a RF-013). La familia ve arriba el aviso de mora (spec 016). */
 function DelRol({ club }: { club: ClubDto }) {
   switch (club.miRol) {
     // El resumen se elige por el rol, no por las asignaciones: quien además entrena lo ve igual (RF-015).
@@ -29,6 +30,7 @@ function DelRol({ club }: { club: ClubDto }) {
     case 'JUGADOR':
       return (
         <>
+          <AvisoDeMora clubId={club.clubId} miUsuarioRolId={club.miUsuarioRolId} />
           <TarjetaMiJugador clubId={club.clubId} miUsuarioRolId={club.miUsuarioRolId} />
           <TarjetaMiCategoria clubId={club.clubId} />
         </>

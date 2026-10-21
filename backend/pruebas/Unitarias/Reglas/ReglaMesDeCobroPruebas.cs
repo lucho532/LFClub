@@ -42,6 +42,16 @@ public class ReglaMesDeCobroPruebas
     }
 
     [Fact]
+    public void El_dia_en_Colombia_cambia_a_las_0500_UTC_y_respeta_fin_de_mes_y_de_ano()
+    {
+        Assert.Equal(new DateOnly(2026, 11, 5), ReglaMesDeCobro.DiaEnColombia(Utc(2026, 11, 6, 4, 59)));
+        Assert.Equal(new DateOnly(2026, 11, 6), ReglaMesDeCobro.DiaEnColombia(Utc(2026, 11, 6, 5, 0)));
+        Assert.Equal(new DateOnly(2026, 10, 31), ReglaMesDeCobro.DiaEnColombia(Utc(2026, 11, 1, 4, 59)));
+        Assert.Equal(new DateOnly(2026, 12, 31), ReglaMesDeCobro.DiaEnColombia(Utc(2027, 1, 1, 4, 59)));
+        Assert.Equal(new DateOnly(2027, 1, 1), ReglaMesDeCobro.DiaEnColombia(Utc(2027, 1, 1, 5, 0)));
+    }
+
+    [Fact]
     public void El_31_de_diciembre_de_noche_en_Bogota_sigue_en_diciembre()
     {
         var ahora = Utc(2027, 1, 1, 3, 0);

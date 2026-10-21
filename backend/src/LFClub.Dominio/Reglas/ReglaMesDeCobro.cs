@@ -19,6 +19,13 @@ public static class ReglaMesDeCobro
         return new DateOnly(local.Year, local.Month, 1);
     }
 
+    /// <summary>Fecha de hoy en Colombia en ese instante UTC (spec 016: el día de corte de la mora).</summary>
+    public static DateOnly DiaEnColombia(DateTime ahoraUtc)
+    {
+        var local = DateTime.SpecifyKind(ahoraUtc, DateTimeKind.Utc) + DesfaseDeColombia;
+        return DateOnly.FromDateTime(local);
+    }
+
     /// <summary>Primer día del mes siguiente al de Colombia en ese instante: desde cuándo se cobra.</summary>
     public static DateOnly PrimerMesDeCobro(DateTime ahoraUtc) => MesEnCurso(ahoraUtc).AddMonths(1);
 }

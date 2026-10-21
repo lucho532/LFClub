@@ -149,3 +149,16 @@ export interface FinanzasDto {
   porCategoria: TotalPorCategoriaDto[];
   jugadoresQueDeben: JugadorQueDebeDto[];
 }
+
+export type EstadoDeAvisoDeMora = 'AL_DIA' | 'PENDIENTE_EN_PLAZO' | 'EN_MORA';
+
+/** El aviso fijo de mora del inicio de la familia (spec 016): lo calcula el servidor con la fecha de Colombia. */
+export interface AvisoDeMoraDto {
+  estado: EstadoDeAvisoDeMora;
+  valorVencido: number;
+  mesesVencidos: number;
+  valorEnPlazo: number;
+  /** Día 5 del mes pendiente dentro del plazo (`AAAA-MM-DD`), o `null`. */
+  venceEl: string | null;
+  pagosEnRevision: number;
+}

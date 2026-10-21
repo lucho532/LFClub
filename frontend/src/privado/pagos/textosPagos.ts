@@ -1,5 +1,6 @@
-import type { EstadoDeCuenta, EstadoPago } from '../../compartido/api/tiposPagos';
+import type { AvisoDeMoraDto, EstadoDeCuenta, EstadoPago } from '../../compartido/api/tiposPagos';
 import { diaDeLaSemana } from '../../compartido/fechas';
+import { formatoMoneda } from './formatoMoneda';
 
 /** El estado de cuenta siempre con texto, no solo con color (§24). */
 export const TEXTO_ESTADO_DE_CUENTA: Record<EstadoDeCuenta, string> = {
@@ -69,3 +70,22 @@ export function rutaDelRecibo(clubId: string, pagoId: string): string {
 
 /** Aviso del inicio del presidente mientras el club no define su mensualidad (RF-011). */
 export const AVISO_VALOR_MENSUALIDAD = 'Defina el valor de la mensualidad';
+
+/** El texto del aviso fijo de mora según su estado; el color nunca es lo único que lo dice (§24). */
+export function textoDelAvisoDeMora(aviso: AvisoDeMoraDto): string {
+  switch (aviso.estado) {
+    case 'EN_MORA':
+      return `Estás en mora: debes ${formatoMoneda(aviso.valorVencido)} de ${aviso.mesesVencidos} ${
+        aviso.mesesVencidos === 1 ? 'mensualidad vencida' : 'mensualidades vencidas'
+      }.`;
+    case 'PENDIENTE_EN_PLAZO':
+      return `Tienes la mensualidad de este mes pendiente (${formatoMoneda(aviso.valorEnPlazo)}). Vence el día 5.`;
+    default:
+      return 'Estás al día.';
+  }
+}
+
+/** "Tienes 1 pago en revisión." / "Tienes 2 pagos en revisión." */
+export function textoDePagosEnRevision(cantidad: number): string {
+  return `Tienes ${cantidad} ${cantidad === 1 ? 'pago en revisión' : 'pagos en revisión'}.`;
+}

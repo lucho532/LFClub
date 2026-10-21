@@ -24,11 +24,26 @@ namespace LFClub.Api.Controladores.Club;
 public class ControladorCuentaJugador : ControladorBase
 {
     private readonly IServicioCuentaDelJugador _servicio;
+    private readonly IServicioAvisoDeMora _aviso;
 
-    /// <summary>Crea el controlador con el servicio de la cuenta del jugador.</summary>
-    public ControladorCuentaJugador(IServicioCuentaDelJugador servicio)
+    /// <summary>Crea el controlador con los servicios de la cuenta y del aviso de mora del jugador.</summary>
+    public ControladorCuentaJugador(IServicioCuentaDelJugador servicio, IServicioAvisoDeMora aviso)
     {
         _servicio = servicio;
+        _aviso = aviso;
+    }
+
+    /// <summary>
+    /// Aviso fijo de mora del inicio (spec 016): lo ve solo la cuenta del propio jugador. El PRESIDENTE,
+    /// el DIRECTIVO y el ENTRENADOR reciben <c>403</c>.
+    /// </summary>
+    [HttpGet("aviso")]
+    [IntegranteDelClub(Rol.JUGADOR)]
+    [ProducesResponseType<AvisoDeMoraDto>(StatusCodes.Status200OK)]
+    public Task<AvisoDeMoraDto> ObtenerAviso(Guid usuarioRolId, CancellationToken cancelacion)
+    {
+        Response.Headers.CacheControl = "private, no-store";
+        return _aviso.ObtenerAsync(usuarioRolId, Integrante, cancelacion);
     }
 
     /// <summary>Cargos, pagos, saldo y estado de un jugador.</summary>

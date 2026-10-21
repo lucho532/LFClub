@@ -6,7 +6,7 @@ using LFClub.Pruebas.Integracion.Base;
 namespace LFClub.Pruebas.Integracion.Pagos;
 
 /// <summary>
-/// El ENTRENADOR queda fuera de todo lo financiero: las 18 operaciones nuevas le responden 403, también
+/// El ENTRENADOR queda fuera de todo lo financiero: las 19 operaciones nuevas (18 de la spec 015 y el aviso de mora de la 016) le responden 403, también
 /// sobre los jugadores de la categoría que tiene asignada, y ninguna respuesta que ve lleva datos de pago
 /// (spec 015; RF-035, RF-037; CE-007; constitución §16.9).
 /// </summary>
@@ -27,17 +27,18 @@ public class EntrenadorSinAccesoPruebas
             || endpoint.Ruta.Contains("/medios-de-pago", StringComparison.Ordinal)
             || endpoint.Ruta.Contains("/finanzas", StringComparison.Ordinal)
             || endpoint.Ruta.Contains("/pagos", StringComparison.Ordinal)
-            || endpoint.Ruta.EndsWith("/cuenta", StringComparison.Ordinal))
+            || endpoint.Ruta.EndsWith("/cuenta", StringComparison.Ordinal)
+            || endpoint.Ruta.EndsWith("/cuenta/aviso", StringComparison.Ordinal))
         .ToList();
 
     [Fact]
-    public void Son_exactamente_las_18_operaciones_nuevas_del_contrato()
+    public void Son_exactamente_las_19_operaciones_nuevas_del_contrato()
     {
-        Assert.Equal(18, Nuevas.Count);
+        Assert.Equal(19, Nuevas.Count);
     }
 
     [Fact]
-    public async Task Las_18_operaciones_responden_403_al_entrenador_aunque_entrene_la_categoria_del_jugador()
+    public async Task Las_19_operaciones_responden_403_al_entrenador_aunque_entrene_la_categoria_del_jugador()
     {
         var c = await _fabrica.Pagos.CrearClubAsync();
         var entrenador = await _fabrica.CrearClienteDePrueba().ConSesionDeAsync(c.Entrenador.Usuario);

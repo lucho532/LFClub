@@ -196,6 +196,21 @@
 }
 
 @media (min-width: 721px) {
+  /* El menú y el contenido van siempre lado a lado. Con la base de envolver (base.css), entre 721 y
+     800 px el contenido (base de 560 px) no cabía junto al menú de 240 px, bajaba a otra fila y el
+     menú, que crece, ocupaba toda la pantalla. */
+  .disposicion {
+    flex-wrap: nowrap;
+  }
+
+  .disposicion > .lateral {
+    flex: 0 0 240px;
+  }
+
+  .disposicion > .contenido {
+    flex: 1 1 0;
+  }
+
   /* El menú lateral se queda fijo al desplazarse por la pantalla. */
   .disposicion > .lateral {
     position: sticky;

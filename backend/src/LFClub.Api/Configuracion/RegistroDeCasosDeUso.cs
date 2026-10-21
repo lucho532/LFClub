@@ -18,6 +18,7 @@ public static class RegistroDeCasosDeUso
         servicios.AddScoped<IServicioGeneracionCargos, ServicioGeneracionCargos>();
         servicios.AddScoped<IServicioMensualidad, ServicioMensualidad>();
         servicios.AddScoped<IServicioCuentaDelJugador, ServicioCuentaDelJugador>();
+        servicios.AddScoped<IServicioAvisoDeMora, ServicioAvisoDeMora>();
         servicios.AddScoped<AplicadorDePagos>();
         servicios.AddScoped<IServicioRegistroDePagos, ServicioRegistroDePagos>();
         servicios.AddScoped<IServicioConsultaDePagos, ServicioConsultaDePagos>();

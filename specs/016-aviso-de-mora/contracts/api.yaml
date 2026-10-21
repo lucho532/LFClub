@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: LFClub - API de la funcionalidad 016 (aviso fijo de mora)
+  version: 0.16.0
+  description: |
+    Contrato de lo que esta funcionalidad añade respecto de los contratos de la 001 a la 015.
+
+    Cuenta de operaciones: **+1**. Partiendo de 131 en el contrato y 105 en las de club, con la 015
+    construida, pasa a 132 y 106 (**confirmar contando con la expresión regular de
+    `EndpointsDeLaApi` al empezar**).
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - Quién puede (constitución §16.9): solo la cuenta del propio jugador. PRESIDENTE, DIRECTIVO y
+      ENTRENADOR reciben `403 rol_no_autorizado`; el DESARROLLADOR no tiene ruta de club (§8). Lo que
+      es de otro jugador, de otro club o de un jugador retirado responde `404 no_encontrado`.
+    - Los importes son pesos enteros. El día de corte es el de Colombia (UTC-5), calculado en el
+      servidor.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/clubes/{clubId}/jugadores/{usuarioRolId}/cuenta/aviso:
+    get:
+      operationId: obtenerAvisoDeMora
+      tags: [Pagos]
+      summary: Estado de mora del jugador para el aviso del inicio
+      description: |
+        Verde, ámbar o rojo según las mensualidades pendientes del jugador y la fecha de Colombia.
+        Responde con `Cache-Control: private, no-store`. No cambia nada y no restringe nada por deber.
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: usuarioRolId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: El aviso.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AvisoDeMoraDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+
+components:
+  responses:
+    Problema:
+      description: Error con `application/problem+json`.
+      content:
+        application/problem+json:
+          schema: { type: object, properties: { codigo: { type: string } } }
+
+  schemas:
+    EstadoDeAvisoDeMora:
+      type: string
+      enum: [AL_DIA, PENDIENTE_EN_PLAZO, EN_MORA]
+
+    AvisoDeMoraDto:
+      type: object
+      required: [estado, valorVencido, mesesVencidos, valorEnPlazo, venceEl, pagosEnRevision]
+      properties:
+        estado: { $ref: '#/components/schemas/EstadoDeAvisoDeMora' }
+        valorVencido:
+          type: number
+          description: Pendiente de las mensualidades vencidas; 0 si no está en mora.
+        mesesVencidos: { type: integer, minimum: 0 }
+        valorEnPlazo:
+          type: number
+          description: Pendiente de las mensualidades que aún no vencen; 0 si no hay.
+        venceEl:
+          type: [string, 'null']
+          format: date
+          description: Día 5 del mes pendiente dentro del plazo; nulo si no hay.
+        pagosEnRevision:
+          type: integer
+          minimum: 0
+          description: Informativo; no cambia el estado.
