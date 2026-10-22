@@ -132,6 +132,21 @@ public class ContextoLFClub : DbContext
     /// <summary>Cuentas por las que cada club recibe pagos (spec 015).</summary>
     public DbSet<MedioPagoClub> MediosPagoClub => Set<MedioPagoClub>();
 
+    /// <summary>Precios y días de gracia del cobro de la plataforma, una sola fila (spec 017).</summary>
+    public DbSet<ConfiguracionPlataforma> ConfiguracionPlataforma => Set<ConfiguracionPlataforma>();
+
+    /// <summary>Cobros mensuales de la plataforma a los clubes (spec 017).</summary>
+    public DbSet<CobroPlataforma> CobrosPlataforma => Set<CobroPlataforma>();
+
+    /// <summary>Intentos de pago de esos cobros (spec 017).</summary>
+    public DbSet<IntentoPagoPlataforma> IntentosPagoPlataforma => Set<IntentoPagoPlataforma>();
+
+    /// <summary>Pagos confirmados de esos cobros (spec 017).</summary>
+    public DbSet<PagoPlataforma> PagosPlataforma => Set<PagoPlataforma>();
+
+    /// <summary>Notificaciones recibidas de la pasarela de pago (spec 017).</summary>
+    public DbSet<NotificacionPasarela> NotificacionesPasarela => Set<NotificacionPasarela>();
+
     /// <summary>Club de la petición; lo lee el filtro global en cada consulta.</summary>
     private Guid? ClubDeLaPeticion => _contextoClub.ClubId;
 

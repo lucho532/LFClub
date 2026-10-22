@@ -57,6 +57,15 @@ public class Club
     /// </summary>
     public decimal? ValorMensualidad { get; set; }
 
+    /// <summary>
+    /// Desde qué mes (primer día) se cobra al club el uso de la plataforma (spec 017). Nulo significa
+    /// que no se le cobra. Lo fija el DESARROLLADOR.
+    /// </summary>
+    public DateOnly? MesInicioCobro { get; set; }
+
+    /// <summary>Por qué está suspendido (spec 017). Solo tiene valor si <see cref="Estado"/> es <c>SUSPENDIDO</c>.</summary>
+    public MotivoSuspension? MotivoSuspension { get; set; }
+
     /// <summary>Último número de recibo dado en el club; el siguiente es este más uno (research §7).</summary>
     public int UltimoRecibo { get; set; }
 

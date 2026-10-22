@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { BarraSuperior } from '../compartido/componentes/BarraSuperior';
 import { EnlaceMenu } from '../compartido/componentes/EnlaceMenu';
-import { IconoClubes } from '../compartido/componentes/Iconos';
+import { IconoCampana, IconoClubes, IconoPagos } from '../compartido/componentes/Iconos';
 import { MenuPerfil } from '../compartido/componentes/MenuPerfil';
 import { useSesion } from '../compartido/sesion/useSesion';
 
@@ -32,6 +32,12 @@ export function DisposicionPlataforma() {
         <nav className="lateral-menu" aria-label="Panel de administración">
           <EnlaceMenu a="/plataforma" icono={<IconoClubes />} exacto>
             Clubes
+          </EnlaceMenu>
+          <EnlaceMenu a="/plataforma/tarifas" icono={<IconoPagos />}>
+            Tarifas
+          </EnlaceMenu>
+          <EnlaceMenu a="/plataforma/notificaciones" icono={<IconoCampana />}>
+            Notificaciones
           </EnlaceMenu>
         </nav>
       </aside>

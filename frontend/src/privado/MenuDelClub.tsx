@@ -79,6 +79,12 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
           Pagos
         </EnlaceMenu>
       )}
+      {/* Lo que el club paga a la plataforma lo ve solo el presidente (spec 017, RF-020). */}
+      {rol === 'PRESIDENTE' && (
+        <EnlaceMenu a={`/club/${clubId}/pago-plataforma`} icono={<IconoPagos />}>
+          Plataforma
+        </EnlaceMenu>
+      )}
       {rol === 'PRESIDENTE' && (
         <EnlaceMenu a={`/club/${clubId}/configuracion`} icono={<IconoDatosClub />}>
           Datos del club

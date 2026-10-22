@@ -1,6 +1,7 @@
 using LFClub.Aplicacion.DTOs;
 using LFClub.Aplicacion.Interfaces;
 using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 
 namespace LFClub.Aplicacion.Mappers;
 
@@ -13,17 +14,25 @@ namespace LFClub.Aplicacion.Mappers;
 public static class MapperClubPlataforma
 {
     /// <summary>Club de la lista del panel.</summary>
-    public static ClubResumenDto AResumen(ClubConPresidente fila) => new(
+    public static ClubResumenDto AResumen(ClubConPresidente fila, EstadoDePagoClubDto? pago = null) => new(
         fila.Club.Id,
         fila.Club.Nombre,
         fila.Club.Estado,
         fila.PresidenteRegistrado,
         MapperIdentidadClub.AIdentidad(fila.Club),
-        new ConteoIntegrantesDto(fila.Jugadores, fila.Entrenadores, fila.Directivos, fila.Presidentes));
+        new ConteoIntegrantesDto(fila.Jugadores, fila.Entrenadores, fila.Directivos, fila.Presidentes),
+        pago?.EstadoDePago ?? EstadoDePagoClub.SIN_COBRO,
+        pago?.ValorAdeudado ?? 0,
+        pago?.MesDeInicioDelCobro,
+        pago?.MotivoDeSuspension);
 
     /// <summary>Detalle de un club con sus presidentes y sus invitaciones sin usar ni anular.</summary>
     public static ClubDetalleDto ADetalle(
-        Club club, IEnumerable<UsuarioRol> presidentes, IEnumerable<Invitacion> invitaciones, DateTime ahoraUtc) => new(
+        Club club,
+        IEnumerable<UsuarioRol> presidentes,
+        IEnumerable<Invitacion> invitaciones,
+        DateTime ahoraUtc,
+        EstadoDePagoClubDto? pago = null) => new(
         club.Id,
         club.Nombre,
         club.Sede,
@@ -34,7 +43,11 @@ public static class MapperClubPlataforma
         club.EstadoCambiadoEn,
         MapperIdentidadClub.AIdentidad(club),
         presidentes.Select(APresidente).ToList(),
-        invitaciones.Select(invitacion => AInvitacion(invitacion, ahoraUtc)).ToList());
+        invitaciones.Select(invitacion => AInvitacion(invitacion, ahoraUtc)).ToList(),
+        pago?.EstadoDePago ?? EstadoDePagoClub.SIN_COBRO,
+        pago?.ValorAdeudado ?? 0,
+        pago?.MesDeInicioDelCobro,
+        pago?.MotivoDeSuspension);
 
     /// <summary>Presidente registrado, a partir de un integrante con su cuenta cargada.</summary>
     public static PresidenteDto APresidente(UsuarioRol integrante) => new(

@@ -3,6 +3,7 @@ using LFClub.Aplicacion.Utilidades;
 using LFClub.Infraestructura.Correo;
 using LFClub.Infraestructura.Datos;
 using LFClub.Infraestructura.Imagenes;
+using LFClub.Infraestructura.Pagos;
 using LFClub.Infraestructura.Repositorios;
 using LFClub.Infraestructura.Repositorios.Plataforma;
 using LFClub.Infraestructura.Seguridad;
@@ -72,6 +73,28 @@ public static class RegistroDeServicios
         servicios.AddScoped<IRepositorioPagos, RepositorioPagos>();
         servicios.AddScoped<IRepositorioMediosPago, RepositorioMediosPago>();
         servicios.AddScoped<IRepositorioFinanzas, RepositorioFinanzas>();
+
+        // Cobro del uso de la plataforma (spec 017): repositorios, pasarela y trabajo.
+        servicios.AddScoped<IRepositorioCobrosPlataforma, RepositorioCobrosPlataforma>();
+        servicios.AddScoped<IRepositorioConfiguracionPlataforma, RepositorioConfiguracionPlataforma>();
+        servicios.AddScoped<IRepositorioConteoDeIntegrantes, RepositorioConteoDeIntegrantes>();
+        servicios.AddSingleton(new OpcionesWompi
+        {
+            LlavePublica = configuracion["Wompi:LlavePublica"] ?? string.Empty,
+            SecretoIntegridad = configuracion["Wompi:SecretoIntegridad"] ?? string.Empty,
+            SecretoEventos = configuracion["Wompi:SecretoEventos"] ?? string.Empty,
+            UrlCheckout = configuracion["Wompi:UrlCheckout"] is { Length: > 0 } url ? url : OpcionesWompi.UrlCheckoutPorDefecto,
+        });
+        servicios.AddSingleton<IPasarelaDePago, PasarelaWompi>();
+        servicios.AddSingleton(new OpcionesDeEnlaces
+        {
+            UrlBaseFrontend = (configuracion["Frontend:UrlBase"] ?? string.Empty).TrimEnd('/'),
+        });
+
+        if (configuracion.GetValue("Plataforma:TrabajoActivo", true))
+        {
+            servicios.AddHostedService<TrabajoCobrosPlataforma>();
+        }
 
         // La mensualidad nace sola cada mes (spec 015); las pruebas que no la necesitan la apagan.
         if (configuracion.GetValue("Cargos:TrabajoActivo", true))

@@ -17,6 +17,8 @@ import { Inicio } from './Inicio';
 import { DetalleClub } from './plataforma/DetalleClub';
 import { DisposicionPlataforma } from './plataforma/DisposicionPlataforma';
 import { ListaClubes } from './plataforma/ListaClubes';
+import { PantallaNotificaciones } from './plataforma/PantallaNotificaciones';
+import { PantallaTarifas } from './plataforma/PantallaTarifas';
 import { FormularioActividad } from './privado/actividades/FormularioActividad';
 import { Calendario } from './privado/calendario/Calendario';
 import { Categorias } from './privado/categorias/Categorias';
@@ -38,6 +40,8 @@ import { PagosEnRevision } from './privado/pagos/PagosEnRevision';
 import { PantallaFinanzas } from './privado/pagos/PantallaFinanzas';
 import { PantallaMediosDePago } from './privado/pagos/PantallaMediosDePago';
 import { PantallaMensualidad } from './privado/pagos/PantallaMensualidad';
+import { PagoPlataforma } from './privado/pagoPlataforma/PagoPlataforma';
+import { RetornoPagoPlataforma } from './privado/pagoPlataforma/RetornoPagoPlataforma';
 import { DetallePartido } from './privado/partidos/DetallePartido';
 import { Goleadores } from './privado/partidos/Goleadores';
 import { Partidos } from './privado/partidos/Partidos';
@@ -77,6 +81,8 @@ export function App({ conArranque = false }: Props) {
               <Route path="/plataforma" element={<DisposicionPlataforma />}>
                 <Route index element={<ListaClubes />} />
                 <Route path="clubes/:clubId" element={<DetalleClub />} />
+                <Route path="tarifas" element={<PantallaTarifas />} />
+                <Route path="notificaciones" element={<PantallaNotificaciones />} />
               </Route>
             </Route>
 
@@ -106,6 +112,8 @@ export function App({ conArranque = false }: Props) {
                   <Route path="mensualidad" element={<PantallaMensualidad />} />
                   <Route path="medios-de-pago" element={<PantallaMediosDePago />} />
                 </Route>
+                <Route path="pago-plataforma" element={<PagoPlataforma />} />
+                <Route path="pago-plataforma/retorno" element={<RetornoPagoPlataforma />} />
                 <Route path="comunicados" element={<PantallaComunicados />} />
                 <Route path="comunicados/nuevo" element={<FormularioComunicado />} />
                 <Route path="comunicados/:comunicadoId" element={<PantallaComunicados />} />

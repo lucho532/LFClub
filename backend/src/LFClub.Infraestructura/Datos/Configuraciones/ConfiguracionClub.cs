@@ -30,6 +30,7 @@ public class ConfiguracionClub : IEntityTypeConfiguration<Club>
         builder.Property(club => club.ValorMensualidad).HasColumnType("numeric(14,2)");
         builder.Property(club => club.UltimoRecibo).HasDefaultValue(0);
         builder.Property(club => club.Estado).HasConversion<string>().HasMaxLength(20).IsRequired();
+        builder.Property(club => club.MotivoSuspension).HasConversion<string>().HasMaxLength(20);
 
         builder.HasIndex(club => club.NombreNormalizado).IsUnique().HasDatabaseName(IndicesUnicos.NombreDeClub);
     }

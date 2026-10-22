@@ -101,3 +101,19 @@ Para crear una migración tras cambiar el modelo:
 ```powershell
 dotnet ef migrations add <Nombre> -p backend/src/LFClub.Infraestructura -s backend/src/LFClub.Infraestructura -o Datos/Migraciones
 ```
+
+## Pago de la plataforma (Wompi)
+
+El cobro del uso de la plataforma a cada club se paga por la pasarela Wompi (spec 017). Las claves se
+fijan **solo como variables de entorno** (o con `dotnet user-secrets` en desarrollo); nunca se escriben en
+el repositorio. Sin ellas la aplicación funciona igual: el pago en línea se indica como no disponible.
+
+| Variable de entorno | Qué es |
+| --- | --- |
+| `Wompi__LlavePublica` | Llave pública del comercio (va en la dirección de pago). |
+| `Wompi__SecretoIntegridad` | Secreto con el que se firma la dirección de pago. |
+| `Wompi__SecretoEventos` | Secreto con el que Wompi firma las notificaciones. |
+| `Wompi__UrlCheckout` | Dirección del checkout. Opcional: por defecto la de Wompi. |
+
+La dirección de eventos que se registra en el panel de Wompi es
+`<dirección de la API>/api/plataforma/pagos/notificaciones` (con la ruta completa, no solo la base).

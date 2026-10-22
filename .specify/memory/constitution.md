@@ -389,6 +389,20 @@ Enmienda 4.14.0 → 4.15.0 (2026-10-21), decidida por el propietario del proyect
 - §28: se ajusta la nota sobre recordatorios de pago
 - Principios renombrados y secciones eliminadas: ninguno
 
+Enmienda 4.15.0 → 4.16.0 (2026-10-21), decidida por el propietario del proyecto en la spec 017:
+- §7.4: se concreta el pago del club por el uso de la plataforma: valor = integrantes activos por
+  rol × precio por rol que fija el DESARROLLADOR; cobro mensual generado el día 1 (hora de
+  Colombia); 5 días de gracia por defecto, configurables; mes de inicio del cobro por club, fijado
+  por el DESARROLLADOR (vacío = no se cobra; un club nuevo queda con el mes siguiente)
+- §7.4: la suspensión tiene motivo (impago o manual). El pago levanta solo la suspensión por impago,
+  nunca la manual. Si el DESARROLLADOR levanta a mano una suspensión por impago, el club queda activo
+  hasta el siguiente cobro
+- §13 y §14: los pagos de la plataforma y el detalle de cada cobro son inmutables, salvo la
+  eliminación del club
+- §28: se cierra "Pago por el uso de la plataforma"; se abre "Recordatorios del cobro de la
+  plataforma"
+- Principios renombrados y secciones eliminadas: ninguno
+
 -->
 
 # Constitución del Proyecto — LFClub, plataforma multiclub de escuelas de fútbol
@@ -781,6 +795,16 @@ su panel, un desplegable le permite elegir de cuál club quiere ver los datos. E
 Cada club paga por el uso de la plataforma, mediante la misma pasarela de pago (ver §6.2), por un
 enlace de pago de la plataforma.
 
+**Valor y periodicidad.** El pago es mensual. La plataforma genera sola el cobro de cada mes el día 1
+(hora de Colombia). Su valor es la suma, por rol, de los integrantes activos del club en ese momento
+multiplicados por el precio de ese rol, que fija el DESARROLLADOR. El cobro conserva el detalle y el
+total con que se generó (ver §13). El pago es del club, no de una persona, y no admite abonos. Un
+club recibe cobros desde su mes de inicio del cobro, que fija el DESARROLLADOR; sin mes de inicio no
+se le cobra. Un club nuevo queda con el mes siguiente al de su creación.
+
+**Plazo.** Cada cobro tiene un plazo de gracia, 5 días por defecto, configurable por el DESARROLLADOR.
+Cumplido el plazo sin pago confirmado, el club se suspende.
+
 El enlace de pago solo lo ve el PRESIDENTE del club, que es el encargado de pagar por el software;
 ningún otro rol, incluido el DIRECTIVO, lo ve. También lo ve cuando el club está suspendido. El
 enlace es configuración de la plataforma y no queda escrito de forma fija en el código. Un pago
@@ -791,6 +815,13 @@ el retorno del navegador no es prueba de pago.
 hasta ponerse al día. En cuanto el pago se confirma, el club vuelve a la normalidad de inmediato.
 El DESARROLLADOR también puede, desde su panel, suspender un club manualmente, levantar una
 suspensión y volver a aplicarla.
+
+La suspensión tiene un motivo: **impago** o **manual**. El pago confirmado levanta solo la
+suspensión por impago, y solo cuando el club ya no tiene ningún cobro vencido; una suspensión manual
+no se levanta con un pago. Si el DESARROLLADOR levanta a mano una suspensión por impago, el club
+queda activo hasta el siguiente cobro: los cobros que ya estaban vencidos siguen pendientes y se
+pueden pagar, pero ya no suspenden. El DESARROLLADOR también puede marcar un cobro como pagado por
+fuera de la pasarela o anularlo con un motivo; ambas cosas dejan constancia de quién y cuándo.
 
 Mientras un club está suspendido:
 
@@ -1439,6 +1470,10 @@ Cargo.Valor
 representa el valor cobrado específicamente en ese mes a ese jugador.
 
 Modificar el valor de la mensualidad no debe modificar cargos ya generados.
+
+Lo mismo vale para el cobro de la plataforma a un club (ver §7.4): cambiar los precios por rol o la
+cantidad de integrantes no modifica un cobro ya generado, y el pago de ese cobro no se edita ni se
+borra; solo desaparece con la eliminación del club.
 
 Del mismo modo:
 
@@ -2167,8 +2202,8 @@ Estas decisiones no están tomadas. Según §25, no deben resolverse por cuenta 
 implementación.
 
 - **Dirección del sitio público.** Cómo llega un visitante al sitio público de un club concreto.
-- **Pago por el uso de la plataforma.** Valor, periodicidad, fecha de corte y quién lo paga dentro
-  del club.
+- **Recordatorios del cobro de la plataforma.** Si el PRESIDENTE recibe un aviso por correo o
+  campana antes del vencimiento del cobro; por ahora solo ve el aviso dentro de la aplicación.
 - **Sitio público de un club suspendido.** Si el sitio público de un club suspendido o dado de
   baja sigue visible.
 - **Matrícula.** Si existe un cobro de inscripción.
@@ -2198,4 +2233,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.15.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-21
+**Versión**: 4.16.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-21

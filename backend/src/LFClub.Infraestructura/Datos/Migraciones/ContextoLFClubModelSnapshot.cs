@@ -370,6 +370,13 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.Property<Guid?>("EstadoCambiadoPorUsuarioId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateOnly?>("MesInicioCobro")
+                        .HasColumnType("date");
+
+                    b.Property<string>("MotivoSuspension")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -406,6 +413,85 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                         .HasDatabaseName("IX_Clubes_NombreNormalizado");
 
                     b.ToTable("Clubes", (string)null);
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.CobroPlataforma", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("AnuladoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("AnuladoPorUsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClubId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DiasDeGracia")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Directivos")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Entrenadores")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("GeneradoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Jugadores")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MotivoAnulacion")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<DateOnly>("Periodo")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("PrecioDirectivo")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.Property<decimal>("PrecioEntrenador")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.Property<decimal>("PrecioJugador")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.Property<decimal>("PrecioPresidente")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.Property<int>("Presidentes")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("SuspendeDesde")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("SuspensionOmitida")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnuladoPorUsuarioId");
+
+                    b.HasIndex("ClubId", "Periodo")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CobrosPlataforma_Club_Periodo");
+
+                    b.ToTable("CobrosPlataforma", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CobrosPlataforma_Total", "\"Total\" > 0");
+                        });
                 });
 
             modelBuilder.Entity("LFClub.Dominio.Entidades.Comunicado", b =>
@@ -550,6 +636,44 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.HasIndex("EquipoId");
 
                     b.ToTable("ComunicadosDestino", (string)null);
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.ConfiguracionPlataforma", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ActualizadoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ActualizadoPorUsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DiasDeGracia")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("PrecioDirectivo")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.Property<decimal?>("PrecioEntrenador")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.Property<decimal?>("PrecioJugador")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.Property<decimal?>("PrecioPresidente")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActualizadoPorUsuarioId");
+
+                    b.ToTable("ConfiguracionPlataforma", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ConfiguracionPlataforma_Dias", "\"DiasDeGracia\" BETWEEN 0 AND 30");
+
+                            t.HasCheckConstraint("CK_ConfiguracionPlataforma_UnaFila", "\"Id\" = 1");
+                        });
                 });
 
             modelBuilder.Entity("LFClub.Dominio.Entidades.DocumentoJugador", b =>
@@ -906,6 +1030,40 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.ToTable("FotosPerfil", (string)null);
                 });
 
+            modelBuilder.Entity("LFClub.Dominio.Entidades.IntentoPagoPlataforma", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CobroId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreadoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreadoPorUsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Referencia")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<decimal>("Valor")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreadoPorUsuarioId");
+
+                    b.HasIndex("Referencia")
+                        .IsUnique();
+
+                    b.HasIndex("CobroId", "CreadoEn");
+
+                    b.ToTable("IntentosPagoPlataforma", (string)null);
+                });
+
             modelBuilder.Entity("LFClub.Dominio.Entidades.Invitacion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1017,6 +1175,51 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.HasIndex("ClubId");
 
                     b.ToTable("MediosPagoClub", (string)null);
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.NotificacionPasarela", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CobroId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EstadoPasarela")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<DateTime>("RecibidaEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Referencia")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<string>("Resultado")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("TransaccionId")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<decimal?>("Valor")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CobroId");
+
+                    b.HasIndex("RecibidaEn");
+
+                    b.HasIndex("TransaccionId", "EstadoPasarela")
+                        .IsUnique()
+                        .HasDatabaseName("UX_NotificacionesPasarela_Transaccion_Estado")
+                        .HasFilter("\"TransaccionId\" IS NOT NULL");
+
+                    b.ToTable("NotificacionesPasarela", (string)null);
                 });
 
             modelBuilder.Entity("LFClub.Dominio.Entidades.Pago", b =>
@@ -1162,6 +1365,50 @@ namespace LFClub.Infraestructura.Datos.Migraciones
 
                             t.HasCheckConstraint("CK_Pagos_Valor", "\"Valor\" > 0");
                         });
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.PagoPlataforma", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CobroId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MedioDePago")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<string>("Origen")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("PagadoEn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Referencia")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<Guid?>("RegistradoPorUsuarioId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TransaccionId")
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<decimal>("Valor")
+                        .HasColumnType("numeric(18,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CobroId")
+                        .IsUnique();
+
+                    b.HasIndex("RegistradoPorUsuarioId");
+
+                    b.ToTable("PagosPlataforma", (string)null);
                 });
 
             modelBuilder.Entity("LFClub.Dominio.Entidades.Partido", b =>
@@ -1786,6 +2033,20 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.Navigation("Club");
                 });
 
+            modelBuilder.Entity("LFClub.Dominio.Entidades.CobroPlataforma", b =>
+                {
+                    b.HasOne("LFClub.Dominio.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("AnuladoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LFClub.Dominio.Entidades.Club", null)
+                        .WithMany()
+                        .HasForeignKey("ClubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LFClub.Dominio.Entidades.Comunicado", b =>
                 {
                     b.HasOne("LFClub.Dominio.Entidades.Club", "Club")
@@ -1863,6 +2124,14 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Comunicado");
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.ConfiguracionPlataforma", b =>
+                {
+                    b.HasOne("LFClub.Dominio.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("ActualizadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("LFClub.Dominio.Entidades.DocumentoJugador", b =>
@@ -2099,6 +2368,20 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("LFClub.Dominio.Entidades.IntentoPagoPlataforma", b =>
+                {
+                    b.HasOne("LFClub.Dominio.Entidades.CobroPlataforma", null)
+                        .WithMany()
+                        .HasForeignKey("CobroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LFClub.Dominio.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("CreadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
             modelBuilder.Entity("LFClub.Dominio.Entidades.Invitacion", b =>
                 {
                     b.HasOne("LFClub.Dominio.Entidades.Club", "Club")
@@ -2146,6 +2429,14 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("LFClub.Dominio.Entidades.NotificacionPasarela", b =>
+                {
+                    b.HasOne("LFClub.Dominio.Entidades.CobroPlataforma", null)
+                        .WithMany()
+                        .HasForeignKey("CobroId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("LFClub.Dominio.Entidades.Pago", b =>
                 {
                     b.HasOne("LFClub.Dominio.Entidades.Usuario", null)
@@ -2177,6 +2468,20 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.HasOne("LFClub.Dominio.Entidades.UsuarioRol", null)
                         .WithMany()
                         .HasForeignKey("UsuarioRolId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("LFClub.Dominio.Entidades.PagoPlataforma", b =>
+                {
+                    b.HasOne("LFClub.Dominio.Entidades.CobroPlataforma", null)
+                        .WithMany()
+                        .HasForeignKey("CobroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LFClub.Dominio.Entidades.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("RegistradoPorUsuarioId")
                         .OnDelete(DeleteBehavior.SetNull);
                 });
 

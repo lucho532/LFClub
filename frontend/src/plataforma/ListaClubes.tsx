@@ -5,10 +5,11 @@ import type { ClubResumenDto } from '../compartido/api/tipos';
 import { useCarga } from '../compartido/api/useCarga';
 import { Aviso } from '../compartido/componentes/Aviso';
 import { Boton } from '../compartido/componentes/Boton';
-import { EtiquetaEstado, EtiquetaEstadoClub } from '../compartido/componentes/EtiquetaEstado';
+import { EtiquetaEstado, EtiquetaEstadoClub, EtiquetaEstadoDePagoClub } from '../compartido/componentes/EtiquetaEstado';
 import { Tabla, type Columna } from '../compartido/componentes/Tabla';
 import { Tarjeta } from '../compartido/componentes/Tarjeta';
 import { Escudo, IdentidadClub } from '../compartido/tema/IdentidadClub';
+import { formatoMoneda } from '../privado/pagos/formatoMoneda';
 import { FormularioCrearClub } from './FormularioCrearClub';
 
 const COLUMNAS: Columna<ClubResumenDto>[] = [
@@ -30,6 +31,15 @@ const COLUMNAS: Columna<ClubResumenDto>[] = [
       ) : (
         <EtiquetaEstado tono="aviso" texto="Presidente sin registrar" />
       ),
+  },
+  {
+    titulo: 'Pago',
+    celda: (club) => (
+      <span className="fila">
+        <EtiquetaEstadoDePagoClub estado={club.estadoDePago} />
+        {club.valorAdeudado > 0 && <strong>{formatoMoneda(club.valorAdeudado)}</strong>}
+      </span>
+    ),
   },
   { titulo: 'Jugadores', celda: (club) => club.integrantes.jugadores },
   { titulo: 'Entrenadores', celda: (club) => club.integrantes.entrenadores },

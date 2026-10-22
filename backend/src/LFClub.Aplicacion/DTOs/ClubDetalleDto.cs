@@ -18,6 +18,10 @@ namespace LFClub.Aplicacion.DTOs;
 /// <param name="Identidad">Identidad visual del club.</param>
 /// <param name="Presidentes">Presidentes registrados.</param>
 /// <param name="Invitaciones">Invitaciones sin usar ni anular.</param>
+/// <param name="EstadoDePago">Situación de pago frente a la plataforma (spec 017).</param>
+/// <param name="ValorAdeudado">Suma de los cobros pendientes, en pesos (spec 017).</param>
+/// <param name="MesDeInicioDelCobro">Mes <c>AAAA-MM</c> desde el que se cobra; nulo si no se cobra (spec 017).</param>
+/// <param name="MotivoDeSuspension">Motivo de la suspensión; nulo si el club no está suspendido (spec 017).</param>
 public record ClubDetalleDto(
     Guid ClubId,
     string Nombre,
@@ -29,4 +33,8 @@ public record ClubDetalleDto(
     DateTime? EstadoCambiadoEn,
     IdentidadClubDto Identidad,
     IReadOnlyList<PresidenteDto> Presidentes,
-    IReadOnlyList<InvitacionDto> Invitaciones);
+    IReadOnlyList<InvitacionDto> Invitaciones,
+    EstadoDePagoClub EstadoDePago = EstadoDePagoClub.SIN_COBRO,
+    decimal ValorAdeudado = 0,
+    string? MesDeInicioDelCobro = null,
+    MotivoSuspension? MotivoDeSuspension = null);

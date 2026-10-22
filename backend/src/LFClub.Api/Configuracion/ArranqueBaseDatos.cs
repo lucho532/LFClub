@@ -1,3 +1,4 @@
+using LFClub.Dominio.Entidades;
 using LFClub.Infraestructura.Datos;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,7 @@ namespace LFClub.Api.Configuracion;
 /// <summary>
 /// Representa la preparación de la base de datos al arrancar la API.
 /// Su responsabilidad es aplicar las migraciones pendientes, si la configuración lo pide, y crear
-/// la cuenta DESARROLLADOR si todavía no existe (research §6).
+/// la cuenta DESARROLLADOR y la fila de configuración de cobro si todavía no existen (research §6).
 /// No crea datos de ningún club.
 /// </summary>
 public static class ArranqueBaseDatos
@@ -20,6 +21,13 @@ public static class ArranqueBaseDatos
         if (aplicacion.Configuration.GetValue("BaseDatos:MigrarAlArrancar", false))
         {
             await contexto.Database.MigrateAsync();
+        }
+
+        // La fila única de precios y días de gracia (spec 017): sin precios, no se cobra nada.
+        if (!await contexto.ConfiguracionPlataforma.AnyAsync())
+        {
+            contexto.ConfiguracionPlataforma.Add(new ConfiguracionPlataforma { ActualizadoEn = DateTime.UtcNow });
+            await contexto.SaveChangesAsync();
         }
 
         await ambito.ServiceProvider.GetRequiredService<CuentaInicial>()

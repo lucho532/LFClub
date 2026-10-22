@@ -120,6 +120,11 @@ describe('InicioClub y el aviso de mora', () => {
         return { ...alDia, estado: 'EN_MORA', valorVencido: 65000, mesesVencidos: 1 } as never;
       }
 
+      // El inicio del PRESIDENTE también pide el cobro de la plataforma (spec 017): sin nada pendiente.
+      if (ruta.endsWith('/pago-plataforma')) {
+        return { pagoEnLineaDisponible: true, suspendidoPorImpago: false, pendientes: [], totalPendiente: 0, historial: [] } as never;
+      }
+
       if (ruta.endsWith('/ficha')) {
         return { nombres: 'Ana', apellidos: 'Arango', equipos: [], categoriaAnio: 2014, permisos: { puedeCambiar: false }, fotoActualizadaEn: null, retirado: false } as never;
       }

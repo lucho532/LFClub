@@ -4,6 +4,7 @@
 // specs/003-categorias-club/contracts/api.yaml están en tiposCategorias.ts, y los de la sala de
 // espera y los ingresos aprobados, en tiposIngresos.ts.
 
+import type { EstadoDePagoClub, MotivoDeSuspension } from './tiposPagoPlataforma';
 import type { ClubDeSesionDto } from './tiposSesion';
 
 export type Rol = 'DESARROLLADOR' | 'PRESIDENTE' | 'DIRECTIVO' | 'ENTRENADOR' | 'JUGADOR';
@@ -141,6 +142,11 @@ export interface ClubResumenDto {
   presidenteRegistrado: boolean;
   identidad: IdentidadClubDto;
   integrantes: ConteoIntegrantesDto;
+  /** Situación de pago frente a la plataforma (spec 017). */
+  estadoDePago: EstadoDePagoClub;
+  valorAdeudado: number;
+  mesDeInicioDelCobro: string | null;
+  motivoDeSuspension: MotivoDeSuspension | null;
 }
 
 export interface PresidenteDto {
@@ -172,6 +178,11 @@ export interface ClubDetalleDto {
   identidad: IdentidadClubDto;
   presidentes: PresidenteDto[];
   invitaciones: InvitacionDto[];
+  /** Situación de pago frente a la plataforma (spec 017). */
+  estadoDePago: EstadoDePagoClub;
+  valorAdeudado: number;
+  mesDeInicioDelCobro: string | null;
+  motivoDeSuspension: MotivoDeSuspension | null;
 }
 
 export interface CrearClubDto {

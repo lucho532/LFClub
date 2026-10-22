@@ -6,6 +6,8 @@ import { Aviso } from '../compartido/componentes/Aviso';
 import { EtiquetaEstadoClub } from '../compartido/componentes/EtiquetaEstado';
 import { SeccionDatos } from './SeccionDatos';
 import { SeccionEstado } from './SeccionEstado';
+import { SeccionCobros } from './SeccionCobros';
+import { SeccionInicioDelCobro } from './SeccionInicioDelCobro';
 import { SeccionInvitaciones } from './SeccionInvitaciones';
 import { SeccionPresidentes } from './SeccionPresidentes';
 
@@ -53,6 +55,8 @@ export function DetalleClub() {
       <SeccionDatos {...seccion} />
       <SeccionPresidentes {...seccion} />
       <SeccionInvitaciones {...seccion} />
+      <SeccionInicioDelCobro {...seccion} alCambiar={recargar} />
+      <SeccionCobros {...seccion} />
       <SeccionEstado {...seccion} />
     </>
   );

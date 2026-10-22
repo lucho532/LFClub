@@ -9,6 +9,7 @@ import { TarjetaPagosEnRevision } from './inicio/TarjetaPagosEnRevision';
 import { TarjetaPartidos } from './inicio/TarjetaPartidos';
 import { TarjetaProximosEntrenamientos } from './inicio/TarjetaProximosEntrenamientos';
 import { TarjetaTuClub } from './inicio/TarjetaTuClub';
+import { AvisoPagoPlataforma } from './pagoPlataforma/AvisoPagoPlataforma';
 import { TarjetaMiCategoria } from './TarjetaMiCategoria';
 
 /** Lo propio del inicio de cada rol (spec 007, RF-011 a RF-013). La familia ve arriba el aviso de mora (spec 016). */
@@ -18,6 +19,7 @@ function DelRol({ club }: { club: ClubDto }) {
     case 'PRESIDENTE':
       return (
         <>
+          <AvisoPagoPlataforma clubId={club.clubId} />
           <AvisoValorMensualidad clubId={club.clubId} />
           <TarjetaPagosEnRevision clubId={club.clubId} />
           <ResumenDelClub clubId={club.clubId} />
