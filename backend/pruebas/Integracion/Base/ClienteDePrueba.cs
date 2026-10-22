@@ -129,6 +129,26 @@ public class ClienteDePrueba
         return Http.PutAsync(ruta, formulario);
     }
 
+    /// <summary>Envía un formulario <c>multipart/form-data</c> con esos campos y, si se da, un archivo en <c>archivo</c>.</summary>
+    public Task<HttpResponseMessage> PostFormularioAsync(
+        string ruta, IReadOnlyDictionary<string, string> campos, byte[]? archivo = null, string nombre = "soporte.png")
+    {
+        var formulario = new MultipartFormDataContent();
+        foreach (var (clave, valor) in campos)
+        {
+            formulario.Add(new StringContent(valor), clave);
+        }
+
+        if (archivo is not null)
+        {
+            var contenido = new ByteArrayContent(archivo);
+            contenido.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            formulario.Add(contenido, "archivo", nombre);
+        }
+
+        return Http.PostAsync(ruta, formulario);
+    }
+
     /// <summary>Lee el cuerpo JSON; se puede llamar varias veces sobre la misma respuesta.</summary>
     public static async Task<T> LeerAsync<T>(HttpResponseMessage respuesta) =>
         JsonSerializer.Deserialize<T>(await respuesta.Content.ReadAsStringAsync(), Json)!;

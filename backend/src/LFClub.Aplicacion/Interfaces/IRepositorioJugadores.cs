@@ -85,9 +85,10 @@ public interface IRepositorioJugadores
 
     /// <summary>
     /// Reincorpora al jugador solo si está retirado: lo deja activo y vacía a la vez los tres datos
-    /// del retiro. Devuelve si lo reincorporó.
+    /// del retiro, y fija desde qué mes se le cobra otra vez (spec 015, RF-008). Devuelve si lo
+    /// reincorporó.
     /// </summary>
-    Task<bool> ReincorporarAsync(Guid usuarioRolId, CancellationToken cancelacion = default);
+    Task<bool> ReincorporarAsync(Guid usuarioRolId, DateOnly cobraDesde, CancellationToken cancelacion = default);
 
     /// <summary>
     /// Indica si otro integrante del club, de cualquier rol, activo o retirado, tiene ya ese número

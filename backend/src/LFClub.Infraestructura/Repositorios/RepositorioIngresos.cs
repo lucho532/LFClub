@@ -57,6 +57,7 @@ public class RepositorioIngresos : IRepositorioIngresos
         DateTime ahoraUtc,
         Guid aprobadoPorUsuarioId,
         string aprobadoPorNombre,
+        DateOnly cobraDesde,
         CancellationToken cancelacion = default) =>
         await EnEspera
             .Where(integrante => integrante.Id == usuarioRolId)
@@ -67,7 +68,8 @@ public class RepositorioIngresos : IRepositorioIngresos
                     .SetProperty(integrante => integrante.RolDeIngreso, Rol.JUGADOR)
                     .SetProperty(integrante => integrante.AprobadoEn, ahoraUtc)
                     .SetProperty(integrante => integrante.AprobadoPorUsuarioId, aprobadoPorUsuarioId)
-                    .SetProperty(integrante => integrante.AprobadoPorNombre, aprobadoPorNombre),
+                    .SetProperty(integrante => integrante.AprobadoPorNombre, aprobadoPorNombre)
+                    .SetProperty(integrante => integrante.CobraDesde, (DateOnly?)cobraDesde),
                 cancelacion) == 1;
 
     /// <inheritdoc />

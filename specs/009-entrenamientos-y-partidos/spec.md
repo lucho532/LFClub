@@ -518,7 +518,7 @@ un partido.
 ## Fuera de alcance
 
 - Torneos como entidades y tablas de posiciones (§17.1).
-- Arbitraje y su cargo entre los convocados (§16.6), que depende de los cargos.
+- Arbitraje y su cargo: quedan fuera de la aplicación (§16.6).
 - Mensualidades, cargos y pagos.
 - Evaluaciones del jugador.
 - Comunicados a las familias, mensajes de convocatoria y avisos por correo.
@@ -533,3 +533,9 @@ un partido.
   ENTRENADOR o DIRECTIVO (§12.2). Lo decide la funcionalidad del cambio de rol. Con el modelo
   actual, la base de datos impide borrar la ficha de un jugador que ya tiene partidos o
   asistencias registrados.
+
+---
+
+**Nota de seguimiento (2026-10-20)**: lo que este documento deja pendiente sobre mensualidades, cargos,
+pagos y el estado de cuenta lo construye la funcionalidad
+[015-mensualidades-cargos-pagos](../015-mensualidades-cargos-pagos/spec.md). Este documento no se reescribe.

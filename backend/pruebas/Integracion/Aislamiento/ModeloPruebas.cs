@@ -12,8 +12,14 @@ namespace LFClub.Pruebas.Integracion.Aislamiento;
 [Collection(ColeccionApi.Nombre)]
 public class ModeloPruebas
 {
+    // El cobro del uso de la plataforma (spec 017, research §6) no es de un club en la petición: lo leen el
+    // trabajo en segundo plano y la notificación de la pasarela, que no tienen club. Sus repositorios filtran
+    // por club de forma explícita y lo prueba AislamientoDePagoPlataformaPruebas.
     private static readonly string[] EntidadesDeLaPlataforma =
-        ["Club", "Usuario", "FotoPerfil", "SolicitudRecuperacion"];
+    [
+        "Club", "Usuario", "FotoPerfil", "SolicitudRecuperacion",
+        "ConfiguracionPlataforma", "CobroPlataforma", "IntentoPagoPlataforma", "PagoPlataforma", "NotificacionPasarela",
+    ];
 
     private readonly FabricaApi _fabrica;
 

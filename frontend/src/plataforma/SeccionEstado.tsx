@@ -113,6 +113,13 @@ export function SeccionEstado({ club, alActualizar }: PropsSeccion) {
         )}
       </div>
 
+      {club.estado === 'SUSPENDIDO' && club.motivoDeSuspension === 'IMPAGO' && (
+        <p className="texto-suave">
+          Está suspendido por falta de pago. Si levantas la suspensión, el club queda activo hasta el próximo
+          cobro; los cobros vencidos siguen pendientes y se pueden pagar.
+        </p>
+      )}
+
       <DialogoConfirmacion
         abierto={accion !== null}
         titulo={`${accion?.texto ?? ''}: ${club.nombre}`}

@@ -4,7 +4,9 @@ import { Tabla, type Columna } from '../../compartido/componentes/Tabla';
 import { estadoVolver } from '../../compartido/navegacion/useVolver';
 import { nombreCompleto, rutaDeFicha } from '../categorias/textos';
 import { FotoJugador } from './FotoJugador';
-import { TEXTO_AL_DIA, TITULO_AL_DIA, textoDeEquipos } from './textos';
+import { InsigniaDeEstadoDeCuenta } from '../pagos/InsigniaDeEstado';
+import { rutaDeLaCuenta } from '../pagos/textosPagos';
+import { textoDeEquipos } from './textos';
 
 interface Props {
   clubId: string;
@@ -16,8 +18,9 @@ interface Props {
 /**
  * Los jugadores de un grupo de la lista "Jugadores": su foto en miniatura, que se pide solo cuando
  * la fila entra en pantalla, o sus iniciales; su nombre completo, que abre su ficha con "← Jugadores"
- * para volver a la lista, sus equipos o "Sin equipo", y la columna "Al
- * día", que es un espacio reservado con el mismo texto suave para todos (RF-006). Un nombre largo
+ * para volver a la lista, sus equipos o "Sin equipo", y la columna "Al día" con el estado de cuenta
+ * real, en texto además del color, que abre su cuenta (spec 015, RF-034). La columna solo existe para
+ * quien recibe el estado, el presidente y el directivo: al entrenador no se le pinta. Un nombre largo
  * se corta con puntos suspensivos sin desbordar la pantalla.
  */
 export function TablaDeGrupo({ clubId, titulo, jugadores }: Props) {
@@ -39,16 +42,24 @@ export function TablaDeGrupo({ clubId, titulo, jugadores }: Props) {
       ),
     },
     { titulo: 'Equipos', celda: (jugador) => textoDeEquipos(jugador.equipos) },
-    {
-      titulo: 'Al día',
-      celda: () => (
-        <span className="texto-suave" title={TITULO_AL_DIA}>
-          {TEXTO_AL_DIA}
-          <span className="solo-lectores">: {TITULO_AL_DIA}</span>
-        </span>
-      ),
-    },
   ];
+
+  // El estado solo llega al presidente y al directivo; para el entrenador la columna no se pinta.
+  if (jugadores.some((jugador) => jugador.estadoCuenta)) {
+    columnas.push({
+      titulo: 'Al día',
+      celda: (jugador) =>
+        jugador.estadoCuenta ? (
+          <Link
+            to={rutaDeLaCuenta(clubId, jugador.usuarioRolId)}
+            state={estadoVolver(`/club/${clubId}/jugadores`, 'Jugadores')}
+            title={`Abrir la cuenta de ${nombreCompleto(jugador)}`}
+          >
+            <InsigniaDeEstadoDeCuenta estado={jugador.estadoCuenta} />
+          </Link>
+        ) : null,
+    });
+  }
 
   return (
     <Tabla

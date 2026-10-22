@@ -20,6 +20,8 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// la reincorporación mientras el documento esté activo con otra cuenta en otro club (RF-041 de la
 /// 006), vacía los datos del retiro (solo se guarda el estado actual, §18) y lo ubica con la misma
 /// regla que a un ingreso recién aprobado; vuelve sin foto, porque no queda nada que recuperar.
+/// Al reincorporar fija también desde qué mes se le cobra: el siguiente al de hoy, sin cargos
+/// retroactivos (spec 015, RF-008).
 /// Todo ocurre con el club bloqueado, así que dos retiros
 /// simultáneos retiran una sola vez; la reincorporación bloquea además, en orden, los clubes donde
 /// está ese número, para que dos reincorporaciones a la vez no lo dejen activo en dos cuentas.
@@ -126,7 +128,8 @@ public class ServicioRetiroJugador : IServicioRetiroJugador
                     throw ErroresDeCategorias.DocumentoActivoEnOtroClub();
                 }
 
-                if (!EstaRetirado(integrante) || !await _jugadores.ReincorporarAsync(usuarioRolId, cancelacion))
+                if (!EstaRetirado(integrante) || !await _jugadores.ReincorporarAsync(
+                        usuarioRolId, ReglaMesDeCobro.PrimerMesDeCobro(_reloj.AhoraUtc), cancelacion))
                 {
                     throw ErroresDeCategorias.JugadorNoRetirado();
                 }

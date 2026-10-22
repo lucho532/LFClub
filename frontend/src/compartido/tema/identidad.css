@@ -38,7 +38,7 @@
   background: var(--color-club-acento);
 }
 
-/* Muestra del menú en la vista previa del editor de identidad (EditorIdentidad.tsx). */
+/* Muestra del menú en la vista previa del diálogo de colores (DialogoEditarColoresClub.tsx). */
 .vista-menu {
   display: flex;
   flex-wrap: wrap;

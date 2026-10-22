@@ -31,13 +31,14 @@ public interface IRepositorioIngresos
     /// <summary>
     /// Aprueba el ingreso solo si sigue en espera: en una única sentencia lo deja aprobado, con el
     /// rol JUGADOR y con quién lo aprobó y cuándo. El rol y el rol de ingreso quedan siempre en
-    /// JUGADOR (RF-016). Devuelve si lo aprobó.
+    /// JUGADOR (RF-016), y desde qué mes se le cobra (spec 015, RF-008). Devuelve si lo aprobó.
     /// </summary>
     Task<bool> AprobarAsync(
         Guid usuarioRolId,
         DateTime ahoraUtc,
         Guid aprobadoPorUsuarioId,
         string aprobadoPorNombre,
+        DateOnly cobraDesde,
         CancellationToken cancelacion = default);
 
     /// <summary>

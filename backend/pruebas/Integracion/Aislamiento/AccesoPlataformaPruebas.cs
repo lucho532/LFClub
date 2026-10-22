@@ -19,15 +19,23 @@ public class AccesoPlataformaPruebas
         _fabrica = fabrica;
     }
 
+    /// <summary>
+    /// La notificación de la pasarela (spec 017) cuelga de <c>/api/plataforma/</c> pero no es del panel: es
+    /// anónima y se protege con la firma, y la cubren <c>NotificacionPasarelaPruebas</c> y la lista de
+    /// anónimos de <c>AccesoClubPruebas</c>.
+    /// </summary>
+    private const string NotificacionDeLaPasarela = "/api/plataforma/pagos/notificaciones";
+
     private List<Endpoint> DelPanel => EndpointsDeLaApi.DeLaApi(_fabrica)
-        .Where(endpoint => endpoint.Ruta.StartsWith("/api/plataforma/", StringComparison.Ordinal))
+        .Where(endpoint => endpoint.Ruta.StartsWith("/api/plataforma/", StringComparison.Ordinal)
+            && endpoint.Ruta != NotificacionDeLaPasarela)
         .ToList();
 
     [Fact]
     public void El_panel_tiene_todos_los_endpoints_del_contrato()
     {
         // Si esta lista quedara vacía, las dos pruebas siguientes pasarían sin probar nada.
-        Assert.Equal(10, DelPanel.Count);
+        Assert.Equal(17, DelPanel.Count);
     }
 
     [Fact]

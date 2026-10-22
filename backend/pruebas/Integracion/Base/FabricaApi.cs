@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Testcontainers.PostgreSql;
 
 namespace LFClub.Pruebas.Integracion.Base;
@@ -25,6 +26,9 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 
     public RelojDePrueba Reloj { get; } = new();
 
+    /// <summary>Todo lo que la API escribe en su registro de eventos.</summary>
+    public RegistroEnMemoria Registro { get; } = new();
+
     public SembradorActividades Actividades => new(this);
 
     public Sembrador Sembrador => new(this);
@@ -35,6 +39,8 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
 
     public SembradorCategorias Categorias => new(this);
 
+    public SembradorCobrosPlataforma CobrosPlataforma => new(this);
+
     public SembradorComunicados Comunicados => new(this);
 
     public SembradorFichas Fichas => new(this);
@@ -42,6 +48,8 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
     public SembradorHermanos Hermanos => new(this);
 
     public SembradorJugadores Jugadores => new(this);
+
+    public SembradorPagos Pagos => new(this);
 
     public SembradorPersonas Personas => new(this);
 
@@ -55,6 +63,23 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
     {
         await base.DisposeAsync();
         await _baseDatos.DisposeAsync();
+    }
+
+    /// <summary>
+    /// Deja la pasarela sin configuración hasta que se libere lo devuelto, para probar la API como
+    /// si no tuviera llaves (spec 017, RF-027).
+    /// </summary>
+    public IDisposable SinPasarela()
+    {
+        var opciones = Services.GetRequiredService<LFClub.Infraestructura.Pagos.OpcionesWompi>();
+        var anteriores = (opciones.LlavePublica, opciones.SecretoIntegridad, opciones.SecretoEventos);
+        (opciones.LlavePublica, opciones.SecretoIntegridad, opciones.SecretoEventos) = (string.Empty, string.Empty, string.Empty);
+        return new Restaurador(() => (opciones.LlavePublica, opciones.SecretoIntegridad, opciones.SecretoEventos) = anteriores);
+    }
+
+    private sealed class Restaurador(Action restaurar) : IDisposable
+    {
+        public void Dispose() => restaurar();
     }
 
     /// <summary>Cliente sin sesión.</summary>
@@ -78,6 +103,17 @@ public class FabricaApi : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Frontend:UrlBase", "http://localhost:5173");
         builder.UseSetting("BaseDatos:MigrarAlArrancar", "true");
         builder.UseSetting("Limites:AnonimoPorMinuto", "100000");
+        // La generación mensual la dispara cada prueba que la necesita; el trabajo en segundo plano la
+        // mezclaría con los datos de las demás.
+        builder.UseSetting("Cargos:TrabajoActivo", "false");
+        // Lo mismo con los cobros de la plataforma: cada prueba los genera y los suspende a mano (spec 017).
+        builder.UseSetting("Plataforma:TrabajoActivo", "false");
+        // Secretos inventados de la pasarela, solo para las pruebas (spec 017).
+        builder.UseSetting("Wompi:LlavePublica", SembradorCobrosPlataforma.LlavePublica);
+        builder.UseSetting("Wompi:SecretoIntegridad", SembradorCobrosPlataforma.SecretoDeIntegridad);
+        builder.UseSetting("Wompi:SecretoEventos", SembradorCobrosPlataforma.SecretoDeEventos);
+
+        builder.ConfigureLogging(registro => registro.AddProvider(Registro));
 
         builder.ConfigureTestServices(servicios =>
         {

@@ -15,7 +15,9 @@ namespace LFClub.Pruebas.Integracion.Jugadores;
 [Collection(ColeccionApi.Nombre)]
 public class ListaJugadoresPruebas
 {
-    private static readonly string[] CamposDelJugador = ["usuarioRolId", "nombres", "apellidos", "equipos", "fotoActualizadaEn"];
+    // Desde la 015 la lista lleva el estado de cuenta (solo al presidente y al directivo): nada más de pagos.
+    private static readonly string[] CamposDelJugador =
+        ["usuarioRolId", "nombres", "apellidos", "equipos", "fotoActualizadaEn", "estadoCuenta"];
 
     private readonly FabricaApi _fabrica;
 
@@ -105,7 +107,7 @@ public class ListaJugadoresPruebas
     }
 
     [Fact]
-    public async Task La_respuesta_no_lleva_datos_de_la_ficha_ni_de_pago()
+    public async Task La_respuesta_no_lleva_datos_de_la_ficha_ni_el_saldo()
     {
         var c = await _fabrica.Jugadores.CrearClubAsync();
         await _fabrica.Fichas.CrearFichaAsync(c.Ana.Integrante);
@@ -122,7 +124,7 @@ public class ListaJugadoresPruebas
         Assert.DoesNotContain(c.Ana.Integrante.NumeroDocumento, texto);
         Assert.DoesNotContain(c.Ana.Usuario.Correo, texto);
         Assert.DoesNotContain(SembradorFichas.Alergias, texto);
-        foreach (var palabra in new[] { "documento", "correo", "telefono", "celular", "salud", "documentacion", "pago", "aldia" })
+        foreach (var palabra in new[] { "documento", "correo", "telefono", "celular", "salud", "documentacion", "saldo", "aldia" })
         {
             Assert.DoesNotContain(palabra, texto, StringComparison.OrdinalIgnoreCase);
         }

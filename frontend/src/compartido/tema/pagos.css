@@ -1,0 +1,131 @@
+/* Pagos (spec 015): pestañas de la sección, estado de cuenta, insignias de estado y resguardo. */
+
+.pestanas-pagos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 0 0 16px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.pestanas-pagos a {
+  padding: 8px 12px;
+  border-bottom: 3px solid transparent;
+  color: var(--texto-suave);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pestanas-pagos a:hover {
+  color: var(--texto);
+}
+
+.pestanas-pagos a.active {
+  border-bottom-color: var(--color-club-principal);
+  color: var(--texto);
+}
+
+.aviso-con-accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.saldo-de-cuenta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.saldo-de-cuenta strong {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.lista-de-cargos,
+.lista-de-pagos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-de-cargos li,
+.lista-de-pagos li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.lista-de-cargos li:last-child,
+.lista-de-pagos li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.pago-anulado {
+  text-decoration: line-through;
+  color: var(--texto-suave);
+}
+
+.casillas-de-cargos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.imagen-de-resguardo {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.imagen-de-soporte {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.cifras-de-finanzas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.datos-de-pago {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.datos-de-pago .fila {
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.datos-de-pago dt {
+  min-width: 160px;
+}
+
+.datos-de-pago dd {
+  margin: 0;
+}

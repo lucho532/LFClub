@@ -19,7 +19,8 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// Quien se registra entra directamente al club con el rol de su invitación, aprobado y sin sala
 /// de espera (RF-008); si es JUGADOR queda además, en esa misma
 /// transacción y con el club bloqueado, en la categoría activa de su año de nacimiento, o sin
-/// categoría si el club no la tiene (RF-011).
+/// categoría si el club no la tiene (RF-011); si entra como JUGADOR, se le cobra desde el mes siguiente
+/// (spec 015, RF-008).
 /// No acepta un correo, un club ni un rol enviados por quien se registra, y no puede crear una
 /// cuenta DESARROLLADOR. No registra ninguna aprobación: nadie aprobó a quien fue invitado. Para
 /// leer las categorías fija en el contexto el club de la invitación válida, que es lo único que
@@ -203,6 +204,7 @@ public class ServicioRegistroConInvitacion : IServicioRegistroConInvitacion
             NumeroDocumento = documento,
             FechaNacimiento = datos.FechaNacimiento!.Value,
             CreadoEn = ahora,
+            CobraDesde = invitacion.Rol == Rol.JUGADOR ? ReglaMesDeCobro.PrimerMesDeCobro(ahora) : null,
         };
 
         return (usuario, integrante);

@@ -22,7 +22,8 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// jugador activo de esa otra cuenta en su club (RF-036). Bloquea el club propio y los de los
 /// jugadores que retira en una sola sentencia ordenada (research §13 de la 006).
 /// No deja elegir rol ni comprueba quién aprueba: solo llega aquí el PRESIDENTE, que nunca está en
-/// espera. No asigna equipo, no genera cobros ni envía correos, y no avisa al otro club. No accede
+/// espera. Fija el mes desde el que se le cobra: el siguiente al de la aprobación (spec 015, RF-008).
+/// No asigna equipo, no genera cobros ni envía correos, y no avisa al otro club. No accede
 /// al contexto de Entity Framework ni conoce HTTP.
 /// </summary>
 public class ServicioAprobacionIngreso : IServicioAprobacionIngreso
@@ -91,6 +92,7 @@ public class ServicioAprobacionIngreso : IServicioAprobacionIngreso
                     ahora,
                     quienAprueba.UsuarioId,
                     $"{quienAprueba.Nombres} {quienAprueba.Apellidos}",
+                    ReglaMesDeCobro.PrimerMesDeCobro(ahora),
                     cancelacion);
 
                 var integrante = await _ingresos.ObtenerAsync(usuarioRolId, cancelacion)

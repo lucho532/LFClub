@@ -3,6 +3,7 @@ using LFClub.Aplicacion.Interfaces;
 using LFClub.Aplicacion.Mappers;
 using LFClub.Aplicacion.Servicios;
 using LFClub.Dominio.Entidades;
+using LFClub.Dominio.Enumeraciones;
 using LFClub.Dominio.Reglas;
 
 namespace LFClub.Aplicacion.Implementaciones;
@@ -13,8 +14,9 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// que quien pregunta puede ver con <see cref="ReglaAlcanceDeCategorias"/>: quien no ve las listas
 /// del club (el ENTRENADOR) recibe solo los de las categorías activas en las que tiene una
 /// asignación activa, que se consulta en cada petición, y nunca a los que no tienen categoría.
-/// Después completa la fecha de la foto de todos con una sola consulta y los agrupa con
-/// <see cref="MapperListaJugadores"/>.
+/// Después completa la fecha de la foto de todos con una sola consulta y, solo para el PRESIDENTE y el
+/// DIRECTIVO, su estado de cuenta con otra consulta agrupada de cargos (spec 015, RF-034; el ENTRENADOR
+/// recibe el estado nulo), y los agrupa con <see cref="MapperListaJugadores"/>.
 /// No modifica datos, no crea ninguna regla de alcance propia, no accede al contexto de Entity
 /// Framework y no recibe un identificador de club: solo existe el que fijó la autorización.
 /// </summary>
@@ -23,14 +25,19 @@ public class ServicioListaJugadores : IServicioListaJugadores
     private readonly IRepositorioJugadores _jugadores;
     private readonly IRepositorioAsignaciones _asignaciones;
     private readonly IRepositorioFotosJugador _fotos;
+    private readonly IRepositorioCargos _cargos;
 
     /// <summary>Crea el servicio con sus dependencias.</summary>
     public ServicioListaJugadores(
-        IRepositorioJugadores jugadores, IRepositorioAsignaciones asignaciones, IRepositorioFotosJugador fotos)
+        IRepositorioJugadores jugadores,
+        IRepositorioAsignaciones asignaciones,
+        IRepositorioFotosJugador fotos,
+        IRepositorioCargos cargos)
     {
         _jugadores = jugadores;
         _asignaciones = asignaciones;
         _fotos = fotos;
+        _cargos = cargos;
     }
 
     /// <inheritdoc />
@@ -49,6 +56,12 @@ public class ServicioListaJugadores : IServicioListaJugadores
         }
 
         var fotos = await _fotos.FechasAsync(jugadores.Select(jugador => jugador.Id).ToList(), cancelacion);
-        return MapperListaJugadores.AGrupos(jugadores, fotos);
+        var estados = ReglaAccesoACuenta.VeFinanzasDelClub(quienPregunta.Rol) ? await EstadosAsync(cancelacion) : null;
+        return MapperListaJugadores.AGrupos(jugadores, fotos, estados);
     }
+
+    private async Task<IReadOnlyDictionary<Guid, EstadoDeCuenta>> EstadosAsync(CancellationToken cancelacion) =>
+        (await _cargos.ListarConAplicadoAsync(cancelacion: cancelacion))
+            .GroupBy(cargo => cargo.UsuarioRolId)
+            .ToDictionary(grupo => grupo.Key, grupo => MapperPagos.ACuenta(grupo).Estado);
 }

@@ -156,6 +156,9 @@ public class EliminarClubPruebas
         await _fabrica.Avisos.GenerarAsync(
             club, HechoDeActividad.ENTRENAMIENTO_PROGRAMADO, TipoDeActividad.ENTRENAMIENTO, entrenamiento.Id,
             "Nuevo entrenamiento", [jugador]);
+
+        // Spec 015: un cargo, un pago confirmado con su aplicación, otro en revisión con su soporte y un medio de pago.
+        await _fabrica.Pagos.SembrarCuentaCompletaAsync(club, jugador, presidente);
     }
 
     private Task<bool> ExisteClubAsync(Guid clubId) =>

@@ -1,4 +1,5 @@
 import type { EstadoClub, EstadoEnvio, EstadoInvitacion } from '../api/tipos';
+import type { EstadoDePagoClub } from '../api/tiposPagoPlataforma';
 import type { Tono } from './Aviso';
 
 interface Props {
@@ -43,4 +44,17 @@ const ESTADOS_INVITACION: Record<EstadoInvitacion, Props> = {
 /** Etiqueta con el estado de una invitación del club. */
 export function EtiquetaEstadoInvitacion({ estado }: { estado: EstadoInvitacion }) {
   return <EtiquetaEstado {...ESTADOS_INVITACION[estado]} />;
+}
+
+const ESTADOS_DE_PAGO_CLUB: Record<EstadoDePagoClub, Props> = {
+  SIN_COBRO: { tono: 'neutro', texto: 'Sin cobro' },
+  AL_DIA: { tono: 'exito', texto: '✓ Al día' },
+  PENDIENTE: { tono: 'info', texto: '! Pendiente' },
+  VENCIDO: { tono: 'aviso', texto: '⚠ Vencido' },
+  SUSPENDIDO_POR_IMPAGO: { tono: 'error', texto: '⚠ Suspendido por impago' },
+};
+
+/** Etiqueta con el estado de pago de un club frente a la plataforma (spec 017), siempre con texto e ícono. */
+export function EtiquetaEstadoDePagoClub({ estado }: { estado: EstadoDePagoClub }) {
+  return <EtiquetaEstado {...ESTADOS_DE_PAGO_CLUB[estado]} />;
 }

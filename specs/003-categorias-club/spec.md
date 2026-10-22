@@ -684,3 +684,9 @@ propietario el 2026-10-08. Los demás conservan su número.
 - Mostrar a las familias datos de contacto de los entrenadores.
 - Mostrar las categorías y el cuerpo técnico en el sitio público.
 - Agregar un hermano desde la ficha de un jugador ya registrado.
+
+---
+
+**Nota de seguimiento (2026-10-20)**: lo que este documento deja pendiente sobre mensualidades, cargos,
+pagos y el estado de cuenta lo construye la funcionalidad
+[015-mensualidades-cargos-pagos](../015-mensualidades-cargos-pagos/spec.md). Este documento no se reescribe.

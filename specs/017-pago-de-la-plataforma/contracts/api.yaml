@@ -1,0 +1,427 @@
+openapi: 3.1.0
+info:
+  title: LFClub - API de la funcionalidad 017 (pago del club por el uso de la plataforma)
+  version: 0.17.0
+  description: |
+    Contrato de lo que esta funcionalidad añade respecto de los contratos de la 001 a la 016.
+
+    Cuenta de operaciones: **+11** (3 de club, 7 de plataforma y 1 notificación de la pasarela),
+    ademas de campos nuevos en `ClubResumenDto`. **Confirmar contando con la expresión regular de
+    `EndpointsDeLaApi` al empezar.**
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - Quién puede: las de club, solo el PRESIDENTE (también con el club suspendido); el resto de roles
+      recibe `403 rol_no_autorizado`. Las de plataforma, solo el DESARROLLADOR. Un cobro de otro club
+      responde `404 no_encontrado`.
+    - Los importes son pesos enteros (COP). Los periodos son `AAAA-MM`. El día de corte es el de
+      Colombia (UTC-5), calculado en el servidor.
+    - **Ninguna respuesta incluye llaves ni secretos de la pasarela.**
+    - Las respuestas del club llevan `Cache-Control: private, no-store`.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/clubes/{clubId}/pago-plataforma:
+    get:
+      operationId: obtenerPagoDeLaPlataforma
+      tags: [PagoPlataforma]
+      summary: Cobros pendientes e historial del club (solo PRESIDENTE)
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: El resumen.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PagoPlataformaDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+
+  /api/clubes/{clubId}/pago-plataforma/cobros/{cobroId}:
+    get:
+      operationId: obtenerCobroDeLaPlataforma
+      tags: [PagoPlataforma]
+      summary: Un cobro con su detalle (lo usa la pantalla de retorno para ver si ya figura pagado)
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cobroId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: El cobro.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CobroPlataformaDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+
+  /api/clubes/{clubId}/pago-plataforma/cobros/{cobroId}/intentos:
+    post:
+      operationId: iniciarPagoDeLaPlataforma
+      tags: [PagoPlataforma]
+      summary: Inicia un intento de pago y devuelve la dirección de la pasarela
+      description: |
+        El valor sale del cobro guardado, nunca del cliente. Cada intento tiene su referencia única.
+        No cambia el estado del cobro: solo la notificación verificada lo hace.
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cobroId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '201':
+          description: La dirección de pago, ya firmada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IntentoDePagoDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+        '409':
+          description: El cobro ya está pagado o anulado (`cobro_no_pendiente`).
+          content:
+            application/problem+json:
+              schema: { type: object, properties: { codigo: { type: string } } }
+        '503':
+          description: La pasarela no está configurada (`pago_no_disponible`).
+          content:
+            application/problem+json:
+              schema: { type: object, properties: { codigo: { type: string } } }
+
+  /api/plataforma/pagos/notificaciones:
+    post:
+      operationId: recibirNotificacionDeLaPasarela
+      tags: [PagoPlataforma]
+      summary: Notificación de la pasarela (sin sesión; la autenticidad es la firma)
+      security: []
+      description: |
+        Operación anónima. Verifica la firma y la referencia y valor antes de tocar nada. Responde
+        `200` a toda notificación bien firmada, aunque no cambie nada (referencia desconocida, valor
+        distinto, no aprobada, repetida), para que la pasarela no reintente sin fin; responde `401` si
+        la firma no es válida. Es idempotente.
+      parameters:
+        - name: X-Event-Checksum
+          in: header
+          required: false
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true, description: 'Evento `transaction.updated` de Wompi.' }
+      responses:
+        '200': { description: Recibida. }
+        '401': { $ref: '#/components/responses/Problema' }
+
+  /api/plataforma/tarifas:
+    get:
+      operationId: obtenerTarifasDeLaPlataforma
+      tags: [Plataforma]
+      summary: Precios por rol y días de gracia (solo DESARROLLADOR)
+      responses:
+        '200':
+          description: Las tarifas vigentes.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TarifasDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+    put:
+      operationId: guardarTarifasDeLaPlataforma
+      tags: [Plataforma]
+      summary: Fija los precios y los días de gracia; aplican a los cobros que se generen después
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GuardarTarifasDto' }
+      responses:
+        '200':
+          description: Las tarifas guardadas.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TarifasDto' }
+        '400': { $ref: '#/components/responses/Problema' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+
+  /api/plataforma/clubes/{clubId}/cobro:
+    put:
+      operationId: fijarInicioDelCobro
+      tags: [Plataforma]
+      summary: Fija desde qué mes se cobra a un club (nulo = no se cobra)
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FijarInicioDelCobroDto' }
+      responses:
+        '200':
+          description: El estado de pago del club.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EstadoDePagoClubDto' }
+        '400': { $ref: '#/components/responses/Problema' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+
+  /api/plataforma/clubes/{clubId}/cobros:
+    get:
+      operationId: listarCobrosDeUnClub
+      tags: [Plataforma]
+      summary: Historial de cobros de un club (sin datos personales)
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Cobros, el más reciente primero.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CobroPlataformaDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+
+  /api/plataforma/clubes/{clubId}/cobros/{cobroId}/pago-manual:
+    post:
+      operationId: marcarCobroPagadoManualmente
+      tags: [Plataforma]
+      summary: Marca un cobro como pagado por fuera de la pasarela
+      description: |
+        Deja constancia de quién y cuándo. Reactiva el club si estaba suspendido por impago y ya no le
+        queda un cobro vencido; no toca una suspensión manual.
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cobroId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: El cobro, ya pagado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CobroPlataformaDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+        '409': { $ref: '#/components/responses/Problema' }
+
+  /api/plataforma/clubes/{clubId}/cobros/{cobroId}/anulacion:
+    post:
+      operationId: anularCobroDeLaPlataforma
+      tags: [Plataforma]
+      summary: Anula un cobro pendiente, con motivo
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cobroId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnularCobroDto' }
+      responses:
+        '200':
+          description: El cobro, ya anulado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CobroPlataformaDto' }
+        '400': { $ref: '#/components/responses/Problema' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+        '409': { $ref: '#/components/responses/Problema' }
+
+  /api/plataforma/notificaciones:
+    get:
+      operationId: listarNotificacionesDeLaPasarela
+      tags: [Plataforma]
+      summary: Últimas notificaciones recibidas (para revisar duplicados y casos raros)
+      parameters:
+        - name: resultado
+          in: query
+          required: false
+          schema: { $ref: '#/components/schemas/ResultadoNotificacion' }
+      responses:
+        '200':
+          description: Hasta 100, la más reciente primero.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/NotificacionPasarelaDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+
+components:
+  responses:
+    Problema:
+      description: Error con `application/problem+json`.
+      content:
+        application/problem+json:
+          schema: { type: object, properties: { codigo: { type: string } } }
+
+  schemas:
+    EstadoCobroPlataforma:
+      type: string
+      enum: [PENDIENTE, PAGADO, ANULADO]
+
+    EstadoDePagoClub:
+      type: string
+      enum: [SIN_COBRO, AL_DIA, PENDIENTE, VENCIDO, SUSPENDIDO_POR_IMPAGO]
+
+    ResultadoNotificacion:
+      type: string
+      enum:
+        - APLICADA
+        - REPETIDA
+        - NO_APROBADA
+        - PAGO_DUPLICADO
+        - PAGO_A_COBRO_ANULADO
+        - VALOR_NO_COINCIDE
+        - REFERENCIA_DESCONOCIDA
+        - FIRMA_INVALIDA
+
+    DetalleDeRolDto:
+      type: object
+      required: [rol, integrantes, precio, subtotal]
+      properties:
+        rol: { type: string, enum: [JUGADOR, ENTRENADOR, DIRECTIVO, PRESIDENTE] }
+        integrantes: { type: integer, minimum: 0 }
+        precio: { type: number }
+        subtotal: { type: number }
+
+    CobroPlataformaDto:
+      type: object
+      required: [cobroId, periodo, estado, detalle, total, suspendeDesde, generadoEn, ultimoPagoNoAprobado]
+      properties:
+        cobroId: { type: string, format: uuid }
+        periodo: { type: string, example: '2026-11' }
+        estado: { $ref: '#/components/schemas/EstadoCobroPlataforma' }
+        detalle:
+          type: array
+          items: { $ref: '#/components/schemas/DetalleDeRolDto' }
+        total: { type: number }
+        generadoEn: { type: string, format: date-time }
+        suspendeDesde:
+          type: string
+          format: date
+          description: Primer día en que el club se suspende; el último día para pagar es el anterior.
+        pagadoEn: { type: [string, 'null'], format: date-time }
+        origenDelPago:
+          type: [string, 'null']
+          enum: [PASARELA, MANUAL, null]
+        referencia: { type: [string, 'null'] }
+        medioDePago: { type: [string, 'null'] }
+        enVerificacion:
+          type: boolean
+          description: Hay un intento de pago reciente sin notificación; solo informativo.
+        ultimoPagoNoAprobado:
+          type: boolean
+          description: La pasarela informó que el último intento de pago no fue aprobado; se puede intentar de nuevo.
+        motivoAnulacion: { type: [string, 'null'] }
+
+    PagoPlataformaDto:
+      type: object
+      required: [pagoEnLineaDisponible, suspendidoPorImpago, pendientes, historial]
+      properties:
+        pagoEnLineaDisponible:
+          type: boolean
+          description: Falso si la pasarela no está configurada; entonces no hay botón de pago.
+        suspendidoPorImpago: { type: boolean }
+        pendientes:
+          type: array
+          items: { $ref: '#/components/schemas/CobroPlataformaDto' }
+        totalPendiente: { type: number }
+        historial:
+          type: array
+          items: { $ref: '#/components/schemas/CobroPlataformaDto' }
+
+    IntentoDePagoDto:
+      type: object
+      required: [urlDePago, referencia]
+      properties:
+        urlDePago:
+          type: string
+          format: uri
+          description: Dirección del checkout, ya firmada; no contiene secretos.
+        referencia: { type: string }
+
+    TarifasDto:
+      type: object
+      required: [diasDeGracia]
+      properties:
+        precioJugador: { type: [number, 'null'] }
+        precioEntrenador: { type: [number, 'null'] }
+        precioDirectivo: { type: [number, 'null'] }
+        precioPresidente: { type: [number, 'null'] }
+        diasDeGracia: { type: integer, minimum: 0, maximum: 30 }
+        pasarelaConfigurada:
+          type: boolean
+          description: Si la plataforma tiene la configuración de la pasarela; nunca los valores.
+        actualizadoEn: { type: [string, 'null'], format: date-time }
+
+    GuardarTarifasDto:
+      type: object
+      required: [diasDeGracia]
+      properties:
+        precioJugador: { type: [number, 'null'], minimum: 0 }
+        precioEntrenador: { type: [number, 'null'], minimum: 0 }
+        precioDirectivo: { type: [number, 'null'], minimum: 0 }
+        precioPresidente: { type: [number, 'null'], minimum: 0 }
+        diasDeGracia: { type: integer, minimum: 0, maximum: 30 }
+
+    FijarInicioDelCobroDto:
+      type: object
+      properties:
+        mesDeInicio:
+          type: [string, 'null']
+          example: '2026-12'
+          description: Mes `AAAA-MM` desde el que se cobra; nulo para no cobrar.
+
+    EstadoDePagoClubDto:
+      type: object
+      required: [estadoDePago, valorAdeudado]
+      properties:
+        estadoDePago: { $ref: '#/components/schemas/EstadoDePagoClub' }
+        valorAdeudado: { type: number }
+        mesDeInicioDelCobro: { type: [string, 'null'], example: '2026-12' }
+        motivoDeSuspension:
+          type: [string, 'null']
+          enum: [MANUAL, IMPAGO, null]
+
+    AnularCobroDto:
+      type: object
+      required: [motivo]
+      properties:
+        motivo: { type: string, minLength: 3, maxLength: 300 }
+
+    NotificacionPasarelaDto:
+      type: object
+      required: [notificacionId, recibidaEn, resultado]
+      properties:
+        notificacionId: { type: string, format: uuid }
+        recibidaEn: { type: string, format: date-time }
+        resultado: { $ref: '#/components/schemas/ResultadoNotificacion' }
+        transaccionId: { type: [string, 'null'] }
+        estadoDeLaPasarela: { type: [string, 'null'] }
+        referencia: { type: [string, 'null'] }
+        valor: { type: [number, 'null'] }
+        clubId: { type: [string, 'null'], format: uuid }
+        periodo: { type: [string, 'null'] }
+
+    ClubResumenDtoAnadidos:
+      description: |
+        Campos que se **añaden** a `ClubResumenDto` (lista del panel del DESARROLLADOR) y a
+        `ClubDetalleDto` (detalle del club en el mismo panel). No hay llaves ni datos personales.
+      type: object
+      required: [estadoDePago, valorAdeudado]
+      properties:
+        estadoDePago: { $ref: '#/components/schemas/EstadoDePagoClub' }
+        valorAdeudado: { type: number }
+        mesDeInicioDelCobro: { type: [string, 'null'], example: '2026-12' }
+        motivoDeSuspension:
+          type: [string, 'null']
+          enum: [MANUAL, IMPAGO, null]

@@ -497,3 +497,9 @@ rechaza y se comprueba que desaparece de la lista de la familia y que el primer 
 - Búsqueda de usuarios por documento y cambio de roles (constitución §12.2).
 - Estado de cuenta, cargos, pagos y mensualidades de cada jugador.
 - Evaluaciones, estadísticas, asistencia, calendario y convocatorias.
+
+---
+
+**Nota de seguimiento (2026-10-20)**: lo que este documento deja pendiente sobre mensualidades, cargos,
+pagos y el estado de cuenta lo construye la funcionalidad
+[015-mensualidades-cargos-pagos](../015-mensualidades-cargos-pagos/spec.md). Este documento no se reescribe.

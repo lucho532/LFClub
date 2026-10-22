@@ -6,6 +6,7 @@ using LFClub.Aplicacion.Utilidades;
 using LFClub.Aplicacion.Validadores;
 using LFClub.Dominio.Entidades;
 using LFClub.Dominio.Enumeraciones;
+using LFClub.Dominio.Reglas;
 
 namespace LFClub.Aplicacion.Implementaciones;
 
@@ -61,6 +62,7 @@ public class ServicioCreacionClub : IServicioCreacionClub
             NombreNormalizado = nombreNormalizado,
             Estado = EstadoClub.ACTIVO,
             CreadoEn = _reloj.AhoraUtc,
+            MesInicioCobro = ReglaMesDeCobro.PrimerMesDeCobro(_reloj.AhoraUtc),
         };
 
         Invitacion invitacion;

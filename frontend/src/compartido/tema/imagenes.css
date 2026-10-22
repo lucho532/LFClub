@@ -140,3 +140,34 @@
   outline: 3px solid var(--color-club-principal);
   outline-offset: 2px;
 }
+
+/* Tarjeta "Escudo" de los datos del club: el escudo en grande, con su lápiz. */
+.escudo-grande {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.escudo-grande .distintivo {
+  width: clamp(160px, 50vw, 260px);
+  height: clamp(160px, 50vw, 260px);
+  font-size: clamp(64px, 20vw, 104px);
+}
+
+.escudo-grande .lapiz-imagen-boton {
+  right: 8px;
+  bottom: 8px;
+  width: 44px;
+  height: 44px;
+}
+
+/* Muestra de un color en la tarjeta "Colores". */
+.muestra-color {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: 50%;
+  vertical-align: middle;
+}

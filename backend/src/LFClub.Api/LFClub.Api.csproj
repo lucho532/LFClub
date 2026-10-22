@@ -18,6 +18,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Para guardar fuera del repositorio las claves de la pasarela en desarrollo (spec 017, RF-025). -->
+    <UserSecretsId>lfclub-api-9c1f4e2a-7b53-4d68-a1e0-5f3b8c2d6a47</UserSecretsId>
   </PropertyGroup>
 
 </Project>

@@ -423,3 +423,9 @@ comprueba que puede registrarse otra vez.
 - Formulario de inscripción del sitio público.
 - Solicitud de eliminación de la propia cuenta y cambio de contraseña desde dentro de la
   aplicación.
+
+---
+
+**Nota de seguimiento (2026-10-20)**: lo que este documento deja pendiente sobre mensualidades, cargos,
+pagos y el estado de cuenta lo construye la funcionalidad
+[015-mensualidades-cargos-pagos](../015-mensualidades-cargos-pagos/spec.md). Este documento no se reescribe.

@@ -350,6 +350,59 @@ Enmienda 4.11.0 → 4.12.0 (2026-10-13), decidida por el propietario del proyect
 - §28: sin cambios. Principios renombrados, secciones añadidas y eliminadas: ninguno
 - Pendientes: ninguna decisión nueva. La spec 014 implementa esta versión
 
+Enmienda 4.12.0 → 4.13.0 (2026-10-20), decidida por el propietario del proyecto en la spec 015:
+- §1, §3, §4, §6 y §6.2: la pasarela (Wompi) queda solo para el pago de los clubes por el uso de la
+  plataforma (§7.4); las familias ya no pagan en línea y los clubes no tienen llaves propias
+- §16.3, §16.4 y §16.5: los medios de pago son EFECTIVO y TRANSFERENCIA (con la entidad); las
+  familias pagan directo al PRESIDENTE; la familia informa la transferencia con imagen de soporte;
+  solo el PRESIDENTE registra, confirma, rechaza y anula pagos; todo pago confirmado genera recibo
+  y resguardo (imagen), con el mismo número del club
+- §16.9 y §8: el ENTRENADOR deja de registrar pagos en efectivo, ver el estado de pago de sus
+  jugadores y las finanzas generales; solo PRESIDENTE, DIRECTIVO y la familia ven este tema
+- §8 (PRESIDENTE, JUGADOR) y §12.4: medios de pago, resguardos y soportes; al eliminar la cuenta se
+  conservan pagos y recibos, y se eliminan soportes y resguardos
+- §20: se retiran las pruebas de la pasarela por familia y se añaden las de transferencia, soporte,
+  rol del ENTRENADOR y visibilidad del soporte
+- Motivo: por ahora el club cobra sin pasarela, por transferencia o en mano al PRESIDENTE
+- §28: sin cambios. Principios renombrados y secciones eliminadas: ninguno; añadida: §16.9
+- Pendientes: la spec 007 (columna "Al día") y la spec 015 se ajustan a esta versión al planificar
+
+Enmienda 4.13.0 → 4.13.1 (2026-10-20), decidida por el propietario del proyecto:
+- §7.4: el pago del club por el uso de la plataforma se hace con un enlace de pago que solo ve el
+  PRESIDENTE, encargado de pagar por el software; se confirma solo por la notificación de la pasarela
+- Las llaves y secretos de la pasarela no se escriben en la constitución ni en el repositorio
+- Principios renombrados, secciones añadidas y eliminadas: ninguno
+
+Enmienda 4.13.1 → 4.14.0 (2026-10-20), decidida por el propietario del proyecto en la spec 015:
+- Arbitraje: sale de la aplicación; ni se registra su costo ni genera cargos. Cambios en §1, §2.2
+  (glosario), §6.2, §8 (PRESIDENTE), §16.1 (se retira el tipo ARBITRAJE), §16.6 (queda como nota de
+  que está fuera de la aplicación; se conserva el número) y §17.2
+- Principios renombrados y secciones eliminadas: ninguno
+
+Enmienda 4.14.0 → 4.15.0 (2026-10-21), decidida por el propietario del proyecto en la spec 016:
+- §16.7: la mensualidad sin pagar después del día 5 deja de ser solo un dato informativo: el inicio
+  de la familia del jugador muestra un aviso fijo (rojo en mora, ámbar dentro del plazo, verde al
+  día). Se mantiene que no hay recargo, interés ni restricción alguna
+- §16.8: se aclara que no hay recordatorios por ningún canal y que el aviso fijo del inicio no es un
+  recordatorio, porque no se envía
+- §16.9: el aviso lo ve únicamente la familia del jugador
+- §28: se ajusta la nota sobre recordatorios de pago
+- Principios renombrados y secciones eliminadas: ninguno
+
+Enmienda 4.15.0 → 4.16.0 (2026-10-21), decidida por el propietario del proyecto en la spec 017:
+- §7.4: se concreta el pago del club por el uso de la plataforma: valor = integrantes activos por
+  rol × precio por rol que fija el DESARROLLADOR; cobro mensual generado el día 1 (hora de
+  Colombia); 5 días de gracia por defecto, configurables; mes de inicio del cobro por club, fijado
+  por el DESARROLLADOR (vacío = no se cobra; un club nuevo queda con el mes siguiente)
+- §7.4: la suspensión tiene motivo (impago o manual). El pago levanta solo la suspensión por impago,
+  nunca la manual. Si el DESARROLLADOR levanta a mano una suspensión por impago, el club queda activo
+  hasta el siguiente cobro
+- §13 y §14: los pagos de la plataforma y el detalle de cada cobro son inmutables, salvo la
+  eliminación del club
+- §28: se cierra "Pago por el uso de la plataforma"; se abre "Recordatorios del cobro de la
+  plataforma"
+- Principios renombrados y secciones eliminadas: ninguno
+
 -->
 
 # Constitución del Proyecto — LFClub, plataforma multiclub de escuelas de fútbol
@@ -390,11 +443,10 @@ La plataforma debe permitir, para cada club:
 - Gestionar jugadores, entrenadores y categorías.
 - Gestionar mensualidades: cargos, pagos, abonos, saldos y estado de cuenta de cada jugador.
 - Saber quién debe, cuánto debe y desde cuándo.
-- Recibir pagos en línea mediante una pasarela de pago y registrar pagos en efectivo o por
-  transferencia.
+- Registrar los pagos que las familias hacen directamente al PRESIDENTE, en efectivo o por
+  transferencia (Nequi, Bancolombia, Daviplata u otra), con su soporte, recibo y resguardo.
 - Programar entrenamientos, partidos y torneos.
 - Registrar convocatorias, asistencia y resultados.
-- Gestionar el arbitraje de cada partido y su cobro entre los convocados.
 - Mantener la ficha de cada jugador con acceso restringido.
 - Enviar comunicados y mensajes de convocatoria.
 - Mantener históricos deportivos y financieros sin alterar información histórica.
@@ -471,10 +523,9 @@ Se utilizará siempre el mismo término para cada concepto:
 | Categoria | grupo de jugadores definido por un único año de nacimiento |
 | Equipo | división de una categoría, con nombre propio (A, B, Élite) |
 | Mensualidad | cobro mensual por la formación de un jugador |
-| Cargo | valor que un jugador debe (mensualidad, arbitraje, otro) |
+| Cargo | valor que un jugador debe (mensualidad, otro) |
 | Pago | dinero recibido y aplicado a uno o varios cargos |
 | Convocatoria | lista de jugadores citados a un partido |
-| Arbitraje | costo del árbitro de un partido |
 
 No se usarán sinónimos en el código (por ejemplo Alumno, Profesor, Cuota) para estos conceptos.
 
@@ -512,8 +563,8 @@ Ejemplo:
 /// Representa el servicio encargado de gestionar las mensualidades.
 /// Su responsabilidad es generar los cargos mensuales, aplicar pagos
 /// y calcular el saldo de cada jugador según las reglas de negocio.
-/// No debe comunicarse directamente con la pasarela de pago
-/// ni acceder al contexto de Entity Framework.
+/// No debe acceder directamente al almacenamiento de imágenes de soporte
+/// ni al contexto de Entity Framework.
 /// </summary>
 public class MensualidadServicio
 {
@@ -566,7 +617,8 @@ frontend/
 └── privado/
 ```
 
-`LFClub.Infraestructura/Pagos` contiene la integración con la pasarela de pago y
+`LFClub.Infraestructura/Pagos` contiene la integración con la pasarela de pago (solo para el pago
+de los clubes por el uso de la plataforma, ver §6.2) y
 `LFClub.Infraestructura/Correo` la integración con el servicio de correo. Ambas quedan detrás de
 interfaces definidas en Aplicacion.
 
@@ -632,7 +684,7 @@ La primera implementación utilizará:
 - GitHub.
 - React para el frontend.
 - Capacitor para empaquetar la aplicación Android.
-- Wompi como pasarela de pago.
+- Wompi como pasarela de pago, solo para el cobro del uso de la plataforma a los clubes (§6.2).
 - Brevo para el envío de correos.
 
 ### 6.1. Una sola base de código para web, escritorio y móvil
@@ -653,16 +705,16 @@ iOS no forma parte de esta primera versión.
 
 ### 6.2. Pasarela de pago
 
-Se utilizará Wompi, con sus medios de pago para Colombia (PSE, Nequi, tarjetas).
+Se utilizará Wompi, con sus medios de pago para Colombia (PSE, Nequi, tarjetas), únicamente para
+el pago de cada club por el uso de la plataforma (ver §7.4).
 
 La integración queda detrás de una interfaz de Aplicacion (ver §4), de modo que cambiar de
 pasarela no afecte las reglas de negocio.
 
-Cada club recibe su dinero en su propia cuenta de la pasarela. Las llaves de la pasarela de cada
-club son secretos de ese club: se guardan protegidas, nunca se devuelven por la API y nunca llegan
-al frontend.
-
-El pago de cada club por el uso de la plataforma se cobra con la misma pasarela (ver §7.4).
+Los pagos de las familias al club (mensualidades) no pasan por la pasarela: se hacen
+directamente al PRESIDENTE y se registran según la §16. Las llaves de la pasarela son secretos de
+la plataforma: se guardan protegidas, nunca se devuelven por la API y nunca llegan al frontend. Si
+más adelante las familias pagan en línea, será una enmienda de esta constitución.
 
 El desarrollo y las pruebas se hacen contra el entorno de pruebas de la pasarela. Las llaves de
 producción solamente se configuran en el despliegue.
@@ -740,12 +792,36 @@ su panel, un desplegable le permite elegir de cuál club quiere ver los datos. E
 
 ### 7.4. Suspensión, baja, eliminación y pago por el uso de la plataforma
 
-Cada club paga por el uso de la plataforma, mediante la misma pasarela de pago (ver §6.2).
+Cada club paga por el uso de la plataforma, mediante la misma pasarela de pago (ver §6.2), por un
+enlace de pago de la plataforma.
+
+**Valor y periodicidad.** El pago es mensual. La plataforma genera sola el cobro de cada mes el día 1
+(hora de Colombia). Su valor es la suma, por rol, de los integrantes activos del club en ese momento
+multiplicados por el precio de ese rol, que fija el DESARROLLADOR. El cobro conserva el detalle y el
+total con que se generó (ver §13). El pago es del club, no de una persona, y no admite abonos. Un
+club recibe cobros desde su mes de inicio del cobro, que fija el DESARROLLADOR; sin mes de inicio no
+se le cobra. Un club nuevo queda con el mes siguiente al de su creación.
+
+**Plazo.** Cada cobro tiene un plazo de gracia, 5 días por defecto, configurable por el DESARROLLADOR.
+Cumplido el plazo sin pago confirmado, el club se suspende.
+
+El enlace de pago solo lo ve el PRESIDENTE del club, que es el encargado de pagar por el software;
+ningún otro rol, incluido el DIRECTIVO, lo ve. También lo ve cuando el club está suspendido. El
+enlace es configuración de la plataforma y no queda escrito de forma fija en el código. Un pago
+solo se considera confirmado cuando el backend recibe y verifica la notificación de la pasarela;
+el retorno del navegador no es prueba de pago.
 
 **Suspendido (congelado).** Si un club no ha hecho ese pago, queda suspendido automáticamente
 hasta ponerse al día. En cuanto el pago se confirma, el club vuelve a la normalidad de inmediato.
 El DESARROLLADOR también puede, desde su panel, suspender un club manualmente, levantar una
 suspensión y volver a aplicarla.
+
+La suspensión tiene un motivo: **impago** o **manual**. El pago confirmado levanta solo la
+suspensión por impago, y solo cuando el club ya no tiene ningún cobro vencido; una suspensión manual
+no se levanta con un pago. Si el DESARROLLADOR levanta a mano una suspensión por impago, el club
+queda activo hasta el siguiente cobro: los cobros que ya estaban vencidos siguen pendientes y se
+pueden pagar, pero ya no suspenden. El DESARROLLADOR también puede marcar un cobro como pagado por
+fuera de la pasarela o anularlo con un motivo; ambas cosas dejan constancia de quién y cuándo.
 
 Mientras un club está suspendido:
 
@@ -855,8 +931,9 @@ Puede:
   §17.3).
 - Definir el valor de la mensualidad del club y modificar el de jugadores concretos (ver §16.7).
 - Consultar las finanzas completas del club.
-- Registrar, anular y corregir pagos.
-- Gestionar torneos, partidos y arbitrajes.
+- Registrar, anular y corregir pagos; confirmar o rechazar las transferencias que las familias
+  informan con su soporte; y publicar los medios de pago del club (ver §16).
+- Gestionar torneos y partidos.
 - Publicar comunicados dirigidos a cualquier audiencia del club y retirar cualquiera (ver §14.4).
 - Enviar invitaciones de registro a su club con el rol JUGADOR, ENTRENADOR o DIRECTIVO (ver
   §12.1).
@@ -916,8 +993,8 @@ los partidos próximos de esas categorías, registra y corrige resultados y gole
 estadísticas de la carta, igual que un ENTRENADOR en las suyas (ver §14.3, §17.2 y §17.3). Para un PRESIDENTE esto no añade nada, porque su rol ya lo cubre en todo el
 club. Un DIRECTIVO, fuera de sus categorías asignadas, sigue con su acceso de consulta. Los
 comunicados los publica con el alcance de su rol, no con el de entrenador (ver §14.4). Lo demás
-que hace un ENTRENADOR (evaluaciones, pagos en efectivo) se decidirá para el DIRECTIVO asignado
-con esas funcionalidades.
+que hace un ENTRENADOR (evaluaciones) se decidirá para el DIRECTIVO asignado con esas
+funcionalidades.
 
 Cuando la categoría tiene equipos, la asignación indica cuáles dirige (ver §11.3).
 
@@ -935,14 +1012,12 @@ Dentro de sus categorías puede:
 - Registrar evaluaciones del jugador.
 - Publicar comunicados dirigidos a sus categorías o a equipos de ellas, y retirar los suyos (ver
   §14.4).
-- Consultar el estado de pago de sus jugadores.
-- Registrar pagos en efectivo recibidos de sus jugadores.
 
-Además dispone de un apartado de finanzas generales del club, de solo lectura: recaudo del mes,
-cartera pendiente y totales por categoría.
+No ve nada de pagos: ni estados de cuenta ni estado de pago de sus jugadores, ni cargos, pagos,
+recibos, resguardos, soportes, medios de pago o finanzas del club, tampoco los de los jugadores de
+sus categorías (ver §16.9).
 
-No puede modificar el valor de la mensualidad del club ni la de un jugador, anular o corregir
-pagos, ni gestionar jugadores de categorías que no tenga asignadas. Sumar a un jugador de otra
+No puede gestionar jugadores de categorías que no tenga asignadas. Sumar a un jugador de otra
 categoría a una actividad no es gestionarlo: no ve su ficha ni cambia nada de él. Tampoco decide en
 qué equipo juega cada jugador: eso es del PRESIDENTE (ver §11.3).
 
@@ -966,8 +1041,9 @@ Puede, únicamente sobre su propio jugador:
   categoría.
 - Abrir la ficha básica de cualquier PRESIDENTE, DIRECTIVO o ENTRENADOR de su club (ver §12.6).
   De ellos no ve nada más: ni documento ni datos de contacto.
-- Consultar el estado de cuenta y los recibos.
-- Pagar mensualidades y arbitrajes.
+- Consultar el estado de cuenta, los recibos y los resguardos de pago, y los medios de pago del
+  club.
+- Informar una transferencia hecha al PRESIDENTE, con su imagen de soporte (ver §16.5).
 - Confirmar asistencia a entrenamientos y partidos.
 - Cambiar cualquier dato de la ficha de su jugador, también sus nombres, sus apellidos y su fecha
   de nacimiento, además de los datos de contacto, médicos y documentos. El número y el tipo de
@@ -1302,8 +1378,9 @@ Una cuenta tiene un único correo y una única contraseña, y puede tener varios
 Una persona puede solicitar desde la aplicación la eliminación de su cuenta. La solicitud se cumple
 sola, sin aprobación de nadie. Al eliminarse la cuenta:
 
-- Sus pagos se conservan, para que el club mantenga el control de lo recaudado (ver §16.3). Junto
-  a ellos solo se guardan el nombre completo y el documento.
+- Sus pagos y sus recibos se conservan, para que el club mantenga el control de lo recaudado (ver
+  §16.3). Junto a ellos solo se guardan el nombre completo y el documento. Las imágenes de soporte
+  y los resguardos se eliminan, porque pueden mostrar datos bancarios de la familia.
 - Se borran todos los demás datos personales.
 - Se eliminan todas sus estadísticas deportivas.
 - Se eliminan también todos los jugadores de la cuenta, en todos los clubes, con su ficha, sus
@@ -1393,6 +1470,10 @@ Cargo.Valor
 representa el valor cobrado específicamente en ese mes a ese jugador.
 
 Modificar el valor de la mensualidad no debe modificar cargos ya generados.
+
+Lo mismo vale para el cobro de la plataforma a un club (ver §7.4): cambiar los precios por rol o la
+cantidad de integrantes no modifica un cobro ya generado, y el pago de ese cobro no se edita ni se
+borra; solo desaparece con la eliminación del club.
 
 Del mismo modo:
 
@@ -1590,7 +1671,6 @@ Todo lo que un jugador debe se representa como un Cargo:
 
 ```text
 MENSUALIDAD
-ARBITRAJE
 OTRO
 ```
 
@@ -1619,37 +1699,44 @@ Un error se corrige mediante una anulación, que queda registrada con autor, fec
 Todo pago registra quién lo registró, cuándo y por qué medio:
 
 ```text
-PASARELA
 TRANSFERENCIA
 EFECTIVO
 ```
 
-### 16.4. Pasarela de pago
+Un pago por transferencia indica además la entidad por la que se hizo (Nequi, Bancolombia,
+Daviplata u otra).
 
-La plataforma nunca almacena ni procesa números de tarjeta, códigos de seguridad ni credenciales
-bancarias. El pago ocurre en la pasarela.
+### 16.4. Los pagos van directos al PRESIDENTE
 
-Un pago en línea solamente se considera confirmado cuando el backend recibe y verifica la
-notificación de la pasarela. El retorno del navegador del usuario no es prueba de pago.
+Las familias pagan directamente al PRESIDENTE, en efectivo o por transferencia a la cuenta que el
+club publica. La plataforma no cobra, no recibe, no custodia dinero ni procesa pagos en línea, y
+nunca almacena números de tarjeta, códigos de seguridad ni credenciales bancarias. Solo registra
+lo que el PRESIDENTE confirma.
 
-El procesamiento de notificaciones debe ser idempotente: recibir dos veces la misma notificación
-no puede registrar dos pagos.
+El PRESIDENTE publica los medios de pago del club (entidad, titular y número, celular o llave), que
+ven las familias del club.
 
-Las llaves privadas de la pasarela son secretos de configuración. No se incluyen en el repositorio
-ni en el frontend.
+### 16.5. Transferencia, efectivo, soporte, recibo y resguardo
 
-### 16.5. Transferencia y efectivo
+Cuando la familia pagó por transferencia, la informa desde la cuenta de su jugador con la entidad,
+el valor, la fecha y una imagen de soporte obligatoria. Ese pago queda en revisión, sin cambiar
+ningún saldo, hasta que el PRESIDENTE lo confirma o lo rechaza con un motivo que la familia ve.
 
-Un pago por transferencia queda en revisión hasta que un PRESIDENTE lo confirma.
+Cuando la familia pagó en mano, o el PRESIDENTE ya verificó la transferencia, el PRESIDENTE
+registra el pago directamente y deja al jugador al día. Solo el PRESIDENTE registra pagos; ni el
+DIRECTIVO ni el ENTRENADOR lo hacen.
 
-Un pago en efectivo lo registra un PRESIDENTE o el ENTRENADOR de la categoría del jugador.
+La imagen de soporte solo la ven la familia del jugador, el PRESIDENTE y el DIRECTIVO.
 
-Todo pago confirmado genera un recibo consultable desde la cuenta del jugador.
+Todo pago confirmado genera y conserva dos constancias con el mismo número consecutivo propio del
+club: un recibo, consultable desde la cuenta del jugador, y un resguardo de pago, una imagen por
+defecto que la familia descarga o comparte. El resguardo no sustituye ni elimina al recibo. En un
+pago anulado ambos siguen existiendo y se marcan como anulados.
 
-### 16.6. Arbitraje
+### 16.6. Arbitraje fuera de la aplicación
 
-El costo del arbitraje de un partido se reparte entre los jugadores convocados y genera un Cargo
-de tipo ARBITRAJE para cada uno.
+El arbitraje de los partidos y su cobro se manejan fuera de la aplicación. La plataforma no
+registra el costo del arbitraje ni genera cargos por él.
 
 ### 16.7. Mensualidad
 
@@ -1669,16 +1756,45 @@ valor del club y, como con este, el cambio no altera los cargos ya generados.
 
 Cada mes se genera un cargo de tipo MENSUALIDAD por cada jugador activo.
 
-Una mensualidad sin pagar después del día 5 simplemente aparece como pendiente en el estado de
-cuenta. Es un dato informativo y no tiene consecuencias.
+Una mensualidad sin pagar después del día 5 aparece como pendiente en el estado de cuenta y deja
+al jugador en mora. El día 5 de cada mes (inclusive, en hora de Colombia) es el último del plazo.
+
+El inicio de la familia del jugador muestra un aviso fijo del estado de su jugador, que no se puede
+cerrar ni descartar:
+
+- **Rojo**: el jugador está en mora, es decir, tiene una mensualidad sin pagar cuyo plazo ya pasó.
+  Dice cuánto debe y de cuántas mensualidades.
+- **Ámbar**: tiene la mensualidad del mes pendiente pero todavía está dentro del plazo.
+- **Verde**: no tiene nada pendiente; dice que está al día.
+
+El aviso se calcula en el servidor cada vez que se abre el inicio y pasa de rojo a verde cuando un
+pago confirmado cubre lo vencido. Los cargos de tipo OTRO no cuentan para la mora. El color nunca es lo
+único que lo dice.
 
 No existe recargo por mora. Deber no genera intereses, cargos adicionales ni restricciones de
-ningún tipo para el jugador: no afecta su acceso, sus entrenamientos ni sus convocatorias.
+ningún tipo para el jugador: no afecta su acceso, sus entrenamientos ni sus convocatorias. Lo único
+que cambia por estar en mora es el aviso del inicio de su familia.
 
 ### 16.8. Recordatorios
 
-En esta primera versión no se envían recordatorios de pago, ni automáticos ni manuales. El estado
-de cuenta se consulta dentro de la aplicación.
+En esta primera versión no se envían recordatorios de pago, ni automáticos ni manuales, por ningún
+canal: ni campana, ni correo, ni mensaje, ni notificación del dispositivo. El estado de cuenta se
+consulta dentro de la aplicación.
+
+El aviso fijo del inicio (ver §16.7) no es un recordatorio: no se envía a nadie, solo se muestra
+dentro de la aplicación a la familia del jugador cuando abre su inicio.
+
+### 16.9. Quién ve los pagos
+
+Los estados de cuenta, cargos, pagos, recibos, resguardos, soportes, medios de pago y finanzas del
+club los ven únicamente el PRESIDENTE, el DIRECTIVO (en consulta) y la familia del jugador, y esta
+solo lo de su propio jugador. El ENTRENADOR no ve nada de este tema, tampoco el de los jugadores de
+sus categorías. El DESARROLLADOR tampoco (ver §8).
+
+El aviso de mora (ver §16.7) lo ve únicamente la familia del jugador, en su propio inicio. No lo ven
+el PRESIDENTE, el DIRECTIVO ni el ENTRENADOR por razón de su rol.
+
+El backend aplica esta visibilidad. No basta con ocultarlo en el frontend.
 
 ## 17. Datos deportivos
 
@@ -1734,8 +1850,6 @@ ni en contadores, ni en mensajes, ni en avisos de la campana (ver §14.4), ni pu
 su identificador.
 
 Nadie puede ver desde una cuenta de jugador la lista de los demás convocados.
-
-El cargo de arbitraje solamente se genera para los convocados.
 
 #### Convocatoria a entrenamientos
 
@@ -1819,7 +1933,12 @@ Las pruebas deben validar principalmente:
 
 - Generación de cargos y cálculo de saldos.
 - Aplicación de pagos, abonos parciales y anulaciones.
-- Idempotencia de las notificaciones de la pasarela.
+- Que un pago por transferencia informado por la familia no cambia ningún saldo hasta que el
+  PRESIDENTE lo confirma, y que al confirmarse se generan su recibo y su resguardo.
+- Que solamente el PRESIDENTE registra, confirma, rechaza y anula pagos y publica los medios de
+  pago del club.
+- Que el ENTRENADOR no accede a ningún dato de pagos, estados de cuenta ni finanzas.
+- Que las imágenes de soporte solo las ven la familia del jugador, el PRESIDENTE y el DIRECTIVO.
 - Autorización por rol.
 - Que solamente el PRESIDENTE puede buscar usuarios por documento, asignar el rol DIRECTIVO y
   retirar roles.
@@ -1842,7 +1961,7 @@ Las pruebas deben validar principalmente:
 - Que el mismo documento no puede repetirse en un club y sí puede existir en dos clubes.
 - Que un club suspendido por impago vuelve a la normalidad al confirmarse su pago, y que un club
   suspendido conserva todos sus datos.
-- Que las llaves de la pasarela de un club nunca se devuelven por la API.
+- Que las llaves de la pasarela de la plataforma nunca se devuelven por la API.
 - Aislamiento entre clubes: que un usuario de un club no puede ver, contar ni consultar por
   identificador ningún dato de otro club.
 - Que solamente el DESARROLLADOR accede al panel de administración y crea clubes, y que solo
@@ -2083,15 +2202,15 @@ Estas decisiones no están tomadas. Según §25, no deben resolverse por cuenta 
 implementación.
 
 - **Dirección del sitio público.** Cómo llega un visitante al sitio público de un club concreto.
-- **Pago por el uso de la plataforma.** Valor, periodicidad, fecha de corte y quién lo paga dentro
-  del club.
+- **Recordatorios del cobro de la plataforma.** Si el PRESIDENTE recibe un aviso por correo o
+  campana antes del vencimiento del cobro; por ahora solo ve el aviso dentro de la aplicación.
 - **Sitio público de un club suspendido.** Si el sitio público de un club suspendido o dado de
   baja sigue visible.
 - **Matrícula.** Si existe un cobro de inscripción.
 - **Fuente automática de posiciones.** Todavía no se conoce ningún enlace o servicio de las ligas
   del que se puedan leer las tablas. Mientras no exista, se mantienen manuales (ver §17.1).
-- **Recordatorios de pago.** Quedan fuera de esta versión (ver §16.8). Si más adelante se quieren,
-  habrá que decidir el canal.
+- **Recordatorios de pago.** Quedan fuera de esta versión (ver §16.8); solo existe el aviso fijo del
+  inicio (ver §16.7). Si más adelante se quieren envíos, habrá que decidir el canal.
 - **Ficha con historial.** Qué pasa si una cuenta que ya tiene cargos, pagos o partidos como
   jugador pasa a ENTRENADOR o DIRECTIVO.
 
@@ -2114,4 +2233,4 @@ Escalabilidad
 La solución más sencilla que cumpla correctamente las reglas de negocio será preferible a una
 solución más compleja.
 
-**Versión**: 4.12.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-13
+**Versión**: 4.16.0 | **Ratificada**: 2026-10-06 | **Última enmienda**: 2026-10-21

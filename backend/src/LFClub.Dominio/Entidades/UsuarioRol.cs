@@ -167,6 +167,18 @@ public class UsuarioRol : IPerteneceAClub
     /// <summary>Jugador desde cuya ficha se agregó a este hermano.</summary>
     public UsuarioRol? AgregadoDesde { get; set; }
 
+    /// <summary>
+    /// Opcional. Valor de mensualidad propio que fijó el PRESIDENTE a este jugador (spec 015, RF-012).
+    /// Nulo significa que paga el del club. Solo cambia cargos futuros.
+    /// </summary>
+    public decimal? ValorMensualidadPropio { get; set; }
+
+    /// <summary>
+    /// Opcional. Primer mes en que se le cobra: el primer día del mes siguiente a su entrada,
+    /// aprobación o reincorporación (spec 015, RF-008). Nulo en quien no es jugador.
+    /// </summary>
+    public DateOnly? CobraDesde { get; set; }
+
     /// <summary>Equipos de su categoría en los que juega; puede no haber ninguno (RF-026).</summary>
     public List<JugadorEquipo> Equipos { get; set; } = [];
 
