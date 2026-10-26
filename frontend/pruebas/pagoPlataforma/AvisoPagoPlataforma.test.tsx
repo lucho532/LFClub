@@ -10,6 +10,7 @@ describe('AvisoPagoPlataforma', () => {
   let montaje: Montaje;
 
   beforeEach(() => {
+    sessionStorage.clear();
     montaje = new Montaje();
   });
 
@@ -33,6 +34,27 @@ describe('AvisoPagoPlataforma', () => {
 
     expect(montaje.contenedor.querySelector('.franja-pago.tono-exito')).not.toBeNull();
     expect(montaje.texto).toContain('próximo pago $ 45.000, paga hasta el 7 de noviembre de 2026');
+  });
+
+  it('la franja verde se cierra con la X y no vuelve a salir al recargar en la misma pestaña', async () => {
+    sessionStorage.clear();
+    await abrir(resumenDe({ pendientes: [], estadoDePago: 'AL_DIA' }));
+
+    await montaje.clic(montaje.contenedor.querySelector('button[aria-label="Cerrar el aviso"]') as HTMLButtonElement);
+    expect(montaje.texto).toBe('');
+
+    montaje.desmontar();
+    montaje = new Montaje();
+    await abrir(resumenDe({ pendientes: [], estadoDePago: 'AL_DIA' }));
+    expect(montaje.texto).toBe('');
+    sessionStorage.clear();
+  });
+
+  it('la franja roja no se puede cerrar', async () => {
+    sessionStorage.clear();
+    await abrir(resumenDe({ estadoDePago: 'VENCIDO' }));
+
+    expect(montaje.contenedor.querySelector('button[aria-label="Cerrar el aviso"]')).toBeNull();
   });
 
   it('en mora es una franja roja con el valor y el enlace', async () => {

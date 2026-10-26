@@ -24,15 +24,23 @@ public static class MapperFichaBasica
         persona.Integrante.Apellidos,
         persona.Integrante.Rol,
         persona.VersionFoto,
-        asignaciones
-            .Select(asignacion => new CategoriaDeFichaBasicaDto(
-                (asignacion.Categoria ?? throw new InvalidOperationException("La asignación debe venir con su categoría.")).Anio,
-                asignacion.Equipos
-                    .Select(fila => fila.Equipo ?? throw new InvalidOperationException("Cada equipo debe venir cargado."))
-                    .Where(equipo => equipo.Activo)
-                    .Select(equipo => equipo.Nombre)
-                    .Order(OrdenDePersonas.Comparador)
-                    .ToList()))
-            .OrderBy(categoria => categoria.Anio)
-            .ToList());
+        ACategorias(asignaciones));
+
+    /// <summary>
+    /// Las categorías que entrena, por año, con los nombres de sus equipos activos; una lista de equipos
+    /// vacía significa que entrena la categoría en general. Las asignaciones deben venir con su categoría y
+    /// sus equipos cargados.
+    /// </summary>
+    public static IReadOnlyList<CategoriaDeFichaBasicaDto> ACategorias(
+        IEnumerable<AsignacionEntrenadorCategoria> asignaciones) => asignaciones
+        .Select(asignacion => new CategoriaDeFichaBasicaDto(
+            (asignacion.Categoria ?? throw new InvalidOperationException("La asignación debe venir con su categoría.")).Anio,
+            asignacion.Equipos
+                .Select(fila => fila.Equipo ?? throw new InvalidOperationException("Cada equipo debe venir cargado."))
+                .Where(equipo => equipo.Activo)
+                .Select(equipo => equipo.Nombre)
+                .Order(OrdenDePersonas.Comparador)
+                .ToList()))
+        .OrderBy(categoria => categoria.Anio)
+        .ToList();
 }

@@ -46,6 +46,8 @@ import { DetallePartido } from './privado/partidos/DetallePartido';
 import { Goleadores } from './privado/partidos/Goleadores';
 import { Partidos } from './privado/partidos/Partidos';
 import { FichaBasica } from './privado/personas/FichaBasica';
+import { CuerpoTecnico } from './privado/cuerpoTecnico/CuerpoTecnico';
+import { DetalleCuerpoTecnico } from './privado/cuerpoTecnico/DetalleCuerpoTecnico';
 
 interface Props {
   /** Si se muestra la animación de arranque encima mientras la aplicación carga (solo en Android). */
@@ -99,6 +101,8 @@ export function App({ conArranque = false }: Props) {
                 <Route path="jugadores/:usuarioRolId/cuenta" element={<CuentaDelJugador />} />
                 <Route path="recibos/:pagoId" element={<DetalleDePago />} />
                 <Route path="personas/:usuarioRolId" element={<FichaBasica />} />
+                <Route path="cuerpo-tecnico" element={<CuerpoTecnico />} />
+                <Route path="cuerpo-tecnico/:usuarioRolId" element={<DetalleCuerpoTecnico />} />
                 <Route path="calendario" element={<Calendario />} />
                 <Route path="actividades/nueva" element={<FormularioActividad />} />
                 <Route path="entrenamientos/:entrenamientoId" element={<DetalleEntrenamiento />} />
