@@ -65,6 +65,11 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
           Jugadores
         </EnlaceMenu>
       )}
+      {rol === 'PRESIDENTE' && (
+        <EnlaceMenu a={`/club/${clubId}/cuerpo-tecnico`} icono={<IconoJugadores />}>
+          Cuerpo técnico
+        </EnlaceMenu>
+      )}
       {rol && puedeVerCategorias(rol) && (
         <EnlaceMenu a={`/club/${clubId}/categorias`} icono={<IconoCategorias />}>
           Categorías

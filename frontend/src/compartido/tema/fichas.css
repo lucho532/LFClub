@@ -253,3 +253,31 @@
   padding: 0 6px;
   font-weight: 700;
 }
+
+/* Cuerpo técnico (spec 018): una fila por persona con su foto, su nombre, su rol y sus categorías. */
+.lista-cuerpo-tecnico {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-cuerpo-tecnico li + li {
+  border-top: 1px solid var(--borde);
+}
+
+.miembro-cuerpo-tecnico {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 8px 0;
+  color: inherit;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.miembro-cuerpo-tecnico:hover strong {
+  text-decoration: underline;
+}

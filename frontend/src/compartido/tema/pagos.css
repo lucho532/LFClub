@@ -172,3 +172,30 @@
 .linea-mensualidad-jugador .lapiz-tarjeta {
   margin: 0;
 }
+
+.franja-pago-acciones {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* La X que cierra la franja verde: círculo táctil de 44 px que no engorda la franja. */
+.franja-pago-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.franja-pago-cerrar:hover {
+  background: rgb(0 0 0 / 10%);
+}

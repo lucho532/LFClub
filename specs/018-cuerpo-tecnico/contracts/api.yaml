@@ -1,0 +1,120 @@
+openapi: 3.1.0
+info:
+  title: LFClub - API de la funcionalidad 018 (cuerpo técnico del club)
+  version: 0.18.0
+  description: |
+    Contrato de lo que esta funcionalidad añade respecto de los contratos de la 001 a la 017.
+
+    Cuenta de operaciones: **+2** (las dos de club, solo del PRESIDENTE).
+
+    Convenciones (las de las specs anteriores):
+    - Todos los errores usan `application/problem+json` con un campo `codigo` estable.
+    - Quién puede: solo el PRESIDENTE del club de la ruta; el resto de roles recibe `403 rol_no_autorizado`
+      y quien es de otro club, `404 no_encontrado`.
+    - Una persona que es JUGADOR, que no está aprobada, que fue retirada o que es de otro club responde
+      `404 no_encontrado`, sin distinguir los casos.
+    - Las respuestas llevan datos personales y `Cache-Control: private, no-store`.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/clubes/{clubId}/cuerpo-tecnico:
+    get:
+      operationId: listarCuerpoTecnico
+      tags: [CuerpoTecnico]
+      summary: Presidentes, directivos y entrenadores del club (solo PRESIDENTE)
+      description: |
+        Ordenados por rol (presidentes, directivos, entrenadores) y por apellido y nombre. Cada uno lleva
+        las categorías activas que entrena con los equipos activos que dirige. No lleva documento ni
+        contacto: esos salen en el detalle.
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: El cuerpo técnico.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/MiembroCuerpoTecnicoDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+
+  /api/clubes/{clubId}/cuerpo-tecnico/{usuarioRolId}:
+    get:
+      operationId: obtenerMiembroDelCuerpoTecnico
+      tags: [CuerpoTecnico]
+      summary: Todos los datos de una persona del cuerpo técnico (solo PRESIDENTE)
+      description: |
+        Nombre completo, documento, correo, celular, categorías y equipos y, si es ENTRENADOR, sus próximos
+        entrenamientos (hasta cinco, los que no han terminado y que ve por sus categorías).
+      parameters:
+        - { name: clubId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: usuarioRolId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: La persona.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MiembroCuerpoTecnicoDetalleDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+        '404': { $ref: '#/components/responses/Problema' }
+
+components:
+  responses:
+    Problema:
+      description: Error con `application/problem+json`.
+      content:
+        application/problem+json:
+          schema: { type: object, properties: { codigo: { type: string } } }
+
+  schemas:
+    CategoriaDeFichaBasicaDto:
+      type: object
+      required: [anio, equipos]
+      properties:
+        anio: { type: integer }
+        equipos:
+          type: array
+          description: Nombres de los equipos activos que dirige; vacía si entrena la categoría en general.
+          items: { type: string }
+
+    MiembroCuerpoTecnicoDto:
+      type: object
+      required: [usuarioRolId, nombres, apellidos, rol, versionFoto, categorias]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        rol: { type: string, enum: [PRESIDENTE, DIRECTIVO, ENTRENADOR] }
+        versionFoto: { type: integer, description: 0 si no tiene foto. }
+        categorias:
+          type: array
+          items: { $ref: '#/components/schemas/CategoriaDeFichaBasicaDto' }
+
+    MiembroCuerpoTecnicoDetalleDto:
+      type: object
+      required:
+        [usuarioRolId, nombres, apellidos, rol, versionFoto, tipoDocumento, numeroDocumento, correo, categorias, proximosEntrenamientos]
+      properties:
+        usuarioRolId: { type: string, format: uuid }
+        nombres: { type: string }
+        apellidos: { type: string }
+        rol: { type: string, enum: [PRESIDENTE, DIRECTIVO, ENTRENADOR] }
+        versionFoto: { type: integer }
+        tipoDocumento:
+          type: string
+          enum: [REGISTRO_CIVIL, TARJETA_IDENTIDAD, CEDULA_CIUDADANIA, CEDULA_EXTRANJERIA]
+        numeroDocumento: { type: string }
+        correo: { type: string }
+        celular: { type: [string, 'null'] }
+        categorias:
+          type: array
+          items: { $ref: '#/components/schemas/CategoriaDeFichaBasicaDto' }
+        proximosEntrenamientos:
+          type: array
+          description: Los mismos resúmenes que el calendario (spec 009); vacía si no es ENTRENADOR.
+          items: { type: object }
