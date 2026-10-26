@@ -57,6 +57,20 @@ export interface PagoPlataformaDto {
   pendientes: CobroPlataformaDto[];
   totalPendiente: number;
   historial: CobroPlataformaDto[];
+  /** El último cobro que se pagó, con su comprobante; nulo si nunca ha pagado. */
+  ultimoPago: CobroPlataformaDto | null;
+  /** Estimación del siguiente cobro, todavía sin generar; nula si no le corresponde cobro. */
+  proximoCobro: ProximoCobroDto | null;
+  /** Situación de pago calculada por el servidor. */
+  estadoDePago: EstadoDePagoClub;
+}
+
+/** El siguiente cobro estimado con los jugadores de hoy y la tarifa vigente; no se puede pagar. */
+export interface ProximoCobroDto {
+  periodo: string;
+  jugadores: number;
+  rango: RangoTarifaDto;
+  valorEstimado: number;
 }
 
 /** Un intento de pago ya creado: la dirección de la pasarela, ya firmada. */

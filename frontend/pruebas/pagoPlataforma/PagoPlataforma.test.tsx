@@ -53,6 +53,36 @@ describe('PagoPlataforma', () => {
     expect(montaje.texto).not.toContain('×');
   });
 
+  it('muestra el último pago registrado y el próximo cobro como estimación', async () => {
+    await abrir(
+      resumenDe({
+        ultimoPago: cobroDe({
+          periodo: '2026-10',
+          estado: 'PAGADO',
+          total: 40000,
+          pagadoEn: '2026-10-05T15:00:00Z',
+          origenDelPago: 'PASARELA',
+          medioDePago: 'PSE',
+        }),
+        proximoCobro: { periodo: '2026-12', jugadores: 25, rango: { desde: 21, hasta: 40, precio: 45000 }, valorEstimado: 45000 },
+      }),
+    );
+
+    expect(montaje.texto).toContain('Último pago registrado');
+    expect(montaje.texto).toContain('octubre de 2026');
+    expect(montaje.texto).toContain('PSE');
+    expect(montaje.texto).toContain('Próximo cobro');
+    expect(montaje.texto).toContain('diciembre de 2026 · estimado $ 45.000');
+    expect(montaje.texto).toContain('Con tus 25 jugadores de hoy (21 a 40 jugadores)');
+  });
+
+  it('sin pagos ni próximo cobro lo dice', async () => {
+    await abrir(resumenDe({ pendientes: [] }));
+
+    expect(montaje.texto).toContain('Todavía no hay pagos registrados.');
+    expect(montaje.texto).toContain('No hay pagos próximos.');
+  });
+
   it('el botón Pagar pide el intento y abre la dirección de la pasarela', async () => {
     await abrir();
     const iniciar = vi

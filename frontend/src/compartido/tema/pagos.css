@@ -129,3 +129,46 @@
 .datos-de-pago dd {
   margin: 0;
 }
+
+/* Franja delgada del inicio con la situación del club frente a la plataforma: texto a un lado, enlace al otro. */
+.franja-pago {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 6px 14px;
+  font-size: 14px;
+}
+
+/* Mensualidad de un jugador en una sola línea: nombre, valor y lápiz; al editar, el campo ocupa la misma línea. */
+.lista-mensualidad-jugadores {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linea-mensualidad-jugador {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  min-height: 52px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.linea-mensualidad-jugador .nombre-jugador {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.linea-mensualidad-jugador > form {
+  flex: 1 1 100%;
+}
+
+.linea-mensualidad-jugador .lapiz-tarjeta {
+  margin: 0;
+}

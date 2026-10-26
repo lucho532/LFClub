@@ -30,6 +30,12 @@ describe('PantallaMensualidad', () => {
 
   afterEach(() => montaje.desmontar());
 
+  const lapizDe = (nombre: string) =>
+    montaje.contenedor.querySelector(`button[aria-label="Editar la mensualidad de ${nombre}"]`) as HTMLButtonElement | null;
+
+  const botonDe = (nombre: string) =>
+    montaje.contenedor.querySelector(`button[aria-label="${nombre}"]`) as HTMLButtonElement | null;
+
   async function abrir(rol: 'PRESIDENTE' | 'DIRECTIVO', mensualidad: MensualidadDto) {
     simularGet({ '/api/clubes/club/mensualidad': mensualidad, '/api/clubes/club/jugadores': jugadores });
     await montaje.pintar(clubDe(rol), '/m', '/m', <PantallaMensualidad />);
@@ -67,36 +73,108 @@ describe('PantallaMensualidad', () => {
     expect(montaje.texto).toContain('$ 70.000');
   });
 
-  it('permite elegir jugadores y fijarles o quitarles el valor propio', async () => {
+  it('cada jugador es una línea de solo lectura con su valor y un lápiz, sin campos hasta pulsarlo', async () => {
     await abrir('PRESIDENTE', conValor);
-    const guardar = vi.spyOn(api, 'put').mockResolvedValue({ ...conValor, jugadoresConValorPropio: [] } as never);
-    const casillas = [...montaje.contenedor.querySelectorAll('input[type="checkbox"]')] as HTMLInputElement[];
-    expect(casillas).toHaveLength(2);
 
-    await montaje.clic(casillas[0]);
-    await montaje.escribir(montaje.campo('Valor propio de la mensualidad')!, '40000');
-    await montaje.enviar(montaje.contenedor.querySelectorAll('form')[1] ?? montaje.contenedor.querySelector('form')!);
-
-    expect(guardar).toHaveBeenCalledWith('/api/clubes/club/mensualidad/jugadores', {
-      usuarioRolIds: ['ana'],
-      valor: 40000,
-    });
-
-    await montaje.clic(casillas[1]);
-    await montaje.clic(montaje.boton('Volver al valor del club')!);
-
-    expect(guardar).toHaveBeenLastCalledWith('/api/clubes/club/mensualidad/jugadores', {
-      usuarioRolIds: ['beto'],
-      valor: null,
-    });
+    expect(montaje.contenedor.querySelectorAll('.linea-mensualidad-jugador')).toHaveLength(2);
+    expect(montaje.texto).toContain('Valor propio: $ 50.000');
+    expect(montaje.texto).toContain('Valor del club: $ 65.000');
+    expect(montaje.campo('Valor de Ana Arango')).toBeNull();
+    expect(lapizDe('Ana Arango')).not.toBeNull();
   });
 
-  it('al directivo solo le deja consultar', async () => {
+  it('el lápiz abre el campo en la misma línea con el valor vigente y Cancelar lo cierra sin guardar', async () => {
+    await abrir('PRESIDENTE', conValor);
+    const guardar = vi.spyOn(api, 'put');
+
+    await montaje.clic(lapizDe('Beto Bermúdez')!);
+    expect(montaje.campo('Valor de Beto Bermúdez')?.value).toBe('50000');
+    await montaje.escribir(montaje.campo('Valor de Beto Bermúdez')!, '1');
+    await montaje.clic(montaje.boton('Cancelar')!);
+
+    expect(montaje.campo('Valor de Beto Bermúdez')).toBeNull();
+    expect(montaje.texto).toContain('Valor propio: $ 50.000');
+    expect(guardar).not.toHaveBeenCalled();
+  });
+
+  it('guarda el valor propio de un jugador desde su línea y la vuelve a cerrar', async () => {
+    await abrir('PRESIDENTE', conValor);
+    const guardar = vi.spyOn(api, 'put').mockResolvedValue({
+      ...conValor,
+      jugadoresConValorPropio: [...conValor.jugadoresConValorPropio, { usuarioRolId: 'ana', nombreCompleto: 'Ana Arango', valor: 40000 }],
+    } as never);
+
+    await montaje.clic(lapizDe('Ana Arango')!);
+    expect((montaje.campo('Valor de Ana Arango') as HTMLInputElement).placeholder).toContain('$ 65.000');
+    expect(botonDe('Guardar el valor de Ana Arango')?.disabled).toBe(true);
+    await montaje.escribir(montaje.campo('Valor de Ana Arango')!, '40.000');
+    await montaje.clic(botonDe('Guardar el valor de Ana Arango')!);
+
+    expect(guardar).toHaveBeenCalledWith('/api/clubes/club/mensualidad/jugadores', { usuarioRolIds: ['ana'], valor: 40000 });
+    expect(montaje.campo('Valor de Ana Arango')).toBeNull();
+    expect(montaje.texto).toContain('Valor propio: $ 40.000');
+  });
+
+  it('rechaza un valor inválido en la tarjeta sin llamar a la API', async () => {
+    await abrir('PRESIDENTE', conValor);
+    const guardar = vi.spyOn(api, 'put');
+
+    await montaje.clic(lapizDe('Ana Arango')!);
+    await montaje.escribir(montaje.campo('Valor de Ana Arango')!, '40,5');
+    await montaje.clic(botonDe('Guardar el valor de Ana Arango')!);
+
+    expect(guardar).not.toHaveBeenCalled();
+    expect(montaje.texto).toContain('Escribe un valor entero de pesos');
+  });
+
+  it('«Usar valor del club» quita el valor propio de ese jugador', async () => {
+    await abrir('PRESIDENTE', conValor);
+    const guardar = vi.spyOn(api, 'put').mockResolvedValue({ ...conValor, jugadoresConValorPropio: [] } as never);
+
+    await montaje.clic(lapizDe('Beto Bermúdez')!);
+    await montaje.clic(botonDe('Usar el valor del club para Beto Bermúdez')!);
+
+    expect(guardar).toHaveBeenCalledWith('/api/clubes/club/mensualidad/jugadores', { usuarioRolIds: ['beto'], valor: null });
+    expect(montaje.campo('Valor de Beto Bermúdez')).toBeNull();
+    expect(montaje.texto).not.toContain('Valor propio');
+    expect(montaje.texto).toContain('Valor del club: $ 65.000');
+  });
+
+  it('si no se pudo guardar lo dice y deja el valor como estaba', async () => {
+    await abrir('PRESIDENTE', conValor);
+    vi.spyOn(api, 'put').mockRejectedValue(new Error('falló'));
+
+    await montaje.clic(lapizDe('Beto Bermúdez')!);
+    await montaje.clic(botonDe('Usar el valor del club para Beto Bermúdez')!);
+
+    expect(montaje.campo('Valor de Beto Bermúdez')?.getAttribute('aria-invalid')).toBe('true');
+    expect(montaje.campo('Valor de Beto Bermúdez')?.value).toBe('50000');
+  });
+
+  it('busca por nombre sin fijarse en tildes ni mayúsculas y puede mostrar solo a quienes tienen valor propio', async () => {
+    await abrir('PRESIDENTE', conValor);
+
+    await montaje.escribir(montaje.campo('Buscar jugador')!, 'bermudez');
+    expect(montaje.contenedor.querySelectorAll('.linea-mensualidad-jugador')).toHaveLength(1);
+    expect(montaje.texto).toContain('Beto Bermúdez');
+
+    await montaje.escribir(montaje.campo('Buscar jugador')!, 'zzz');
+    expect(montaje.texto).toContain('Ningún jugador coincide');
+
+    await montaje.escribir(montaje.campo('Buscar jugador')!, '');
+    const filtro = montaje.contenedor.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    await montaje.clic(filtro);
+    expect(montaje.contenedor.querySelectorAll('.linea-mensualidad-jugador')).toHaveLength(1);
+  });
+
+  it('al directivo solo le deja consultar: ve los valores pero no los campos ni los botones', async () => {
     await abrir('DIRECTIVO', conValor);
 
     expect(montaje.texto).toContain('$ 65.000');
+    expect(montaje.texto).toContain('Valor propio: $ 50.000');
     expect(montaje.boton('Guardar valor')).toBeUndefined();
-    expect(montaje.contenedor.querySelector('input[type="checkbox"]')).toBeNull();
+    expect(montaje.campo('Valor de Beto Bermúdez')).toBeNull();
+    expect(lapizDe('Beto Bermúdez')).toBeNull();
   });
 
   it('avisa que se defina el valor cuando el club no lo tiene', async () => {

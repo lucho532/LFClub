@@ -5,6 +5,7 @@ using LFClub.Aplicacion.Servicios;
 using LFClub.Aplicacion.Utilidades;
 using LFClub.Dominio.Entidades;
 using LFClub.Dominio.Enumeraciones;
+using LFClub.Dominio.Reglas;
 
 namespace LFClub.Aplicacion.Implementaciones;
 
@@ -14,7 +15,7 @@ namespace LFClub.Aplicacion.Implementaciones;
 /// Su responsabilidad es separar lo pendiente del historial, sumar lo pendiente, indicar si el pago en
 /// línea está disponible y si el club está suspendido por impago, y marcar «en verificación» el cobro
 /// pendiente que tuvo un intento de pago en los últimos 30 minutos, salvo que la pasarela ya haya dicho que
-/// ese último intento no fue aprobado (entonces lo indica aparte). El detalle sale del cobro guardado,
+/// ese último intento no fue aprobado (entonces lo indica aparte). Añade el último pago y una estimación del próximo cobro. El detalle sale del cobro guardado,
 /// nunca de un cálculo nuevo.
 /// No cambia nada y no devuelve llaves, secretos ni datos personales.
 /// </summary>
@@ -24,6 +25,8 @@ public class ServicioConsultaPagoPlataforma : IServicioConsultaPagoPlataforma
 
     private readonly IRepositorioClubesPlataforma _clubes;
     private readonly IRepositorioCobrosPlataforma _cobros;
+    private readonly IRepositorioConfiguracionPlataforma _configuracion;
+    private readonly IRepositorioConteoDeIntegrantes _conteo;
     private readonly IPasarelaDePago _pasarela;
     private readonly IReloj _reloj;
 
@@ -31,11 +34,15 @@ public class ServicioConsultaPagoPlataforma : IServicioConsultaPagoPlataforma
     public ServicioConsultaPagoPlataforma(
         IRepositorioClubesPlataforma clubes,
         IRepositorioCobrosPlataforma cobros,
+        IRepositorioConfiguracionPlataforma configuracion,
+        IRepositorioConteoDeIntegrantes conteo,
         IPasarelaDePago pasarela,
         IReloj reloj)
     {
         _clubes = clubes;
         _cobros = cobros;
+        _configuracion = configuracion;
+        _conteo = conteo;
         _pasarela = pasarela;
         _reloj = reloj;
     }
@@ -63,7 +70,37 @@ public class ServicioConsultaPagoPlataforma : IServicioConsultaPagoPlataforma
             club.Estado == EstadoClub.SUSPENDIDO && club.MotivoSuspension == MotivoSuspension.IMPAGO,
             pendientes,
             pendientes.Sum(cobro => cobro.Total),
-            historial);
+            historial,
+            historial.Where(cobro => cobro.Estado == EstadoCobroPlataforma.PAGADO).MaxBy(cobro => cobro.PagadoEn),
+            await EstimarProximoCobroAsync(club, cancelacion),
+            MapperCobroPlataforma.AEstadoDePago(
+                club, cobros.Where(cobro => cobro.Estado == EstadoCobroPlataforma.PENDIENTE).ToList(),
+                ReglaMesDeCobro.DiaEnColombia(_reloj.AhoraUtc)).EstadoDePago);
+    }
+
+    /// <summary>
+    /// El siguiente cobro: el del mes que viene o, si al club se le empieza a cobrar más adelante, el de ese
+    /// mes. Nulo si no se le cobra, si está dado de baja o si con sus jugadores de hoy no le tocaría cobro.
+    /// </summary>
+    private async Task<ProximoCobroDto?> EstimarProximoCobroAsync(Club club, CancellationToken cancelacion)
+    {
+        if (club.MesInicioCobro is not { } inicio || club.Estado == EstadoClub.DADO_DE_BAJA)
+        {
+            return null;
+        }
+
+        var siguiente = ReglaMesDeCobro.MesEnCurso(_reloj.AhoraUtc).AddMonths(1);
+        var periodo = inicio > siguiente ? inicio : siguiente;
+        var configuracion = await _configuracion.ObtenerAsync(cancelacion);
+        var calculo = ReglaCobroPlataforma.Calcular(await _conteo.ContarPorRolAsync(club.Id, cancelacion), configuracion.Rangos);
+
+        return calculo is null
+            ? null
+            : new ProximoCobroDto(
+                MapperCobroPlataforma.APeriodo(periodo),
+                calculo.Conteo.Jugadores,
+                new RangoTarifaDto(calculo.Rango.Desde, calculo.Rango.Hasta, calculo.Rango.Precio),
+                calculo.Total);
     }
 
     /// <inheritdoc />
