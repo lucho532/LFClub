@@ -6,6 +6,12 @@
 
 **Estado**: Borrador
 
+**Enmienda (2026-10-23)**: la tarifa pasó de «precio por rol» a **rangos de jugadores activos con un precio
+mensual fijo** (por ejemplo 1 a 20 jugadores: $25.000; 21 a 40: $45.000; 81 o más: $110.000). Los
+entrenadores, directivos y presidentes ya no suman al cobro. El DESARROLLADOR edita los rangos en
+Tarifas y ve ahí mismo lo que le corresponde pagar a cada club. Donde esta spec y sus anexos hablan del
+precio por rol, vale lo de esta enmienda; los cobros ya generados conservan su detalle por rol.
+
 **Entrada**: Descripción del propietario del proyecto: cada club le paga al proveedor del software
 (el DESARROLLADOR) por el uso de la plataforma mediante la pasarela Wompi. La tarifa es mensual y se
 calcula por integrantes activos y rol, con un precio por rol que fija el DESARROLLADOR. Cada mes se

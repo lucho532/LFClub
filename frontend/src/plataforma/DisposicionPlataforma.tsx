@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { BarraSuperior } from '../compartido/componentes/BarraSuperior';
 import { EnlaceMenu } from '../compartido/componentes/EnlaceMenu';
@@ -7,7 +8,8 @@ import { useSesion } from '../compartido/sesion/useSesion';
 
 /**
  * Armazón del panel de administración de la plataforma: menú lateral, barra superior con el tema y
- * el perfil (desde donde se cierra sesión) e identidad neutra de la plataforma (nunca la de un club).
+ * el perfil (desde donde se cierra sesión) y la marca de LFDevelopments, con su logo de marca de agua
+ * (nunca la identidad de un club).
  */
 export function DisposicionPlataforma() {
   const { sesion, cerrar } = useSesion();
@@ -20,9 +22,13 @@ export function DisposicionPlataforma() {
   }
 
   return (
-    <div className="disposicion">
+    <div
+      className="disposicion marca-plataforma con-marca-agua"
+      style={{ '--escudo-marca': 'url("/logo-lfdevelopments-fondo.png")' } as CSSProperties}
+    >
       <aside className="lateral">
         <div className="lateral-marca">
+          <img className="logo-plataforma" src="/logo-lfdevelopments.png" alt="" />
           <span>
             LFClub
             <br />
@@ -42,7 +48,14 @@ export function DisposicionPlataforma() {
         </nav>
       </aside>
       <div className="contenido">
-        <BarraSuperior marca={<span>LFClub</span>}>
+        <BarraSuperior
+          marca={
+            <>
+              <img className="logo-plataforma" src="/logo-lfdevelopments.png" alt="" />
+              <span>LFClub</span>
+            </>
+          }
+        >
           <MenuPerfil
             nombre={correo}
             detalle="Desarrollador"

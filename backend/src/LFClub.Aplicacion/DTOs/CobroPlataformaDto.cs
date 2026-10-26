@@ -11,7 +11,7 @@ namespace LFClub.Aplicacion.DTOs;
 /// <param name="CobroId">Identificador del cobro.</param>
 /// <param name="Periodo">Mes que cobra, <c>AAAA-MM</c>.</param>
 /// <param name="Estado">Estado del cobro.</param>
-/// <param name="Detalle">Una línea por rol.</param>
+/// <param name="Detalle">Una línea por rol; vacío en los cobros por rango, que llevan <paramref name="Rango"/>.</param>
 /// <param name="Total">Total a pagar, en pesos.</param>
 /// <param name="GeneradoEn">Cuándo se generó, en UTC.</param>
 /// <param name="SuspendeDesde">Primer día en que el club se suspende; el último día para pagar es el anterior.</param>
@@ -22,6 +22,8 @@ namespace LFClub.Aplicacion.DTOs;
 /// <param name="EnVerificacion">Hay un intento de pago reciente sin respuesta de la pasarela; solo informativo.</param>
 /// <param name="UltimoPagoNoAprobado">La pasarela informó que el último intento de pago no fue aprobado; se puede intentar de nuevo.</param>
 /// <param name="MotivoAnulacion">Por qué se anuló; nulo si no está anulado.</param>
+/// <param name="Jugadores">Jugadores activos del club al generar el cobro.</param>
+/// <param name="Rango">Rango de la tarifa que se aplicó al generar el cobro; nulo en los cobros por precio de rol anteriores.</param>
 public record CobroPlataformaDto(
     Guid CobroId,
     string Periodo,
@@ -36,4 +38,6 @@ public record CobroPlataformaDto(
     string? MedioDePago,
     bool EnVerificacion,
     bool UltimoPagoNoAprobado,
-    string? MotivoAnulacion);
+    string? MotivoAnulacion,
+    RangoTarifaDto? Rango = null,
+    int Jugadores = 0);

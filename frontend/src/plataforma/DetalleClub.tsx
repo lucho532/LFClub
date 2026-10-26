@@ -7,6 +7,7 @@ import { EtiquetaEstadoClub } from '../compartido/componentes/EtiquetaEstado';
 import { SeccionDatos } from './SeccionDatos';
 import { SeccionEstado } from './SeccionEstado';
 import { SeccionCobros } from './SeccionCobros';
+import { SeccionIntegrantes } from './SeccionIntegrantes';
 import { SeccionInicioDelCobro } from './SeccionInicioDelCobro';
 import { SeccionInvitaciones } from './SeccionInvitaciones';
 import { SeccionPresidentes } from './SeccionPresidentes';
@@ -53,6 +54,7 @@ export function DetalleClub() {
         <Aviso tono="aviso">El presidente de este club todavía no se ha registrado.</Aviso>
       )}
       <SeccionDatos {...seccion} />
+      <SeccionIntegrantes {...seccion} />
       <SeccionPresidentes {...seccion} />
       <SeccionInvitaciones {...seccion} />
       <SeccionInicioDelCobro {...seccion} alCambiar={recargar} />

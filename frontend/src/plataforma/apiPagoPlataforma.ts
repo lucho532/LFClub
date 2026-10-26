@@ -7,6 +7,7 @@ import type {
   GuardarTarifasDto,
   NotificacionPasarelaDto,
   ResultadoNotificacion,
+  TarifaDeClubDto,
   TarifasDto,
 } from '../compartido/api/tiposPagoPlataforma';
 
@@ -15,6 +16,7 @@ export const apiPagoPlataforma = {
   tarifas: {
     obtener: () => api.get<TarifasDto>('/api/plataforma/tarifas'),
     guardar: (datos: GuardarTarifasDto) => api.put<TarifasDto>('/api/plataforma/tarifas', datos),
+    porClub: () => api.get<TarifaDeClubDto[]>('/api/plataforma/tarifas/clubes'),
   },
 
   inicioDelCobro: {

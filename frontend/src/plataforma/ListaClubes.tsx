@@ -16,7 +16,7 @@ const COLUMNAS: Columna<ClubResumenDto>[] = [
   {
     titulo: 'Club',
     celda: (club) => (
-      <IdentidadClub identidad={club.identidad} className="fila">
+      <IdentidadClub identidad={club.identidad} className="fila" sinMarcaDeAgua>
         <Escudo identidad={club.identidad} nombre={club.nombre} />
         <Link to={`/plataforma/clubes/${club.clubId}`}>{club.nombre}</Link>
       </IdentidadClub>
@@ -40,17 +40,6 @@ const COLUMNAS: Columna<ClubResumenDto>[] = [
         {club.valorAdeudado > 0 && <strong>{formatoMoneda(club.valorAdeudado)}</strong>}
       </span>
     ),
-  },
-  { titulo: 'Jugadores', celda: (club) => club.integrantes.jugadores },
-  { titulo: 'Entrenadores', celda: (club) => club.integrantes.entrenadores },
-  { titulo: 'Directivos', celda: (club) => club.integrantes.directivos },
-  { titulo: 'Presidentes', celda: (club) => club.integrantes.presidentes },
-  {
-    titulo: 'Total',
-    celda: (club) => {
-      const { jugadores, entrenadores, directivos, presidentes } = club.integrantes;
-      return <strong>{jugadores + entrenadores + directivos + presidentes}</strong>;
-    },
   },
 ];
 

@@ -4,8 +4,8 @@ namespace LFClub.Dominio.Entidades;
 
 /// <summary>
 /// Representa lo que un club debe a la plataforma por un mes (spec 017, RF-003 a RF-005).
-/// Su responsabilidad es guardar el detalle tal como se generó (integrantes por rol, precios,
-/// total, días de gracia y la fecha de suspensión), que no cambia después (§13): cambiar precios o
+/// Su responsabilidad es guardar el detalle tal como se generó (integrantes por rol, rango de la
+/// tarifa aplicado, total, días de gracia y la fecha de suspensión), que no cambia después (§13): cambiar precios o
 /// integrantes no toca un cobro ya generado. Solo cambian el estado y los datos de anulación. Hay a
 /// lo sumo un cobro por club y periodo.
 /// No implementa <c>IPerteneceAClub</c>: el trabajo en segundo plano y la notificación de la pasarela
@@ -50,7 +50,13 @@ public class CobroPlataforma
     /// <summary>Precio por presidente vigente al generar.</summary>
     public decimal PrecioPresidente { get; set; }
 
-    /// <summary>Suma de integrantes por precio de cada rol. Siempre mayor que cero.</summary>
+    /// <summary>Primer jugador del rango de la tarifa que se aplicó; nulo en los cobros por precio de rol anteriores.</summary>
+    public int? RangoDesde { get; set; }
+
+    /// <summary>Último jugador del rango que se aplicó; nulo si no tenía límite o si no hubo rango.</summary>
+    public int? RangoHasta { get; set; }
+
+    /// <summary>Lo que paga el club: el precio fijo de su rango. Siempre mayor que cero.</summary>
     public decimal Total { get; set; }
 
     /// <summary>Cuándo se generó, en UTC.</summary>
