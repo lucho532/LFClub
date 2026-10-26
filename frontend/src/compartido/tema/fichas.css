@@ -237,3 +237,19 @@
 .ficha-datos .dato-ancho {
   grid-column: 1 / -1;
 }
+
+/* Un rango de la tarifa en el diálogo de edición de tarifas. */
+.rango-tarifa {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+}
+
+.rango-tarifa legend {
+  padding: 0 6px;
+  font-weight: 700;
+}

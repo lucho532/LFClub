@@ -183,6 +183,8 @@ export interface ClubDetalleDto {
   valorAdeudado: number;
   mesDeInicioDelCobro: string | null;
   motivoDeSuspension: MotivoDeSuspension | null;
+  /** Integrantes activos por rol; solo números. */
+  integrantes: ConteoIntegrantesDto;
 }
 
 export interface CrearClubDto {

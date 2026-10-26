@@ -38,6 +38,21 @@ describe('PagoPlataforma', () => {
     expect(montaje.texto).toContain('! Pendiente');
   });
 
+  it('un cobro por rango muestra los jugadores y el rango aplicado en vez del detalle por rol', async () => {
+    await abrir(
+      resumenDe({
+        pendientes: [
+          cobroDe({ detalle: [], rango: { desde: 21, hasta: 40, precio: 45000 }, jugadores: 25, total: 45000 }),
+        ],
+      }),
+    );
+
+    expect(montaje.texto).toContain('Jugadores activos: 25');
+    expect(montaje.texto).toContain('rango de 21 a 40 jugadores');
+    expect(montaje.texto).toContain('Total: $ 45.000');
+    expect(montaje.texto).not.toContain('×');
+  });
+
   it('el botón Pagar pide el intento y abre la dirección de la pasarela', async () => {
     await abrir();
     const iniciar = vi

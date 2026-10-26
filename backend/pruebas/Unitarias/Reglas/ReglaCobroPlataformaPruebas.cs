@@ -4,56 +4,79 @@ namespace LFClub.Pruebas.Unitarias.Reglas;
 
 public class ReglaCobroPlataformaPruebas
 {
-    [Fact]
-    public void El_total_es_la_suma_de_integrantes_por_precio_de_cada_rol()
+    private static readonly RangoTarifa[] Rangos =
+    [
+        new(1, 20, 25000),
+        new(21, 40, 45000),
+        new(41, 80, 75000),
+        new(81, null, 110000),
+    ];
+
+    [Theory]
+    [InlineData(1, 25000)]
+    [InlineData(20, 25000)]
+    [InlineData(21, 45000)]
+    [InlineData(40, 45000)]
+    [InlineData(41, 75000)]
+    [InlineData(80, 75000)]
+    [InlineData(81, 110000)]
+    [InlineData(500, 110000)]
+    public void El_total_es_el_precio_fijo_del_rango_que_cubre_los_jugadores(int jugadores, int esperado)
     {
-        var calculo = ReglaCobroPlataforma.Calcular(
-            new ConteoPorRol(20, 3, 2, 1),
-            new PreciosPorRol(1000, 5000, 3000, 10000));
+        var calculo = ReglaCobroPlataforma.Calcular(new ConteoPorRol(jugadores, 3, 2, 1), Rangos);
 
         Assert.NotNull(calculo);
-        Assert.Equal((20 * 1000m) + (3 * 5000m) + (2 * 3000m) + 10000m, calculo.Total);
-        Assert.Equal(5000m, calculo.PrecioEntrenador);
+        Assert.Equal(esperado, calculo.Total);
+        Assert.Equal(esperado, calculo.Rango.Precio);
     }
 
     [Fact]
-    public void Un_precio_sin_definir_cuenta_como_cero_si_hay_otro_definido()
+    public void Los_demas_roles_no_cambian_el_total()
     {
-        var calculo = ReglaCobroPlataforma.Calcular(
-            new ConteoPorRol(10, 4, 0, 1),
-            new PreciosPorRol(2000, null, null, null));
+        var pocos = ReglaCobroPlataforma.Calcular(new ConteoPorRol(10, 0, 0, 0), Rangos);
+        var muchos = ReglaCobroPlataforma.Calcular(new ConteoPorRol(10, 30, 12, 4), Rangos);
 
-        Assert.NotNull(calculo);
-        Assert.Equal(20000m, calculo.Total);
-        Assert.Equal(0m, calculo.PrecioEntrenador);
-        Assert.Equal(0m, calculo.PrecioPresidente);
+        Assert.Equal(pocos!.Total, muchos!.Total);
     }
 
     [Fact]
-    public void Con_todos_los_precios_sin_definir_no_hay_cobro()
+    public void El_calculo_guarda_el_rango_aplicado_y_el_conteo()
     {
-        var calculo = ReglaCobroPlataforma.Calcular(
-            new ConteoPorRol(10, 4, 2, 1), new PreciosPorRol(null, null, null, null));
+        var conteo = new ConteoPorRol(25, 3, 1, 1);
 
-        Assert.Null(calculo);
+        var calculo = ReglaCobroPlataforma.Calcular(conteo, Rangos);
+
+        Assert.Equal(new RangoTarifa(21, 40, 45000), calculo!.Rango);
+        Assert.Equal(conteo, calculo.Conteo);
     }
 
     [Fact]
-    public void Si_el_total_es_cero_no_hay_cobro()
+    public void Sin_rangos_no_hay_cobro()
     {
-        Assert.Null(ReglaCobroPlataforma.Calcular(
-            new ConteoPorRol(0, 0, 0, 0), new PreciosPorRol(1000, 1000, 1000, 1000)));
-        Assert.Null(ReglaCobroPlataforma.Calcular(
-            new ConteoPorRol(5, 1, 1, 1), new PreciosPorRol(0, 0, 0, 0)));
+        Assert.Null(ReglaCobroPlataforma.Calcular(new ConteoPorRol(10, 4, 2, 1), []));
     }
 
     [Fact]
-    public void Los_presidentes_a_precio_cero_no_suman()
+    public void Un_club_sin_jugadores_no_tiene_rango_y_no_hay_cobro()
     {
-        var calculo = ReglaCobroPlataforma.Calcular(
-            new ConteoPorRol(3, 0, 0, 2), new PreciosPorRol(1000, 0, 0, 0));
+        Assert.Null(ReglaCobroPlataforma.BuscarRango(0, Rangos));
+        Assert.Null(ReglaCobroPlataforma.Calcular(new ConteoPorRol(0, 2, 1, 1), Rangos));
+    }
 
-        Assert.NotNull(calculo);
-        Assert.Equal(3000m, calculo.Total);
+    [Fact]
+    public void Si_el_precio_del_rango_es_cero_no_hay_cobro()
+    {
+        RangoTarifa[] gratis = [new(1, 10, 0), new(11, null, 20000)];
+
+        Assert.Null(ReglaCobroPlataforma.Calcular(new ConteoPorRol(5, 1, 1, 1), gratis));
+        Assert.NotNull(ReglaCobroPlataforma.Calcular(new ConteoPorRol(11, 1, 1, 1), gratis));
+    }
+
+    [Fact]
+    public void Si_ningun_rango_cubre_la_cantidad_no_hay_cobro()
+    {
+        RangoTarifa[] corto = [new(1, 20, 25000)];
+
+        Assert.Null(ReglaCobroPlataforma.Calcular(new ConteoPorRol(21, 1, 1, 1), corto));
     }
 }

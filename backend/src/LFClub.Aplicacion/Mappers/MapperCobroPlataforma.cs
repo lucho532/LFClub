@@ -24,12 +24,7 @@ public static class MapperCobroPlataforma
         cobro.Id,
         APeriodo(cobro.Periodo),
         cobro.Estado,
-        [
-            Linea(Rol.JUGADOR, cobro.Jugadores, cobro.PrecioJugador),
-            Linea(Rol.ENTRENADOR, cobro.Entrenadores, cobro.PrecioEntrenador),
-            Linea(Rol.DIRECTIVO, cobro.Directivos, cobro.PrecioDirectivo),
-            Linea(Rol.PRESIDENTE, cobro.Presidentes, cobro.PrecioPresidente),
-        ],
+        DetalleDe(cobro),
         cobro.Total,
         cobro.GeneradoEn,
         cobro.SuspendeDesde,
@@ -39,7 +34,9 @@ public static class MapperCobroPlataforma
         pago?.MedioDePago,
         enVerificacion && !noAprobado,
         noAprobado,
-        cobro.MotivoAnulacion);
+        cobro.MotivoAnulacion,
+        cobro.RangoDesde is { } desde ? new RangoTarifaDto(desde, cobro.RangoHasta, cobro.Total) : null,
+        cobro.Jugadores);
 
     /// <summary>Estado de pago de un club a partir de sus cobros pendientes y el día de hoy en Colombia.</summary>
     public static EstadoDePagoClubDto AEstadoDePago(
@@ -65,6 +62,17 @@ public static class MapperCobroPlataforma
         fila.Notificacion.Valor,
         fila.ClubId,
         fila.Periodo is { } periodo ? APeriodo(periodo) : null);
+
+    /// <summary>Una línea por rol en los cobros por precio de rol; ninguna en los cobros por rango.</summary>
+    private static IReadOnlyList<DetalleDeRolDto> DetalleDe(CobroPlataforma cobro) =>
+        cobro.RangoDesde is not null
+            ? []
+            : [
+                Linea(Rol.JUGADOR, cobro.Jugadores, cobro.PrecioJugador),
+                Linea(Rol.ENTRENADOR, cobro.Entrenadores, cobro.PrecioEntrenador),
+                Linea(Rol.DIRECTIVO, cobro.Directivos, cobro.PrecioDirectivo),
+                Linea(Rol.PRESIDENTE, cobro.Presidentes, cobro.PrecioPresidente),
+            ];
 
     private static DetalleDeRolDto Linea(Rol rol, int integrantes, decimal precio) =>
         new(rol, integrantes, precio, integrantes * precio);

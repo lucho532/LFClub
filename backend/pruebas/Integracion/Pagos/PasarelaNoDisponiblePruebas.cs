@@ -62,7 +62,7 @@ public class PasarelaNoDisponiblePruebas : IDisposable
     [Fact]
     public async Task El_trabajo_sigue_generando_cobros_y_suspendiendo_y_la_marca_manual_reactiva()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000, dias: 0);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000, dias: 0);
         var club = await _fabrica.Sembrador.CrearClubAsync();
         await _fabrica.Sembrador.CrearIntegranteAsync(club, Rol.JUGADOR);
         await _fabrica.CobrosPlataforma.FijarInicioAsync(club, Noviembre);

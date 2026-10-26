@@ -113,11 +113,27 @@ paths:
         '200': { description: Recibida. }
         '401': { $ref: '#/components/responses/Problema' }
 
+  /api/plataforma/tarifas/clubes:
+    get:
+      operationId: listarTarifasPorClub
+      tags: [Plataforma]
+      summary: Lo que le corresponde pagar a cada club con la tarifa vigente (solo DESARROLLADOR)
+      responses:
+        '200':
+          description: Un elemento por club, con sus jugadores activos, su rango y su valor mensual.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TarifaDeClubDto' }
+        '401': { $ref: '#/components/responses/Problema' }
+        '403': { $ref: '#/components/responses/Problema' }
+
   /api/plataforma/tarifas:
     get:
       operationId: obtenerTarifasDeLaPlataforma
       tags: [Plataforma]
-      summary: Precios por rol y días de gracia (solo DESARROLLADOR)
+      summary: Rangos de precio por cantidad de jugadores y días de gracia (solo DESARROLLADOR)
       responses:
         '200':
           description: Las tarifas vigentes.
@@ -300,6 +316,12 @@ components:
         cobroId: { type: string, format: uuid }
         periodo: { type: string, example: '2026-11' }
         estado: { $ref: '#/components/schemas/EstadoCobroPlataforma' }
+        rango:
+          oneOf:
+            - { $ref: '#/components/schemas/RangoTarifaDto' }
+            - { type: 'null' }
+          description: Rango aplicado al generar el cobro; nulo en los cobros por precio de rol anteriores (`detalle` los trae).
+        jugadores: { type: integer, description: Jugadores activos al generar el cobro. }
         detalle:
           type: array
           items: { $ref: '#/components/schemas/DetalleDeRolDto' }
@@ -349,14 +371,26 @@ components:
           description: Dirección del checkout, ya firmada; no contiene secretos.
         referencia: { type: string }
 
+    RangoTarifaDto:
+      type: object
+      required: [desde, precio]
+      description: >
+        De `desde` a `hasta` jugadores activos el club paga `precio` al mes. Los rangos van seguidos,
+        el primero empieza en 1 y el último no tiene `hasta`.
+      properties:
+        desde: { type: integer, minimum: 1 }
+        hasta: { type: [integer, 'null'] }
+        precio: { type: number, minimum: 0, description: Pesos enteros. }
+
     TarifasDto:
       type: object
-      required: [diasDeGracia]
+      required: [rangos, diasDeGracia]
       properties:
-        precioJugador: { type: [number, 'null'] }
-        precioEntrenador: { type: [number, 'null'] }
-        precioDirectivo: { type: [number, 'null'] }
-        precioPresidente: { type: [number, 'null'] }
+        rangos:
+          type: array
+          maxItems: 10
+          items: { $ref: '#/components/schemas/RangoTarifaDto' }
+          description: Vacío = no se cobra.
         diasDeGracia: { type: integer, minimum: 0, maximum: 30 }
         pasarelaConfigurada:
           type: boolean
@@ -365,13 +399,28 @@ components:
 
     GuardarTarifasDto:
       type: object
-      required: [diasDeGracia]
+      required: [rangos, diasDeGracia]
       properties:
-        precioJugador: { type: [number, 'null'], minimum: 0 }
-        precioEntrenador: { type: [number, 'null'], minimum: 0 }
-        precioDirectivo: { type: [number, 'null'], minimum: 0 }
-        precioPresidente: { type: [number, 'null'], minimum: 0 }
+        rangos:
+          type: array
+          maxItems: 10
+          items: { $ref: '#/components/schemas/RangoTarifaDto' }
         diasDeGracia: { type: integer, minimum: 0, maximum: 30 }
+
+    TarifaDeClubDto:
+      type: object
+      description: Vista previa de lo que le corresponde pagar a un club con la tarifa vigente; no es un cobro.
+      required: [clubId, nombre, jugadores, valorMensual]
+      properties:
+        clubId: { type: string, format: uuid }
+        nombre: { type: string }
+        jugadores: { type: integer }
+        rango:
+          oneOf:
+            - { $ref: '#/components/schemas/RangoTarifaDto' }
+            - { type: 'null' }
+        valorMensual: { type: number }
+        mesDeInicioDelCobro: { type: [string, 'null'] }
 
     FijarInicioDelCobroDto:
       type: object

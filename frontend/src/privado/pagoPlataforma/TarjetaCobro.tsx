@@ -3,7 +3,7 @@ import type { CobroPlataformaDto, EstadoCobroPlataforma } from '../../compartido
 import { Aviso, type Tono } from '../../compartido/componentes/Aviso';
 import { EtiquetaEstado } from '../../compartido/componentes/EtiquetaEstado';
 import { Tarjeta } from '../../compartido/componentes/Tarjeta';
-import { fechaYHora } from '../../compartido/formato';
+import { fechaYHora, textoDeRango } from '../../compartido/formato';
 import { formatoMoneda } from '../pagos/formatoMoneda';
 import {
   TEXTO_ESTADO_COBRO,
@@ -36,16 +36,22 @@ export function TarjetaCobro({ cobro, accion }: Props) {
       titulo={`Uso de la plataforma · ${textoDelPeriodo(cobro.periodo)}`}
       acciones={<EtiquetaEstado tono={TONO[cobro.estado]} texto={TEXTO_ESTADO_COBRO[cobro.estado]} />}
     >
-      <ul className="lista-de-inicio">
-        {cobro.detalle
-          .filter((linea) => linea.integrantes > 0 || linea.subtotal > 0)
-          .map((linea) => (
-            <li key={linea.rol}>
-              {TEXTO_ROL_PLURAL[linea.rol]}: {linea.integrantes} × {formatoMoneda(linea.precio)} ={' '}
-              <strong>{formatoMoneda(linea.subtotal)}</strong>
-            </li>
-          ))}
-      </ul>
+      {cobro.rango ? (
+        <p>
+          Jugadores activos: <strong>{cobro.jugadores}</strong> · rango de {textoDeRango(cobro.rango.desde, cobro.rango.hasta)}
+        </p>
+      ) : (
+        <ul className="lista-de-inicio">
+          {cobro.detalle
+            .filter((linea) => linea.integrantes > 0 || linea.subtotal > 0)
+            .map((linea) => (
+              <li key={linea.rol}>
+                {TEXTO_ROL_PLURAL[linea.rol]}: {linea.integrantes} × {formatoMoneda(linea.precio)} ={' '}
+                <strong>{formatoMoneda(linea.subtotal)}</strong>
+              </li>
+            ))}
+        </ul>
+      )}
       <p>
         Total: <strong>{formatoMoneda(cobro.total)}</strong>
       </p>

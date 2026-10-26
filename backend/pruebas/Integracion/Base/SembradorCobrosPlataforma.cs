@@ -3,6 +3,7 @@ using System.Text;
 using LFClub.Aplicacion.Servicios;
 using LFClub.Dominio.Entidades;
 using LFClub.Dominio.Enumeraciones;
+using LFClub.Dominio.Reglas;
 using LFClub.Infraestructura.Pagos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,22 +28,25 @@ public class SembradorCobrosPlataforma
         _fabrica = fabrica;
     }
 
-    /// <summary>Guarda las tarifas; sin ningún precio, no se genera ningún cobro.</summary>
-    public Task FijarTarifasAsync(
-        decimal? jugador = null, decimal? entrenador = null, decimal? directivo = null, decimal? presidente = null, int dias = 5) =>
+    /// <summary>
+    /// Guarda las tarifas con un solo rango sin límite (cualquier cantidad de jugadores paga <paramref name="precio"/>);
+    /// sin precio, no queda ningún rango y no se genera ningún cobro.
+    /// </summary>
+    public Task FijarTarifasAsync(decimal? precio = null, int dias = 5) =>
+        FijarRangosAsync(precio is null ? [] : [new RangoTarifa(1, null, precio.Value)], dias);
+
+    /// <summary>Guarda los rangos de la tarifa y los días de gracia.</summary>
+    public Task FijarRangosAsync(IReadOnlyList<RangoTarifa> rangos, int dias = 5) =>
         _fabrica.ConContextoAsync(async contexto =>
         {
             var fila = await contexto.ConfiguracionPlataforma.SingleAsync();
-            fila.PrecioJugador = jugador;
-            fila.PrecioEntrenador = entrenador;
-            fila.PrecioDirectivo = directivo;
-            fila.PrecioPresidente = presidente;
+            fila.Rangos = rangos.ToList();
             fila.DiasDeGracia = dias;
             await contexto.SaveChangesAsync();
             return true;
         });
 
-    /// <summary>Vuelve las tarifas al estado inicial: sin precios y cinco días de gracia.</summary>
+    /// <summary>Vuelve las tarifas al estado inicial: sin rangos y cinco días de gracia.</summary>
     public Task QuitarTarifasAsync() => FijarTarifasAsync();
 
     /// <summary>Fija el mes de inicio del cobro de un club.</summary>

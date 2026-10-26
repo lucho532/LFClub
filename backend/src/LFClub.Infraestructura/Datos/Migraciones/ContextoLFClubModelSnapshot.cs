@@ -471,6 +471,12 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.Property<int>("Presidentes")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("RangoDesde")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RangoHasta")
+                        .HasColumnType("integer");
+
                     b.Property<DateOnly>("SuspendeDesde")
                         .HasColumnType("date");
 
@@ -652,17 +658,9 @@ namespace LFClub.Infraestructura.Datos.Migraciones
                     b.Property<int>("DiasDeGracia")
                         .HasColumnType("integer");
 
-                    b.Property<decimal?>("PrecioDirectivo")
-                        .HasColumnType("numeric(18,0)");
-
-                    b.Property<decimal?>("PrecioEntrenador")
-                        .HasColumnType("numeric(18,0)");
-
-                    b.Property<decimal?>("PrecioJugador")
-                        .HasColumnType("numeric(18,0)");
-
-                    b.Property<decimal?>("PrecioPresidente")
-                        .HasColumnType("numeric(18,0)");
+                    b.Property<string>("Rangos")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
 
                     b.HasKey("Id");
 

@@ -44,6 +44,10 @@ export interface CobroPlataformaDto {
   /** La pasarela informó que el último intento no fue aprobado: no se debitó nada y se puede reintentar. */
   ultimoPagoNoAprobado: boolean;
   motivoAnulacion: string | null;
+  /** Rango de la tarifa que se aplicó al generarlo; nulo en los cobros por precio de rol anteriores. */
+  rango: RangoTarifaDto | null;
+  /** Jugadores activos del club al generar el cobro. */
+  jugadores: number;
 }
 
 /** Lo que ve el PRESIDENTE en «Pago de la plataforma». */
@@ -61,22 +65,33 @@ export interface IntentoDePagoDto {
   referencia: string;
 }
 
+/** Un rango de la tarifa: de `desde` a `hasta` jugadores (sin límite si `hasta` es nulo) el club paga `precio` al mes. */
+export interface RangoTarifaDto {
+  desde: number;
+  hasta: number | null;
+  precio: number;
+}
+
 export interface TarifasDto {
-  precioJugador: number | null;
-  precioEntrenador: number | null;
-  precioDirectivo: number | null;
-  precioPresidente: number | null;
+  rangos: RangoTarifaDto[];
   diasDeGracia: number;
   pasarelaConfigurada: boolean;
   actualizadoEn: string | null;
 }
 
 export interface GuardarTarifasDto {
-  precioJugador: number | null;
-  precioEntrenador: number | null;
-  precioDirectivo: number | null;
-  precioPresidente: number | null;
+  rangos: RangoTarifaDto[];
   diasDeGracia: number;
+}
+
+/** Lo que le corresponde pagar a un club con la tarifa vigente (vista previa, no un cobro). */
+export interface TarifaDeClubDto {
+  clubId: string;
+  nombre: string;
+  jugadores: number;
+  rango: RangoTarifaDto | null;
+  valorMensual: number;
+  mesDeInicioDelCobro: string | null;
 }
 
 /** `mesDeInicio` es `AAAA-MM`; nulo para no cobrar. */
