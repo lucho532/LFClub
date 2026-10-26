@@ -37,6 +37,9 @@ export function resumenDe(cambios: Partial<PagoPlataformaDto> = {}): PagoPlatafo
     pendientes,
     totalPendiente: pendientes.reduce((suma, cobro) => suma + cobro.total, 0),
     historial: [],
+    ultimoPago: null,
+    proximoCobro: null,
+    estadoDePago: pendientes.length > 0 ? 'PENDIENTE' : 'AL_DIA',
     ...cambios,
   };
 }

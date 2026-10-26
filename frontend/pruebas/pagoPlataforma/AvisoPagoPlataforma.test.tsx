@@ -20,16 +20,31 @@ describe('AvisoPagoPlataforma', () => {
     await montaje.pintar(clubDe('PRESIDENTE'), '/i', '/i', <AvisoPagoPlataforma clubId="club" />);
   }
 
-  it('con un cobro pendiente muestra el valor, hasta cuándo se paga y el enlace', async () => {
-    await abrir(resumenDe());
+  it('al día sin cobros pendientes es una franja verde con el enlace a Plataforma', async () => {
+    await abrir(resumenDe({ pendientes: [], estadoDePago: 'AL_DIA' }));
 
-    expect(montaje.texto).toContain('Tienes un cobro de la plataforma por $ 45.000');
-    expect(montaje.texto).toContain('Paga hasta el 7 de noviembre de 2026');
+    expect(montaje.texto).toContain('Estás al día con la plataforma');
+    expect(montaje.contenedor.querySelector('.franja-pago.tono-exito')).not.toBeNull();
     expect(montaje.contenedor.querySelector('a')?.getAttribute('href')).toBe('/club/club/pago-plataforma');
   });
 
-  it('sin cobros pendientes no muestra nada', async () => {
-    await abrir(resumenDe({ pendientes: [] }));
+  it('con un cobro pendiente dentro del plazo sigue en verde y dice cuánto y hasta cuándo', async () => {
+    await abrir(resumenDe({ estadoDePago: 'PENDIENTE' }));
+
+    expect(montaje.contenedor.querySelector('.franja-pago.tono-exito')).not.toBeNull();
+    expect(montaje.texto).toContain('próximo pago $ 45.000, paga hasta el 7 de noviembre de 2026');
+  });
+
+  it('en mora es una franja roja con el valor y el enlace', async () => {
+    await abrir(resumenDe({ estadoDePago: 'VENCIDO' }));
+
+    expect(montaje.contenedor.querySelector('.franja-pago.tono-error')).not.toBeNull();
+    expect(montaje.texto).toContain('En mora con la plataforma: debes $ 45.000');
+    expect(montaje.contenedor.querySelector('a')?.getAttribute('href')).toBe('/club/club/pago-plataforma');
+  });
+
+  it('sin cobro todavía no muestra nada', async () => {
+    await abrir(resumenDe({ pendientes: [], estadoDePago: 'SIN_COBRO' }));
 
     expect(montaje.texto).toBe('');
   });
@@ -38,7 +53,7 @@ describe('AvisoPagoPlataforma', () => {
     await abrir(resumenDe({ suspendidoPorImpago: true, pendientes: [cobroDe()] }));
 
     expect(montaje.texto).toContain('Tu club está suspendido por falta de pago');
-    expect(montaje.texto).not.toContain('Tienes un cobro de la plataforma');
+    expect(montaje.texto).not.toContain('Estás al día');
   });
 
   it('mientras carga, o si falla, no muestra nada ni rompe el inicio', async () => {

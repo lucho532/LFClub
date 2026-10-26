@@ -57,7 +57,7 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
       </EnlaceMenu>
       {rol === 'PRESIDENTE' && (
         <EnlaceMenu a={`/club/${clubId}/ingresos`} icono={<IconoIngresos />}>
-          Ingresos
+          Nuevo jugador
         </EnlaceMenu>
       )}
       {rol && puedeVerJugadores(rol) && (
@@ -76,13 +76,13 @@ export function MenuDelClub({ clubId, nombre, club, rol }: Props) {
           a={rol === 'JUGADOR' && club ? rutaDeLaCuenta(clubId, club.miUsuarioRolId) : `/club/${clubId}/pagos`}
           icono={<IconoPagos />}
         >
-          Pagos
+          Mensualidades
         </EnlaceMenu>
       )}
       {/* Lo que el club paga a la plataforma lo ve solo el presidente (spec 017, RF-020). */}
       {rol === 'PRESIDENTE' && (
         <EnlaceMenu a={`/club/${clubId}/pago-plataforma`} icono={<IconoPagos />}>
-          Plataforma
+          Suscripción
         </EnlaceMenu>
       )}
       {rol === 'PRESIDENTE' && (

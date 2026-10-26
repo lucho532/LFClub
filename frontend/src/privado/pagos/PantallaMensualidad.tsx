@@ -7,13 +7,13 @@ import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { useClub } from '../contextoClub';
 import { apiMensualidad } from './apiMensualidad';
 import { formatoMoneda, leerPesos } from './formatoMoneda';
-import { SelectorDeJugadoresConValor } from './SelectorDeJugadoresConValor';
+import { MensualidadPorJugador } from './MensualidadPorJugador';
 import { AVISO_VALOR_MENSUALIDAD } from './textosPagos';
 import { useMensualidad } from './useMensualidad';
 
 /**
- * Pagos → Mensualidad (spec 015, historia 2): el valor de la mensualidad del club y los jugadores
- * que pagan otro. Solo el PRESIDENTE los cambia; el DIRECTIVO los consulta. Cambiar el valor solo
+ * Pagos → Mensualidad (spec 015, historia 2): el valor de la mensualidad del club y una tarjeta editable
+ * por jugador para los que pagan otro. Solo el PRESIDENTE los cambia; el DIRECTIVO los consulta. Cambiar el valor solo
  * afecta los cargos que se generen después: los ya generados conservan el suyo (RF-013).
  */
 export function PantallaMensualidad() {
@@ -98,25 +98,13 @@ export function PantallaMensualidad() {
               </form>
             )}
           </Tarjeta>
-          <Tarjeta titulo="Jugadores con valor propio">
-            {datos.jugadoresConValorPropio.length === 0 ? (
-              <p className="texto-suave">Todos los jugadores pagan el valor del club.</p>
-            ) : (
-              <ul className="lista-de-inicio">
-                {datos.jugadoresConValorPropio.map((jugador) => (
-                  <li key={jugador.usuarioRolId}>
-                    {jugador.nombreCompleto}: <strong>{formatoMoneda(jugador.valor)}</strong>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {puedeCambiar && (
-              <SelectorDeJugadoresConValor
-                clubId={club.clubId}
-                propios={datos.jugadoresConValorPropio}
-                alCambiar={mensualidad.fijar}
-              />
-            )}
+          <Tarjeta titulo="Mensualidad de cada jugador">
+            <MensualidadPorJugador
+              clubId={club.clubId}
+              mensualidad={datos}
+              editable={puedeCambiar}
+              alCambiar={mensualidad.fijar}
+            />
           </Tarjeta>
         </>
       )}

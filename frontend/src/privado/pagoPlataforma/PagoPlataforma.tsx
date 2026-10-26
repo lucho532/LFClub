@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { mensajeDe } from '../../compartido/api/errores';
 import { Aviso } from '../../compartido/componentes/Aviso';
 import { Boton } from '../../compartido/componentes/Boton';
+import { Tarjeta } from '../../compartido/componentes/Tarjeta';
 import { useClub } from '../contextoClub';
 import { formatoMoneda } from '../pagos/formatoMoneda';
 import { apiPagoPlataforma } from './apiPagoPlataforma';
+import { ResumenPagosPlataforma } from './ResumenPagosPlataforma';
 import { TarjetaCobro } from './TarjetaCobro';
 import { AVISO_SIN_PAGO_EN_LINEA } from './textosPagoPlataforma';
 import { usePagoPlataforma } from './usePagoPlataforma';
@@ -70,6 +72,9 @@ export function PagoPlataforma() {
               puedan volver a entrar.
             </Aviso>
           )}
+          <Tarjeta titulo="Resumen">
+            <ResumenPagosPlataforma resumen={resumen} />
+          </Tarjeta>
           {resumen.pendientes.length === 0 ? (
             <Aviso tono="exito">
               <span aria-hidden="true">✓</span> Estás al día con la plataforma.
