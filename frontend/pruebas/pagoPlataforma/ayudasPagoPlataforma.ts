@@ -22,6 +22,8 @@ export function cobroDe(cambios: Partial<CobroPlataformaDto> = {}): CobroPlatafo
     enVerificacion: false,
     ultimoPagoNoAprobado: false,
     motivoAnulacion: null,
+    rango: null,
+    jugadores: 20,
     ...cambios,
   };
 }

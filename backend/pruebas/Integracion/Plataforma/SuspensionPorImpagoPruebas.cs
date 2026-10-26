@@ -46,7 +46,7 @@ public class SuspensionPorImpagoPruebas : IDisposable
     [Fact]
     public async Task Con_cinco_dias_de_gracia_el_club_se_suspende_el_dia_seis_a_las_0000_de_Colombia()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000, dias: 5);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000, dias: 5);
         var club = await _fabrica.Sembrador.CrearClubAsync();
         await _fabrica.Sembrador.CrearIntegranteAsync(club, Rol.JUGADOR);
         await _fabrica.CobrosPlataforma.FijarInicioAsync(club, Noviembre);

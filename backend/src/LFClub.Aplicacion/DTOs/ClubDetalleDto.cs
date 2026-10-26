@@ -22,6 +22,7 @@ namespace LFClub.Aplicacion.DTOs;
 /// <param name="ValorAdeudado">Suma de los cobros pendientes, en pesos (spec 017).</param>
 /// <param name="MesDeInicioDelCobro">Mes <c>AAAA-MM</c> desde el que se cobra; nulo si no se cobra (spec 017).</param>
 /// <param name="MotivoDeSuspension">Motivo de la suspensión; nulo si el club no está suspendido (spec 017).</param>
+/// <param name="Integrantes">Integrantes activos del club contados por rol; solo números, sin datos personales.</param>
 public record ClubDetalleDto(
     Guid ClubId,
     string Nombre,
@@ -37,4 +38,5 @@ public record ClubDetalleDto(
     EstadoDePagoClub EstadoDePago = EstadoDePagoClub.SIN_COBRO,
     decimal ValorAdeudado = 0,
     string? MesDeInicioDelCobro = null,
-    MotivoSuspension? MotivoDeSuspension = null);
+    MotivoSuspension? MotivoDeSuspension = null,
+    ConteoIntegrantesDto? Integrantes = null);

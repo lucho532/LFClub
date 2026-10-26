@@ -29,12 +29,18 @@ public class ControladorTarifas : ControladorBase
         _inicioDelCobro = inicioDelCobro;
     }
 
-    /// <summary>Precios por rol y días de gracia vigentes.</summary>
+    /// <summary>Rangos de precio y días de gracia vigentes.</summary>
     [HttpGet("tarifas")]
     [ProducesResponseType<TarifasDto>(StatusCodes.Status200OK)]
     public Task<TarifasDto> Obtener(CancellationToken cancelacion) => _tarifas.ObtenerAsync(cancelacion);
 
-    /// <summary>Fija los precios y los días de gracia; aplican a los cobros que se generen después.</summary>
+    /// <summary>Lo que le corresponde pagar a cada club con la tarifa vigente.</summary>
+    [HttpGet("tarifas/clubes")]
+    [ProducesResponseType<IReadOnlyList<TarifaDeClubDto>>(StatusCodes.Status200OK)]
+    public Task<IReadOnlyList<TarifaDeClubDto>> ListarPorClub(CancellationToken cancelacion) =>
+        _tarifas.ListarPorClubAsync(cancelacion);
+
+    /// <summary>Fija los rangos de precio y los días de gracia; aplican a los cobros que se generen después.</summary>
     [HttpPut("tarifas")]
     [ProducesResponseType<TarifasDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<Problema>(StatusCodes.Status400BadRequest, Problema.TipoContenido)]

@@ -20,7 +20,7 @@ Enumeración nueva `MotivoSuspension { MANUAL, IMPAGO }`.
 | Columna | Tipo | Regla |
 | --- | --- | --- |
 | `Id` | int | Siempre 1 (restricción `CHECK`) |
-| `PrecioJugador`, `PrecioEntrenador`, `PrecioDirectivo`, `PrecioPresidente` | `decimal?` | ≥ 0. Todos nulos = sin precios, no se genera nada |
+| `Rangos` | `jsonb` (lista de `{Desde, Hasta?, Precio}`) | Seguidos desde 1, el último sin `Hasta`, precios enteros ≥ 0, hasta 10. Vacío = no se genera nada |
 | `DiasDeGracia` | int | 0 a 30; por defecto 5 |
 | `ActualizadoPorUsuarioId` | `Guid?` | `SetNull` si se elimina la cuenta |
 | `ActualizadoEn` | `DateTime` | UTC |
@@ -40,8 +40,8 @@ cobros, §7.4).
 | `Periodo` | `DateOnly` | Primer día del mes que cobra |
 | `Estado` | `EstadoCobroPlataforma` | `PENDIENTE`, `PAGADO`, `ANULADO` |
 | `Jugadores`, `Entrenadores`, `Directivos`, `Presidentes` | int | Conteo de integrantes activos al generar |
-| `PrecioJugador`, `PrecioEntrenador`, `PrecioDirectivo`, `PrecioPresidente` | decimal | Precios vigentes al generar (los nulos, como 0) |
-| `Total` | decimal | Suma de conteo × precio por rol; siempre > 0 |
+| `RangoDesde`, `RangoHasta` | int? | Rango de la tarifa aplicado al generar; nulos en los cobros por precio de rol anteriores, que conservan sus `Precio*` |
+| `Total` | decimal | Precio fijo del rango que cubre los jugadores (en los cobros anteriores, la suma de conteo × precio por rol); siempre > 0 |
 | `GeneradoEn` | `DateTime` | UTC |
 | `DiasDeGracia` | int | Los vigentes al generar |
 | `SuspendeDesde` | `DateOnly` | Día de Colombia de la generación + días de gracia: **primer día** en que el club se suspende. El último día para pagar es el anterior. |

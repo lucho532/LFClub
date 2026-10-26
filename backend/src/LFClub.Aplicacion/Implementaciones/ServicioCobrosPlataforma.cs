@@ -41,12 +41,6 @@ public class ServicioCobrosPlataforma : IServicioCobrosPlataforma
     public async Task<int> GenerarAsync(CancellationToken cancelacion = default)
     {
         var configuracion = await _configuracion.ObtenerAsync(cancelacion);
-        var precios = new PreciosPorRol(
-            configuracion.PrecioJugador,
-            configuracion.PrecioEntrenador,
-            configuracion.PrecioDirectivo,
-            configuracion.PrecioPresidente);
-
         var ahora = _reloj.AhoraUtc;
         var periodo = ReglaMesDeCobro.MesEnCurso(ahora);
         var suspendeDesde = ReglaMesDeCobro.DiaEnColombia(ahora).AddDays(configuracion.DiasDeGracia);
@@ -61,7 +55,7 @@ public class ServicioCobrosPlataforma : IServicioCobrosPlataforma
         var creados = 0;
         foreach (var clubId in pendientes)
         {
-            var calculo = ReglaCobroPlataforma.Calcular(conteos[clubId], precios);
+            var calculo = ReglaCobroPlataforma.Calcular(conteos[clubId], configuracion.Rangos);
             if (calculo is null)
             {
                 continue;
@@ -98,10 +92,8 @@ public class ServicioCobrosPlataforma : IServicioCobrosPlataforma
                         Entrenadores = calculo.Conteo.Entrenadores,
                         Directivos = calculo.Conteo.Directivos,
                         Presidentes = calculo.Conteo.Presidentes,
-                        PrecioJugador = calculo.PrecioJugador,
-                        PrecioEntrenador = calculo.PrecioEntrenador,
-                        PrecioDirectivo = calculo.PrecioDirectivo,
-                        PrecioPresidente = calculo.PrecioPresidente,
+                        RangoDesde = calculo.Rango.Desde,
+                        RangoHasta = calculo.Rango.Hasta,
                         Total = calculo.Total,
                         GeneradoEn = ahora,
                         DiasDeGracia = diasDeGracia,

@@ -32,7 +32,8 @@ public static class MapperClubPlataforma
         IEnumerable<UsuarioRol> presidentes,
         IEnumerable<Invitacion> invitaciones,
         DateTime ahoraUtc,
-        EstadoDePagoClubDto? pago = null) => new(
+        EstadoDePagoClubDto? pago = null,
+        ConteoIntegrantesDto? integrantes = null) => new(
         club.Id,
         club.Nombre,
         club.Sede,
@@ -47,7 +48,8 @@ public static class MapperClubPlataforma
         pago?.EstadoDePago ?? EstadoDePagoClub.SIN_COBRO,
         pago?.ValorAdeudado ?? 0,
         pago?.MesDeInicioDelCobro,
-        pago?.MotivoDeSuspension);
+        pago?.MotivoDeSuspension,
+        integrantes ?? new ConteoIntegrantesDto(0, 0, 0, 0));
 
     /// <summary>Presidente registrado, a partir de un integrante con su cuenta cargada.</summary>
     public static PresidenteDto APresidente(UsuarioRol integrante) => new(

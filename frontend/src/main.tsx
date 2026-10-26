@@ -17,6 +17,7 @@ import './compartido/tema/audiencia.css';
 import './compartido/tema/imagenes.css';
 import './compartido/tema/calendario.css';
 import './compartido/tema/identidad.css';
+import './compartido/tema/marcaPlataforma.css';
 import './compartido/tema/carta.css';
 import './compartido/tema/comunicados.css';
 import './compartido/tema/pagos.css';

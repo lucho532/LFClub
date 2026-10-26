@@ -56,9 +56,9 @@ public class CobrosPlataformaPruebas : IDisposable
     }
 
     [Fact]
-    public async Task Con_precios_y_mes_de_inicio_crea_un_cobro_con_el_conteo_los_precios_y_el_total()
+    public async Task Con_rangos_y_mes_de_inicio_crea_un_cobro_con_el_conteo_el_rango_y_el_total()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000, entrenador: 5000, directivo: 3000, presidente: 10000, dias: 5);
+        await _fabrica.CobrosPlataforma.FijarRangosAsync([new(1, 2, 10000), new(3, 10, 20000), new(11, null, 30000)], dias: 5);
         var club = await ClubConIntegrantesAsync(Noviembre);
 
         await _fabrica.CobrosPlataforma.GenerarAsync();
@@ -67,8 +67,8 @@ public class CobrosPlataformaPruebas : IDisposable
         Assert.Equal(Noviembre, cobro.Periodo);
         Assert.Equal(EstadoCobroPlataforma.PENDIENTE, cobro.Estado);
         Assert.Equal((3, 2, 1, 1), (cobro.Jugadores, cobro.Entrenadores, cobro.Directivos, cobro.Presidentes));
-        Assert.Equal((1000m, 5000m, 3000m, 10000m), (cobro.PrecioJugador, cobro.PrecioEntrenador, cobro.PrecioDirectivo, cobro.PrecioPresidente));
-        Assert.Equal((3 * 1000m) + (2 * 5000m) + 3000m + 10000m, cobro.Total);
+        Assert.Equal((3, 10), (cobro.RangoDesde, cobro.RangoHasta));
+        Assert.Equal(20000m, cobro.Total);
         Assert.Equal(5, cobro.DiasDeGracia);
         Assert.Equal(new DateOnly(2026, 11, 8), cobro.SuspendeDesde);
     }
@@ -76,7 +76,7 @@ public class CobrosPlataformaPruebas : IDisposable
     [Fact]
     public async Task Los_integrantes_en_espera_o_retirados_no_se_cuentan()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000);
         var club = await ClubConIntegrantesAsync(Noviembre, jugadores: 2, entrenadores: 0, directivos: 0, presidentes: 0);
         await _fabrica.Sembrador.CrearIntegranteEnEsperaAsync(club);
 
@@ -84,13 +84,13 @@ public class CobrosPlataformaPruebas : IDisposable
 
         var cobro = Assert.Single(await _fabrica.CobrosPlataforma.CobrosDeAsync(club));
         Assert.Equal(2, cobro.Jugadores);
-        Assert.Equal(2000m, cobro.Total);
+        Assert.Equal(1000m, cobro.Total);
     }
 
     [Fact]
     public async Task Repetir_la_generacion_no_duplica_el_cobro()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000);
         var club = await ClubConIntegrantesAsync(Noviembre);
 
         await _fabrica.CobrosPlataforma.GenerarAsync();
@@ -103,7 +103,7 @@ public class CobrosPlataformaPruebas : IDisposable
     [Fact]
     public async Task Dos_generaciones_a_la_vez_crean_un_solo_cobro()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000);
         var club = await ClubConIntegrantesAsync(Noviembre);
 
         await Task.WhenAll(_fabrica.CobrosPlataforma.GenerarAsync(), _fabrica.CobrosPlataforma.GenerarAsync());
@@ -112,26 +112,26 @@ public class CobrosPlataformaPruebas : IDisposable
     }
 
     [Fact]
-    public async Task Cambiar_precios_e_integrantes_despues_no_cambia_el_cobro_generado()
+    public async Task Cambiar_los_rangos_e_integrantes_despues_no_cambia_el_cobro_generado()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000, dias: 5);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000, dias: 5);
         var club = await ClubConIntegrantesAsync(Noviembre);
         await _fabrica.CobrosPlataforma.GenerarAsync();
         var antes = Assert.Single(await _fabrica.CobrosPlataforma.CobrosDeAsync(club));
 
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 9999, entrenador: 9999, dias: 20);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 9999, dias: 20);
         await _fabrica.Sembrador.CrearIntegranteAsync(club, Rol.JUGADOR);
         await _fabrica.CobrosPlataforma.GenerarAsync();
 
         var despues = Assert.Single(await _fabrica.CobrosPlataforma.CobrosDeAsync(club));
-        Assert.Equal((antes.Total, antes.Jugadores, antes.PrecioJugador, antes.DiasDeGracia, antes.SuspendeDesde),
-            (despues.Total, despues.Jugadores, despues.PrecioJugador, despues.DiasDeGracia, despues.SuspendeDesde));
+        Assert.Equal((antes.Total, antes.Jugadores, antes.RangoDesde, antes.DiasDeGracia, antes.SuspendeDesde),
+            (despues.Total, despues.Jugadores, despues.RangoDesde, despues.DiasDeGracia, despues.SuspendeDesde));
     }
 
     [Fact]
     public async Task Un_club_suspendido_tambien_recibe_cobro_y_uno_dado_de_baja_no()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000);
         var suspendido = await ClubConIntegrantesAsync(Noviembre, EstadoClub.SUSPENDIDO);
         var dadoDeBaja = await ClubConIntegrantesAsync(Noviembre, EstadoClub.DADO_DE_BAJA);
 
@@ -144,7 +144,7 @@ public class CobrosPlataformaPruebas : IDisposable
     [Fact]
     public async Task Si_el_total_es_cero_no_se_genera_cobro()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 0, presidente: 0);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 0);
         var club = await ClubConIntegrantesAsync(Noviembre);
 
         await _fabrica.CobrosPlataforma.GenerarAsync();
@@ -155,7 +155,7 @@ public class CobrosPlataformaPruebas : IDisposable
     [Fact]
     public async Task Un_mes_de_inicio_futuro_o_vacio_no_genera_cobro()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000);
         var futuro = await ClubConIntegrantesAsync(new DateOnly(2026, 12, 1));
         var vacio = await ClubConIntegrantesAsync(null);
 
@@ -168,7 +168,7 @@ public class CobrosPlataformaPruebas : IDisposable
     [Fact]
     public async Task Un_mes_de_inicio_pasado_genera_solo_el_mes_en_curso()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000);
         var club = await ClubConIntegrantesAsync(new DateOnly(2026, 6, 1));
 
         await _fabrica.CobrosPlataforma.GenerarAsync();
@@ -180,7 +180,7 @@ public class CobrosPlataformaPruebas : IDisposable
     [Fact]
     public async Task Si_el_servidor_estuvo_caido_el_plazo_cuenta_desde_el_dia_en_que_se_genera()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000, dias: 5);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000, dias: 5);
         var club = await ClubConIntegrantesAsync(Noviembre);
         _fabrica.Reloj.FijarEnColombia(new DateOnly(2026, 11, 3), new TimeOnly(0, 10));
 
@@ -193,7 +193,7 @@ public class CobrosPlataformaPruebas : IDisposable
     [Fact]
     public async Task Tras_diciembre_el_primero_de_enero_genera_el_cobro_de_enero()
     {
-        await _fabrica.CobrosPlataforma.FijarTarifasAsync(jugador: 1000, dias: 5);
+        await _fabrica.CobrosPlataforma.FijarTarifasAsync(precio: 1000, dias: 5);
         var club = await ClubConIntegrantesAsync(new DateOnly(2026, 12, 1));
 
         _fabrica.Reloj.FijarEnColombia(new DateOnly(2026, 12, 31), new TimeOnly(23, 50));

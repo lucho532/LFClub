@@ -6,6 +6,8 @@ import { variablesDeIdentidad } from './identidadVisual';
 interface Props {
   identidad: IdentidadClubDto | null | undefined;
   className?: string;
+  /** Para listas de clubes: usa los colores de cada club pero no pone su escudo de fondo de la pantalla. */
+  sinMarcaDeAgua?: boolean;
   children: ReactNode;
 }
 
@@ -17,8 +19,8 @@ interface Props {
  * teñir el fondo y marcar tarjetas, títulos y barra superior. Sin identidad, lo de dentro se ve
  * con la identidad neutra de la plataforma y sin marca de agua.
  */
-export function IdentidadClub({ identidad, className, children }: Props) {
-  const escudo = identidad?.urlEscudo;
+export function IdentidadClub({ identidad, className, sinMarcaDeAgua, children }: Props) {
+  const escudo = sinMarcaDeAgua ? null : identidad?.urlEscudo;
   const estilo = variablesDeIdentidad(identidad);
   if (escudo) {
     estilo['--escudo-marca'] = `url("${api.url(escudo)}")`;

@@ -53,3 +53,8 @@ const TIPOS_DOCUMENTO: Record<TipoDocumento, string> = {
 export function nombreDeTipoDocumento(tipo: TipoDocumento): string {
   return TIPOS_DOCUMENTO[tipo];
 }
+
+/** Un rango de jugadores para mostrar: «1 a 20 jugadores» o «81 jugadores o más». */
+export function textoDeRango(desde: number, hasta: number | null): string {
+  return hasta === null ? `${desde} jugadores o más` : `${desde} a ${hasta} jugadores`;
+}
