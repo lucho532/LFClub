@@ -59,6 +59,34 @@ public class ProximoPagoPresidentePruebas : IDisposable
     }
 
     [Fact]
+    public async Task El_resumen_explica_la_tarifa_vigente_con_el_rango_del_club_y_los_dias_de_gracia()
+    {
+        await _fabrica.CobrosPlataforma.FijarRangosAsync([new(1, 2, 10000), new(3, null, 30000)], dias: 7);
+        var (club, presidente) = await ClubAsync(null, jugadores: 3);
+
+        var tarifa = (await ResumenAsync(club, presidente)).GetProperty("tarifa");
+
+        Assert.Equal(7, tarifa.GetProperty("diasDeGracia").GetInt32());
+        Assert.Equal(3, tarifa.GetProperty("jugadores").GetInt32());
+        var rangos = tarifa.GetProperty("rangos").EnumerateArray().ToList();
+        Assert.Equal(2, rangos.Count);
+        Assert.Equal(10000, rangos[0].GetProperty("precio").GetDecimal());
+        Assert.Equal(3, tarifa.GetProperty("rangoDelClub").GetProperty("desde").GetInt32());
+        Assert.Equal(30000, tarifa.GetProperty("rangoDelClub").GetProperty("precio").GetDecimal());
+    }
+
+    [Fact]
+    public async Task Sin_rangos_la_tarifa_viene_vacia_y_sin_rango_del_club()
+    {
+        var (club, presidente) = await ClubAsync(null, jugadores: 2);
+
+        var tarifa = (await ResumenAsync(club, presidente)).GetProperty("tarifa");
+
+        Assert.Empty(tarifa.GetProperty("rangos").EnumerateArray());
+        Assert.Equal(JsonValueKind.Null, tarifa.GetProperty("rangoDelClub").ValueKind);
+    }
+
+    [Fact]
     public async Task Sin_pagos_el_ultimo_pago_es_nulo()
     {
         var (club, presidente) = await ClubAsync(null, 0);

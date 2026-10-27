@@ -151,31 +151,6 @@ describe('PagoPlataforma', () => {
     expect(montaje.boton('Pagar')).toBeDefined();
   });
 
-  it('el historial trae el comprobante de un cobro pagado y el motivo de uno anulado', async () => {
-    await abrir(
-      resumenDe({
-        pendientes: [],
-        historial: [
-          cobroDe({
-            cobroId: 'c0',
-            periodo: '2026-10',
-            estado: 'PAGADO',
-            pagadoEn: '2026-10-05T15:00:00Z',
-            origenDelPago: 'PASARELA',
-            referencia: 'LFC-abc',
-            medioDePago: 'PSE',
-          }),
-          cobroDe({ cobroId: 'c9', periodo: '2026-09', estado: 'ANULADO', motivoAnulacion: 'Cobro duplicado' }),
-        ],
-      }),
-    );
-
-    expect(montaje.texto).toContain('✓ Pagado');
-    expect(montaje.texto).toContain('Referencia: LFC-abc');
-    expect(montaje.texto).toContain('Medio de pago: PSE');
-    expect(montaje.texto).toContain('Cobro anulado: Cobro duplicado');
-  });
-
   it('un club suspendido por impago lo dice arriba', async () => {
     await abrir(resumenDe({ suspendidoPorImpago: true }));
 

@@ -41,6 +41,9 @@ import { PantallaFinanzas } from './privado/pagos/PantallaFinanzas';
 import { PantallaMediosDePago } from './privado/pagos/PantallaMediosDePago';
 import { PantallaMensualidad } from './privado/pagos/PantallaMensualidad';
 import { PagoPlataforma } from './privado/pagoPlataforma/PagoPlataforma';
+import { DisposicionSuscripcion } from './privado/pagoPlataforma/DisposicionSuscripcion';
+import { PagosRealizados } from './privado/pagoPlataforma/PagosRealizados';
+import { PantallaComoSeCobra } from './privado/pagoPlataforma/PantallaComoSeCobra';
 import { RetornoPagoPlataforma } from './privado/pagoPlataforma/RetornoPagoPlataforma';
 import { DetallePartido } from './privado/partidos/DetallePartido';
 import { Goleadores } from './privado/partidos/Goleadores';
@@ -116,7 +119,11 @@ export function App({ conArranque = false }: Props) {
                   <Route path="mensualidad" element={<PantallaMensualidad />} />
                   <Route path="medios-de-pago" element={<PantallaMediosDePago />} />
                 </Route>
-                <Route path="pago-plataforma" element={<PagoPlataforma />} />
+                <Route path="pago-plataforma" element={<DisposicionSuscripcion />}>
+                  <Route index element={<PagoPlataforma />} />
+                  <Route path="como-se-cobra" element={<PantallaComoSeCobra />} />
+                  <Route path="pagos-realizados" element={<PagosRealizados />} />
+                </Route>
                 <Route path="pago-plataforma/retorno" element={<RetornoPagoPlataforma />} />
                 <Route path="comunicados" element={<PantallaComunicados />} />
                 <Route path="comunicados/nuevo" element={<FormularioComunicado />} />
