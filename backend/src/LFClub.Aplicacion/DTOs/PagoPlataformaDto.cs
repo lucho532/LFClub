@@ -16,6 +16,7 @@ namespace LFClub.Aplicacion.DTOs;
 /// <param name="UltimoPago">El último cobro que se pagó, con su comprobante; nulo si nunca ha pagado.</param>
 /// <param name="EstadoDePago">Situación de pago del club, calculada en el servidor (al día, pendiente, vencido o suspendido por impago).</param>
 /// <param name="ProximoCobro">Estimación del siguiente cobro; nulo si al club no se le cobra o no le corresponde cobro.</param>
+/// <param name="Tarifa">La tarifa vigente explicada al presidente: rangos, días de gracia y el rango de su club.</param>
 public record PagoPlataformaDto(
     bool PagoEnLineaDisponible,
     bool SuspendidoPorImpago,
@@ -24,4 +25,5 @@ public record PagoPlataformaDto(
     IReadOnlyList<CobroPlataformaDto> Historial,
     CobroPlataformaDto? UltimoPago = null,
     ProximoCobroDto? ProximoCobro = null,
-    EstadoDePagoClub EstadoDePago = EstadoDePagoClub.SIN_COBRO);
+    EstadoDePagoClub EstadoDePago = EstadoDePagoClub.SIN_COBRO,
+    TarifaVigenteDto? Tarifa = null);

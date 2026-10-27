@@ -7,6 +7,7 @@ import { useClub } from '../contextoClub';
 import { formatoMoneda } from '../pagos/formatoMoneda';
 import { apiPagoPlataforma } from './apiPagoPlataforma';
 import { ResumenPagosPlataforma } from './ResumenPagosPlataforma';
+import { TablaDeTarifa } from './TablaDeTarifa';
 import { TarjetaCobro } from './TarjetaCobro';
 import { AVISO_SIN_PAGO_EN_LINEA } from './textosPagoPlataforma';
 import { usePagoPlataforma } from './usePagoPlataforma';
@@ -110,6 +111,7 @@ export function PagoPlataforma() {
           {resumen.historial.map((cobro) => (
             <TarjetaCobro key={cobro.cobroId} cobro={cobro} />
           ))}
+          <TablaDeTarifa tarifa={resumen.tarifa} />
         </>
       )}
     </>

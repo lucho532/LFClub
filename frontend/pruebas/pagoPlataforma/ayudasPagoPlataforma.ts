@@ -40,6 +40,16 @@ export function resumenDe(cambios: Partial<PagoPlataformaDto> = {}): PagoPlatafo
     ultimoPago: null,
     proximoCobro: null,
     estadoDePago: pendientes.length > 0 ? 'PENDIENTE' : 'AL_DIA',
+    tarifa: {
+      rangos: [
+        { desde: 1, hasta: 20, precio: 25000 },
+        { desde: 21, hasta: 40, precio: 45000 },
+        { desde: 41, hasta: null, precio: 75000 },
+      ],
+      diasDeGracia: 5,
+      jugadores: 25,
+      rangoDelClub: { desde: 21, hasta: 40, precio: 45000 },
+    },
     ...cambios,
   };
 }

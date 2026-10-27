@@ -360,6 +360,45 @@ components:
         historial:
           type: array
           items: { $ref: '#/components/schemas/CobroPlataformaDto' }
+        ultimoPago:
+          oneOf:
+            - { $ref: '#/components/schemas/CobroPlataformaDto' }
+            - { type: 'null' }
+          description: El cobro pagado más recientemente, con su comprobante; nulo si nunca ha pagado.
+        proximoCobro:
+          oneOf:
+            - { $ref: '#/components/schemas/ProximoCobroDto' }
+            - { type: 'null' }
+          description: Estimación del siguiente cobro (no es un cobro ni se puede pagar); nula si no le toca cobro.
+        estadoDePago: { $ref: '#/components/schemas/EstadoDePagoClub' }
+        tarifa:
+          $ref: '#/components/schemas/TarifaVigenteDto'
+
+    ProximoCobroDto:
+      type: object
+      required: [periodo, jugadores, rango, valorEstimado]
+      properties:
+        periodo: { type: string, example: '2026-12' }
+        jugadores: { type: integer, description: Jugadores activos hoy. }
+        rango: { $ref: '#/components/schemas/RangoTarifaDto' }
+        valorEstimado: { type: number }
+
+    TarifaVigenteDto:
+      type: object
+      description: >
+        La tarifa explicada al presidente: solo informativa. Los rangos de jugadores con su precio mensual fijo,
+        los días de gracia y en qué rango cae su club hoy.
+      required: [rangos, diasDeGracia, jugadores]
+      properties:
+        rangos:
+          type: array
+          items: { $ref: '#/components/schemas/RangoTarifaDto' }
+        diasDeGracia: { type: integer }
+        jugadores: { type: integer }
+        rangoDelClub:
+          oneOf:
+            - { $ref: '#/components/schemas/RangoTarifaDto' }
+            - { type: 'null' }
 
     IntentoDePagoDto:
       type: object

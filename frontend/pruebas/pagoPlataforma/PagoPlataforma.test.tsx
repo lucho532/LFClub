@@ -76,6 +76,29 @@ describe('PagoPlataforma', () => {
     expect(montaje.texto).toContain('Con tus 25 jugadores de hoy (21 a 40 jugadores)');
   });
 
+  it('explica cómo se cobra con la tabla de rangos y marca el rango del club', async () => {
+    await abrir();
+
+    expect(montaje.texto).toContain('Cómo se cobra');
+    expect(montaje.texto).toContain('1 a 20 jugadores');
+    expect(montaje.texto).toContain('$ 25.000');
+    expect(montaje.texto).toContain('41 jugadores o más');
+    expect(montaje.texto).toContain('$ 75.000');
+    expect(montaje.texto).toContain('Tu club hoy: 25');
+    expect(montaje.texto).toContain('los entrenadores, directivos y presidentes no suman');
+    expect(montaje.texto).toContain('Tienes 5 días desde que se genera para pagar');
+  });
+
+  it('sin tarifa definida la tabla lo dice en lugar de mostrar filas', async () => {
+    await abrir(
+      resumenDe({ tarifa: { rangos: [], diasDeGracia: 1, jugadores: 3, rangoDelClub: null } }),
+    );
+
+    expect(montaje.texto).toContain('La tarifa todavía no está definida');
+    expect(montaje.texto).toContain('Tienes 1 día desde que se genera');
+    expect(montaje.texto).not.toContain('Tu club hoy');
+  });
+
   it('sin pagos ni próximo cobro lo dice', async () => {
     await abrir(resumenDe({ pendientes: [] }));
 
