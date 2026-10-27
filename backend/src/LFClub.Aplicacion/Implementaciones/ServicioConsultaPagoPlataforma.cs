@@ -65,6 +65,9 @@ public class ServicioConsultaPagoPlataforma : IServicioConsultaPagoPlataforma
             .Select(cobro => MapperCobroPlataforma.ACobro(cobro, pagos.GetValueOrDefault(cobro.Id)))
             .ToList();
 
+        var configuracion = await _configuracion.ObtenerAsync(cancelacion);
+        var conteo = await _conteo.ContarPorRolAsync(clubId, cancelacion);
+
         return new PagoPlataformaDto(
             _pasarela.Disponible,
             club.Estado == EstadoClub.SUSPENDIDO && club.MotivoSuspension == MotivoSuspension.IMPAGO,
@@ -72,17 +75,29 @@ public class ServicioConsultaPagoPlataforma : IServicioConsultaPagoPlataforma
             pendientes.Sum(cobro => cobro.Total),
             historial,
             historial.Where(cobro => cobro.Estado == EstadoCobroPlataforma.PAGADO).MaxBy(cobro => cobro.PagadoEn),
-            await EstimarProximoCobroAsync(club, cancelacion),
+            EstimarProximoCobro(club, configuracion, conteo),
             MapperCobroPlataforma.AEstadoDePago(
                 club, cobros.Where(cobro => cobro.Estado == EstadoCobroPlataforma.PENDIENTE).ToList(),
-                ReglaMesDeCobro.DiaEnColombia(_reloj.AhoraUtc)).EstadoDePago);
+                ReglaMesDeCobro.DiaEnColombia(_reloj.AhoraUtc)).EstadoDePago,
+            TarifaVigente(configuracion, conteo));
+    }
+
+    /// <summary>La tarifa vigente y el rango en el que cae el club hoy; sirve para explicarle cómo se le cobra.</summary>
+    private static TarifaVigenteDto TarifaVigente(ConfiguracionPlataforma configuracion, ConteoPorRol conteo)
+    {
+        var rango = ReglaCobroPlataforma.BuscarRango(conteo.Jugadores, configuracion.Rangos);
+        return new TarifaVigenteDto(
+            configuracion.Rangos.Select(r => new RangoTarifaDto(r.Desde, r.Hasta, r.Precio)).ToList(),
+            configuracion.DiasDeGracia,
+            conteo.Jugadores,
+            rango is null ? null : new RangoTarifaDto(rango.Desde, rango.Hasta, rango.Precio));
     }
 
     /// <summary>
     /// El siguiente cobro: el del mes que viene o, si al club se le empieza a cobrar más adelante, el de ese
     /// mes. Nulo si no se le cobra, si está dado de baja o si con sus jugadores de hoy no le tocaría cobro.
     /// </summary>
-    private async Task<ProximoCobroDto?> EstimarProximoCobroAsync(Club club, CancellationToken cancelacion)
+    private ProximoCobroDto? EstimarProximoCobro(Club club, ConfiguracionPlataforma configuracion, ConteoPorRol conteo)
     {
         if (club.MesInicioCobro is not { } inicio || club.Estado == EstadoClub.DADO_DE_BAJA)
         {
@@ -91,8 +106,7 @@ public class ServicioConsultaPagoPlataforma : IServicioConsultaPagoPlataforma
 
         var siguiente = ReglaMesDeCobro.MesEnCurso(_reloj.AhoraUtc).AddMonths(1);
         var periodo = inicio > siguiente ? inicio : siguiente;
-        var configuracion = await _configuracion.ObtenerAsync(cancelacion);
-        var calculo = ReglaCobroPlataforma.Calcular(await _conteo.ContarPorRolAsync(club.Id, cancelacion), configuracion.Rangos);
+        var calculo = ReglaCobroPlataforma.Calcular(conteo, configuracion.Rangos);
 
         return calculo is null
             ? null

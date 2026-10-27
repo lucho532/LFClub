@@ -63,6 +63,18 @@ export interface PagoPlataformaDto {
   proximoCobro: ProximoCobroDto | null;
   /** Situación de pago calculada por el servidor. */
   estadoDePago: EstadoDePagoClub;
+  /** La tarifa vigente explicada al presidente. */
+  tarifa: TarifaVigenteDto;
+}
+
+/** La tarifa explicada al presidente: solo informativa; el valor de cada cobro queda fijo al generarse. */
+export interface TarifaVigenteDto {
+  rangos: RangoTarifaDto[];
+  diasDeGracia: number;
+  /** Jugadores activos del club hoy. */
+  jugadores: number;
+  /** El rango en el que cae su club hoy; nulo si ninguno cubre esa cantidad. */
+  rangoDelClub: RangoTarifaDto | null;
 }
 
 /** El siguiente cobro estimado con los jugadores de hoy y la tarifa vigente; no se puede pagar. */
