@@ -7,14 +7,14 @@ import { useClub } from '../contextoClub';
 import { formatoMoneda } from '../pagos/formatoMoneda';
 import { apiPagoPlataforma } from './apiPagoPlataforma';
 import { ResumenPagosPlataforma } from './ResumenPagosPlataforma';
-import { TablaDeTarifa } from './TablaDeTarifa';
 import { TarjetaCobro } from './TarjetaCobro';
 import { AVISO_SIN_PAGO_EN_LINEA } from './textosPagoPlataforma';
 import { usePagoPlataforma } from './usePagoPlataforma';
 
 /**
- * Pago de la plataforma (spec 017, historia 1): solo para el PRESIDENTE. Muestra los cobros pendientes
- * con su detalle y un botón que lleva a la pasarela de pago, y el historial. El botón solo abre la
+ * Pestaña «Pago» de la suscripción (spec 017, historia 1): solo para el PRESIDENTE. Muestra el resumen (último
+ * pago y próximo cobro) y los cobros pendientes con su detalle y un botón que lleva a la pasarela de pago. El
+ * historial y la tarifa están en sus propias pestañas. El botón solo abre la
  * dirección que firmó el servidor; que el cobro quede pagado lo decide la notificación de la pasarela,
  * nunca esta pantalla. Si la pasarela no está configurada no hay botón y se dice por qué.
  */
@@ -59,9 +59,6 @@ export function PagoPlataforma() {
 
   return (
     <>
-      <div className="cabecera">
-        <h1>Pago de la plataforma</h1>
-      </div>
       {carga.error && <Aviso tono="error">{carga.error}</Aviso>}
       {errorDePago && <Aviso tono="error">{errorDePago}</Aviso>}
       {!resumen && carga.cargando && <p className="texto-suave">Cargando…</p>}
@@ -107,11 +104,6 @@ export function PagoPlataforma() {
               }
             />
           ))}
-          {resumen.historial.length > 0 && <h2>Historial</h2>}
-          {resumen.historial.map((cobro) => (
-            <TarjetaCobro key={cobro.cobroId} cobro={cobro} />
-          ))}
-          <TablaDeTarifa tarifa={resumen.tarifa} />
         </>
       )}
     </>

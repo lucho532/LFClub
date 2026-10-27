@@ -76,29 +76,6 @@ describe('PagoPlataforma', () => {
     expect(montaje.texto).toContain('Con tus 25 jugadores de hoy (21 a 40 jugadores)');
   });
 
-  it('explica cómo se cobra con la tabla de rangos y marca el rango del club', async () => {
-    await abrir();
-
-    expect(montaje.texto).toContain('Cómo se cobra');
-    expect(montaje.texto).toContain('1 a 20 jugadores');
-    expect(montaje.texto).toContain('$ 25.000');
-    expect(montaje.texto).toContain('41 jugadores o más');
-    expect(montaje.texto).toContain('$ 75.000');
-    expect(montaje.texto).toContain('Tu club hoy: 25');
-    expect(montaje.texto).toContain('los entrenadores, directivos y presidentes no suman');
-    expect(montaje.texto).toContain('Tienes 5 días desde que se genera para pagar');
-  });
-
-  it('sin tarifa definida la tabla lo dice en lugar de mostrar filas', async () => {
-    await abrir(
-      resumenDe({ tarifa: { rangos: [], diasDeGracia: 1, jugadores: 3, rangoDelClub: null } }),
-    );
-
-    expect(montaje.texto).toContain('La tarifa todavía no está definida');
-    expect(montaje.texto).toContain('Tienes 1 día desde que se genera');
-    expect(montaje.texto).not.toContain('Tu club hoy');
-  });
-
   it('sin pagos ni próximo cobro lo dice', async () => {
     await abrir(resumenDe({ pendientes: [] }));
 
@@ -172,31 +149,6 @@ describe('PagoPlataforma', () => {
     expect(montaje.texto).toContain('Tu último pago no fue aprobado');
     expect(montaje.texto).not.toContain('En verificación');
     expect(montaje.boton('Pagar')).toBeDefined();
-  });
-
-  it('el historial trae el comprobante de un cobro pagado y el motivo de uno anulado', async () => {
-    await abrir(
-      resumenDe({
-        pendientes: [],
-        historial: [
-          cobroDe({
-            cobroId: 'c0',
-            periodo: '2026-10',
-            estado: 'PAGADO',
-            pagadoEn: '2026-10-05T15:00:00Z',
-            origenDelPago: 'PASARELA',
-            referencia: 'LFC-abc',
-            medioDePago: 'PSE',
-          }),
-          cobroDe({ cobroId: 'c9', periodo: '2026-09', estado: 'ANULADO', motivoAnulacion: 'Cobro duplicado' }),
-        ],
-      }),
-    );
-
-    expect(montaje.texto).toContain('✓ Pagado');
-    expect(montaje.texto).toContain('Referencia: LFC-abc');
-    expect(montaje.texto).toContain('Medio de pago: PSE');
-    expect(montaje.texto).toContain('Cobro anulado: Cobro duplicado');
   });
 
   it('un club suspendido por impago lo dice arriba', async () => {
