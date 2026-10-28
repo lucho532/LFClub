@@ -1,7 +1,7 @@
 # LFClub en Google Play: material para Play Console
 
 Todo lo que pide Play Console, listo para copiar. Id de la app: `com.lfclub.app`.
-Versión actual del bundle: `versionCode 3`, `versionName 1.2`. SDK objetivo 36, mínimo 24.
+Versión actual del bundle: `versionCode 4`, `versionName 1.3`. SDK objetivo 36, mínimo 24.
 
 ## 1. Ficha de la tienda
 
